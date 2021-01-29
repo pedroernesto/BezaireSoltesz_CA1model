@@ -1,0 +1,19 @@
+syntax: glob
+results/*
+cellclamp_results/*
+networkclamp_results/*
+jobscripts/*
+datasets/*
+setupfiles/*.dat
+setupfiles/clamp/*.dat
+setupfiles/clamp/*.mat
+setupfiles/clamp/*.txt
+stimulation/sintrainparams.hoc
+cells/allsyns.dat
+cells/synlist.dat
+*.o
+*.c
+*.dll
+*.~
+*.dat
+x86_64/*

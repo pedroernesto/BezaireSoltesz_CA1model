@@ -1,0 +1,13 @@
+#!/bin/sh
+if test "x${NRNHOME}" = "x" ; then
+	NRNHOME="/home/pedroernesto/miniconda2/envs/CA1_BezaireSoltesz"
+fi
+if test "x${NRNBIN}" = "x" ; then
+	NRNBIN="/home/pedroernesto/miniconda2/envs/CA1_BezaireSoltesz/x86_64/bin/"
+fi
+if test "" = "yes" ; then
+	NRNIV="${NRNBIN}nrniv.app/Contents/MacOS/nrniv"
+else
+	NRNIV="${NRNBIN}nrniv"
+fi
+"${NRNIV}" -dll "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64/.libs/libnrnmech.so" "$@"
