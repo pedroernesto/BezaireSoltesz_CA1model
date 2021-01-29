@@ -45,10 +45,10 @@ proc calcNetSize_Slice() {local i, targetCircuit_length, gid, startgid, endgid
 		cellType[i].updateGidRange(prevgid+1)	// Update the gid range for each
 												//  cell type
 
-		objref GidList = new Vector(numCells)	// After slicing, collects original cell Gids for this celltype,
-												// the length of which equals the number of
-												// cells left of this type in the model
-		cellType[i].GidList.copy(GidsVector)
+		objref PosGidList = new Vector(numCells)	// After slicing, collects original cell Gids for this celltype,
+													// the length of which equals the number of
+													// cells left of this type in the model
+		cellType[i].PosGidList.copy(GidsVector)
 
 		if (cellType[i].is_art==0) {
 			totalCells = totalCells + cellType[i].numCells		// Update the total number of cells

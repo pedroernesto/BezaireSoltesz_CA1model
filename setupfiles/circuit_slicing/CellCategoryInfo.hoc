@@ -101,16 +101,13 @@ begintemplate CellCategoryInfo	// Define a template that describes
 		objref CellList[numCells]	// Create a new CellList for this celltype, the length of which
 									//  equals the number of cells of this type in the model
 
-		objref PosList 	// After slicing, collects original cell Gids for this celltype, the length of which
-						//  equals the number of cells left of this type in the model
-
 		numThisHost = 0		// Initialize a counter that keeps track of how many cells of
 							//  this type are 'owned' by a particular processor in a parallel
 							//  NEURON run. This number may or may not come in handy later, so
 							//  we will keep the functionality for now.
 
 		ctype = new StringFunctions()	// Create a new StringFunctions object
-										//  for parsing the name of the celltype
+																	//  for parsing the name of the celltype
 	}
 
 	proc setSynList(){			// From a file, read in the constants
