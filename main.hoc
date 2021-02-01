@@ -103,6 +103,8 @@ proc loadCellTemplates(){local i		// Proc to load the template that defines (eac
 }
 loadCellTemplates()
 
+// The content of the following code was already executed, as part of the the Cell templates loading (done above)
+/*
 proc calcNetSize_CellDeath() {local i
 					// Calculate the final network size, (after any cell death)
 					//  The total number of cells 'ncell' is reduced to include only those neurons
@@ -121,6 +123,9 @@ proc calcNetSize_CellDeath() {local i
 	}
 }
 calcNetSize_CellDeath()
+*/
+{load_file("./setupfiles/update_network_gids.hoc")}
+update_network_gids()
 
 // Calculate bin sizes at this point, with the current values for numCells
 // to not affect the expected cells density in the circuit after any slicing
@@ -138,34 +143,12 @@ proc calcBinSize(){
 }
 calcBinSize()
 
-// Calculate the final network size, after any circuit slicing
+// Calculate the final network size, after any circuit slicing.
+// Keep a list of previous gids for cells left from the original circuit,
+// to be used later in cells positioning
 {load_file("./setupfiles/circuit_slicing/calcNetSize_Slicing.hoc")}
+update_network_gids()
 
-// Calculate total number of cells and update grade gid ranges for each cell type
-totalCells = 0						// Initialize totalCells (which counts the number of 'real'
-									//  cells) so we can add to it iteratively in the 'for' loop
-
-ncell = 0							// Initialize ncell (which counts all 'real' and 'artificial'
-									//  cells) so we can add to it iteratively in the 'for' loop
-
-prevgid = -1						// Initialize gid setter
-
-for i=0, numCellTypes-1 {			// For each cell type
-
-	cellType[i].updateGidRange(prevgid+1)	// Update the gid range for each
-											//  cell type
-	if (cellType[i].is_art==0) {
-		totalCells = totalCells + cellType[i].numCells		// Update the total number of cells
-															// after any cell death and circuit slicing,
-															// not including artificial cells
-	}
-
-	ncell = ncell + cellType[i].numCells 	// Update the total number of cells
-											//   after circuit slicing, including
-											//   artificial cells
-	prevgid = cellType[i].cellEndGid		// Track the prevgid so the subsequent
-											//  gid ranges can be updated
-}
 /***********************************************************************************************
 III. SET UP PARALLEL CAPABILITY AND MEMORY USAGE RECORDER, AND WRITE OUT RUN RECEIPT
 ***********************************************************************************************/

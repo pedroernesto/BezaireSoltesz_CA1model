@@ -1,0 +1,28 @@
+// Calculate total number of cells and update grade gid ranges for each cell type
+proc update_network_gids() {local i, prevgid
+
+    totalCells = 0						// Initialize totalCells (which counts the number of 'real'
+    									//  cells) so we can add to it iteratively in the 'for' loop
+
+    ncell = 0							// Initialize ncell (which counts all 'real' and 'artificial'
+    									//  cells) so we can add to it iteratively in the 'for' loop
+
+    prevgid = -1						// Initialize gid setter
+
+    for i=0, numCellTypes-1 {			// For each cell type
+
+    	cellType[i].updateGidRange(prevgid+1)	// Update the gid range for each
+    											//  cell type
+    	if (cellType[i].is_art==0) {
+    		totalCells = totalCells + cellType[i].numCells		// Update the total number of cells
+    															// after any cell death and circuit slicing,
+    															// not including artificial cells
+    	}
+
+    	ncell = ncell + cellType[i].numCells 	// Update the total number of cells
+    											//   after circuit slicing, including
+    											//   artificial cells
+    	prevgid = cellType[i].cellEndGid		// Track the prevgid so the subsequent
+    											//  gid ranges can be updated
+    }
+}

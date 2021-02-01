@@ -1,4 +1,4 @@
-proc calcNetSize_Slicing() {local i, targetCircuit_length, gid, startgid, endgid
+proc calcNetSize_Slicing() {local i, targetCircuit_length, gid, startgid, endgid, localobj GidsVector
 					// Calculate the final network size (after any circuit slicing)
 					//  The total number of cells 'ncell' is reduced to include only those neurons
 					//    - targetCircuit_length: x-length of the target circuit to simulate
@@ -6,15 +6,12 @@ proc calcNetSize_Slicing() {local i, targetCircuit_length, gid, startgid, endgid
 					//    - $2: Slices: number of slices along the x-direction
 					//    - gid: index of the cell in the original whole network
 
-	// Calculate the number of cells for each cell type, after any slicing
-	objref GidsVector = new Vector
 	targetCircuit_length = $1*$2		// x-length of the target circuit to simulate
-	if (targetCircuit_length < LongitudinalLength) {targetCircuit_length = LongitudinalLength}
-	// Actually, skip all this procedure code
+	if (targetCircuit_length >= LongitudinalLength) return //Slicing length desired is larger than the available x-lengh
 
+	objref GidsVector = new Vector()
 	for i=0, numCellTypes-1 {			// For each cell type
 
-		cell_counter = 0
 		StartGid = cellType[i].cellStartGid
 		EndGid = cellType[i].cellEndGid
 		for (gid=StartGid; gid <=EndGid ; gid += 1) {
@@ -25,17 +22,16 @@ proc calcNetSize_Slicing() {local i, targetCircuit_length, gid, startgid, endgid
 				cellType[i].numCells -= 1
 				if (cellType[cellind].numCells == 0) {
 					cellType[cellind].numCells = 1
-				}	// If all cells of one type
-					//  are killed, let 1 live
+				}	// If all cells of one type are left out, let 1 included
 			}
 			else {GidsVector.append(gid)}	// Keep the orginal gid value of that cell in the whole network,
 											// for posterior positioning in the target circuit slices
 		}
+		cellType[i].PosGidList = new Vector()
+		cellType[i].PosGidList.copy(GidsVector)	// After slicing, collects original cell Gids for this celltype,
+												// the length of which equals the number of
+												// cells left of this type in the model
 
-		objref PosGidList = new Vector(numCells)	// After slicing, collects original cell Gids for this celltype,
-													// the length of which equals the number of
-													// cells left of this type in the model
-		cellType[i].PosGidList.copy(GidsVector)
 	}
 
 }
