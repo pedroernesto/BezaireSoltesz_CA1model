@@ -1,26 +1,16 @@
-// A modified version of calcNetSize() procedure,
-// to reduce the network size after circuit slicing
-// and update corresponding gid ranges for each cell type
-objref GidsVector = new Vector
-proc calcNetSize_Slice() {local i, targetCircuit_length, gid, startgid, endgid
-					// Calculate the final network size, after circuit slicing
+proc calcNetSize_Slicing() {local i, targetCircuit_length, gid, startgid, endgid
+					// Calculate the final network size (after any circuit slicing)
 					//  The total number of cells 'ncell' is reduced to include only those neurons
 					//    - targetCircuit_length: x-length of the target circuit to simulate
 					//    - $1: SliceThickness: Thickness of the horizontal slice in microns (x-direction)
 					//    - $2: Slices: number of slices along the x-direction
 					//    - gid: index of the cell in the original whole network
 
+	// Calculate the number of cells for each cell type, after any slicing
+	objref GidsVector = new Vector
 	targetCircuit_length = $1*$2		// x-length of the target circuit to simulate
-	if (targetCircuit_length >= LongitudinalLength) {targetCircuit_length = LongitudinalLength}  // Actually, skip all this procedure code
-
-	totalCells = 0						// Initialize totalCells (which counts the number of 'real'
-										//  cells) so we can add to it iteratively in the 'for' loop
-
-	ncell = 0							// Initialize ncell (which counts all 'real' and 'artificial'
-										//  cells) so we can add to it iteratively in the 'for' loop
-
-	prevgid = -1						// Initialize gid setter
-
+	if (targetCircuit_length < LongitudinalLength) {targetCircuit_length = LongitudinalLength}
+	// Actually, skip all this procedure code
 
 	for i=0, numCellTypes-1 {			// For each cell type
 
@@ -42,25 +32,11 @@ proc calcNetSize_Slice() {local i, targetCircuit_length, gid, startgid, endgid
 											// for posterior positioning in the target circuit slices
 		}
 
-		cellType[i].updateGidRange(prevgid+1)	// Update the gid range for each
-												//  cell type
-
 		objref PosGidList = new Vector(numCells)	// After slicing, collects original cell Gids for this celltype,
 													// the length of which equals the number of
 													// cells left of this type in the model
 		cellType[i].PosGidList.copy(GidsVector)
-
-		if (cellType[i].is_art==0) {
-			totalCells = totalCells + cellType[i].numCells		// Update the total number of cells
-																//   after circuit slicing, not including
-																//   artificial cells
-		}
-
-		ncell = ncell + cellType[i].numCells 	// Update the total number of cells
-												//   after circuit slicing, including
-												//   artificial cells
-		prevgid = cellType[i].cellEndGid		// Track the prevgid so the subsequent
-												//  gid ranges can be updated
 	}
+
 }
-calcNetSize_Slice(SliceThickness, Slices)
+calcNetSize_Slicing(SliceThickness, Slices)

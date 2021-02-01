@@ -103,16 +103,12 @@ proc loadCellTemplates(){local i		// Proc to load the template that defines (eac
 }
 loadCellTemplates()
 
-proc calcNetSize(){local i				// Calculate the final network size (after any cell death)
-	totalCells = 0						// Initialize totalCells (which counts the number of 'real'
-										//  cells) so we can add to it iteratively in the 'for' loop
+proc calcNetSize_CellDeath() {local i
+					// Calculate the final network size, (after any cell death)
+					//  The total number of cells 'ncell' is reduced to include only those neurons
 
-	ncell = 0							// Initialize ncell (which counts all 'real' and 'artificial'
-										//  cells) so we can add to it iteratively in the 'for' loop
-
-	prevgid = -1						// Initialize gid setter
-
-	for i=0,numCellTypes-1 {			// For each cell type
+	// Calculate the number of cells for each cell type, after any cell death
+	for i=0, numCellTypes-1 {			// For each cell type
 
 		if (cellType[i].layerflag==0 && cellType[i].is_art==0) {	// For cell types in layer 0, which are susceptible to death
 
@@ -122,25 +118,12 @@ proc calcNetSize(){local i				// Calculate the final network size (after any cel
 			if (cellType[i].numCells == 0) {cellType[i].numCells = 1}	// If all cells of one type
 																		//  are killed, let 1 live
 		}
-
-		cellType[i].updateGidRange(prevgid+1)	// Update the gid range for each
-												//  cell type
-
-		if (cellType[i].is_art==0) {
-			totalCells = totalCells + cellType[i].numCells		// Update the total number of cells
-																//   after cell death, not including
-																//   artificial cells
-		}
-
-		ncell = ncell + cellType[i].numCells 	// Update the total number of cells
-												//   after cell death, including
-												//   artificial cells
-		prevgid = cellType[i].cellEndGid		// Track the prevgid so the subsequent
-												//  gid ranges can be updated
 	}
 }
-calcNetSize()
+calcNetSize_CellDeath()
 
+// Calculate bin sizes at this point, with the current values for numCells
+// to not affect the expected cells density in the circuit after any slicing
 proc calcBinSize(){
 
 	for i=0, numCellTypes-1 {		// Using the specified dimensions of the network (in um) and
@@ -155,9 +138,34 @@ proc calcBinSize(){
 }
 calcBinSize()
 
-// Calculate the final network size, after circuit slicing
-{load_file("./setupfiles/circuit_slicing/circuit_slicing_funcs.hoc")}
+// Calculate the final network size, after any circuit slicing
+{load_file("./setupfiles/circuit_slicing/calcNetSize_Slicing.hoc")}
 
+// Calculate total number of cells and update grade gid ranges for each cell type
+totalCells = 0						// Initialize totalCells (which counts the number of 'real'
+									//  cells) so we can add to it iteratively in the 'for' loop
+
+ncell = 0							// Initialize ncell (which counts all 'real' and 'artificial'
+									//  cells) so we can add to it iteratively in the 'for' loop
+
+prevgid = -1						// Initialize gid setter
+
+for i=0, numCellTypes-1 {			// For each cell type
+
+	cellType[i].updateGidRange(prevgid+1)	// Update the gid range for each
+											//  cell type
+	if (cellType[i].is_art==0) {
+		totalCells = totalCells + cellType[i].numCells		// Update the total number of cells
+															// after any cell death and circuit slicing,
+															// not including artificial cells
+	}
+
+	ncell = ncell + cellType[i].numCells 	// Update the total number of cells
+											//   after circuit slicing, including
+											//   artificial cells
+	prevgid = cellType[i].cellEndGid		// Track the prevgid so the subsequent
+											//  gid ranges can be updated
+}
 /***********************************************************************************************
 III. SET UP PARALLEL CAPABILITY AND MEMORY USAGE RECORDER, AND WRITE OUT RUN RECEIPT
 ***********************************************************************************************/
