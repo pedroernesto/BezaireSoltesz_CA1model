@@ -1,14 +1,19 @@
-proc calcNetSize_Slicing() {local i, targetCircuit_length, gid, localobj GidsVector
+proc calcNetSize_Slicing() {local i, max_number_slices, targetCircuit_length, gid localobj GidsVector
 					// Calculate the final network size (after any circuit slicing)
 					//  The total number of cells 'ncell' is reduced to include only those neurons
 					//    - targetCircuit_length: x-length of the target circuit to simulate
 					//    - $1: SliceThickness: Thickness of the horizontal slice in microns (x-direction)
-					//    - $2: Slices: number of slices along the x-direction
+					//    - $2: Slices: desired number of slices along the x-direction
 					//    - gid: index of the cell in the original whole network
 
-	targetCircuit_length = $1*$2		// x-length of the target circuit to simulate
-	if (targetCircuit_length >= LongitudinalLength) return //Slicing length desired is larger than the available x-lengh
-
+	max_number_slices = int(LongitudinalLength/$1) > $2 ? $2 : max_number_slices // Target circuit length with number of slices desired
+	 																			// might be larger than the available x-lengh
+	if (max_number_slices != 0) {
+		targetCircuit_length = $1*max_number_slices		// x-length of the target circuit to simulate
+	}
+	else {
+		targetCircuit_length = LongitudinalLength	// Desired length of just one slice is bigger than the available x-lengh
+	}
 	objref GidsVector = new Vector()
 	for i=0, numCellTypes-1 {			// For each cell type
 
@@ -29,7 +34,6 @@ proc calcNetSize_Slicing() {local i, targetCircuit_length, gid, localobj GidsVec
 		cellType[i].PosGidList.copy(GidsVector)	// After slicing, collects original cell Gids for this celltype,
 												// the length of which equals the number of
 												// cells left of this type in the model
-
 	}
 }
 calcNetSize_Slicing(SliceThickness, Slices)

@@ -60,4 +60,4 @@ default_var("LFPCellTypes","pyramidalcell")		// semicolon separated list of cell
 
 // For circuit slicing
 default_var("SliceThickness",450)   // Thickness of a single horizontal (x-direction) slice in microns
-default_var("Slices",10)            // Number of contiguous (but disconnected) slices
+default_var("Slices",10)            // Desired number of contiguous (but disconnected) slices
