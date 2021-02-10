@@ -242,21 +242,21 @@ if (strcmp(UID,"0")==0 && pc.id==0) {	// if a unique ID (UID) was not already
 		{system("cscript //NoLogo setupfiles/uuid.vbs", direx)} // use a custom VBS (Visual Basic script)
 																//  to generate the UID. This VBS file is
 																//  included in the code repository
-}
+	}
 	UID = direx
 }//  your pcitr loop when you call the
 																			//  pcitr iterator
 
 if (OK2executeSysCmds==1) {
-	{load_file("./setupfiles/save_run_info.hoc")}		// This file will ensure a unique RunName (if
-								//  the specified RunName was already used, it
-								//  will append numbers to it like "_00", "_01"
-								//  to create a unique RunName). Then it will
-								//  create a RunName directory within the results
-								//  folder, where all the results will be stored.
-								//  It will also write out a receipt of the run
-								//  parameters and other administrative sorts of
-								//  run information.
+	{load_file("./setupfiles/save_run_info.hoc")}	// This file will ensure a unique RunName (if
+													//  the specified RunName was already used, it
+													//  will append numbers to it like "_00", "_01"
+													//  to create a unique RunName). Then it will
+													//  create a RunName directory within the results
+													//  folder, where all the results will be stored.
+													//  It will also write out a receipt of the run
+													//  parameters and other administrative sorts of
+													//  run information.
 	// NOTE: If you don't like the NEURON code to make new directories, concatenate files, or delete files,
 	//  set the OK2executeSysCmds parameter to 0 in "set_other_parameters.hoc" file. Watch out though, if
 	//  OK2executeSysCmds is set to 0, the code will use whatever RunName you supply or 'none' if you do not
@@ -356,8 +356,7 @@ V.	CONNECT THE MODEL CELLS AND CONNECT THE STIMULATION CELLS TO SOME MODEL CELLS
 
 MakeArtConns=1
 
-if (slicing_flag==1) {sprint(cmd,"./setupfiles/circuit_slicing/connectivity/%s_connections.hoc", Connectivity)}
-else {sprint(cmd,"./connectivity/%s_connections.hoc", Connectivity)}
+sprint(cmd,"./setupfiles/circuit_slicing/connectivity/%s_connections.hoc", Connectivity)
 {load_file(cmd)}			// Loads in a particular algorithm to connect the cells in the network.
 							//  Each algorithm is specified by a different file in the connectivity
 							//  folder, and the file names are all of the format:

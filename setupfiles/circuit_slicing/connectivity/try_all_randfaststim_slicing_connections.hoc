@@ -248,6 +248,7 @@ func connectCells () {local r, syn, distance, counter, precellType, postcellType
 			} else {
 				postgid = postcellgids.x[0]
 			}
+
 			if (pc.gid_exists(postgid)) {		// Check that the postsynaptic cell exists on this processor
 				cell = pc.gid2cell(postgid)		//  and create a reference to the cell object
 
@@ -255,6 +256,14 @@ func connectCells () {local r, syn, distance, counter, precellType, postcellType
 												//  to connect. It does not suggest which synapses on the
 												//  postsynaptic cell should be used to make the desired number
 												//  of synapses for the suggested connection. That happens below.
+
+				// Connect only cells belonging to the same slice
+				pregid = conns2make.x[r]
+				precell = pc.gid2cell(pregid)
+				if (cellType[precell.slice != cell.slice) {
+					continue  // Transfer control to the next iteration of the for-loop statement
+				}
+
 
 				numSynTypes = cell.pre_list.o(precellType).count()	// Get total number of potential synapse types for this combination
 																	//  of presynaptic cell type and postsynaptic cell type.
