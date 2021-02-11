@@ -27,11 +27,11 @@ create soma[NumSoma], dend[NumBasal], axon[NumAxon]
 proc init() {
 	gid = $1
 	randi = $2
-	
+
 	// morphology
 	connect_sections()	// local fcn: connect soma, dendrites, axon initial segment
 	size_sections()		// local fcn: set the size dimensions of each section
-	define_shape()		// builtin fcn: fill in 3d info for sections defined by only L and diam, translate 3d points for consistency with their connections 
+	define_shape()		// builtin fcn: fill in 3d info for sections defined by only L and diam, translate 3d points for consistency with their connections
   	append_sections()	// local fcn: append all sections to the section list
 	set_nseg()			// local fcn: set the number of segments in each section
 	get_root()			// local fcn: perform morphology checks
@@ -39,7 +39,7 @@ proc init() {
 	// electrophysiology
 	mechinit()			// local fcn: set values for max conductances and reversal potentials of ion channels and other ephys parameters that are subject to fitting
 	insert_mechs()		// local fcn: insert ion channels and actually set values determined in the mechinit fcn
-	set_chanparams()	// local fcn: after all channels have been inserted, then their other parameters can be set	
+	set_chanparams()	// local fcn: after all channels have been inserted, then their other parameters can be set
 	// synapses
 	pre_list = new List() // define a list for the presynaptic connections
 	define_synapses($3)	// local fcn: define all possible synaptic connections received by this cell
@@ -56,11 +56,11 @@ proc size_sections() {
 	dend[0] {L=250 diam=3}
 	dend[1] {L=250 diam=3}
 	axon[0] {L=150 diam=1.5}*/
-NumSoma=1
-NumApical=0
-NumBasal=2
-NumAxon=1
-	
+	NumSoma=1
+	NumApical=0
+	NumBasal=2
+	NumAxon=1
+
 	soma[0] {pt3dclear()
 		pt3dadd(0.0, 0.0, 0.0, 10.0) // distance from (0,0,0) = 0
 		pt3dadd(0.0, 10.0, 0.0, 10.0) // distance from (0,0,0) = 10
@@ -114,29 +114,29 @@ proc set_nseg() {
 
 
 
-proc mechinit() {	
+proc mechinit() {
 	// Temperature of simulation
-	celsius = 34.0  
+	celsius = 34.0
 
 	Vrest = -67
-	
+
 	Rm = 20000*5
-	
+
 	gH = 0.0005
-	
+
 	gKvAsoma = 0.0165*.3
 	gKvAdend = 0.004*.7
-	
+
 	// *2.3 gives 2x frequency & no depol. block
 	gKvEaxon =  0.05104*2.3
 	gKvEsoma =  0.0319*2.3
 	gKvEdend =  2*0.023*2.3
-	
+
 	gNasoma = 0.0107
 	gNadend = 2*0.0117
 	gNaaxon = 0.01712
-	
-	eleak = -67	
+
+	eleak = -67
 }
 
 proc insert_mechs() {
@@ -144,14 +144,14 @@ proc insert_mechs() {
 		insert ch_KvAolm
     		gmax_ch_KvAolm = gKvAsoma
 		insert ch_HCNolm
-			gmax_ch_HCNolm = gH 
+			gmax_ch_HCNolm = gH
 		insert ch_Kdrfast  // ch_Kvsoma
-			gmax_ch_Kdrfast = gKvEsoma 
+			gmax_ch_Kdrfast = gKvEsoma
 		insert ch_Nav // ch_Navsoma
 			gmax_ch_Nav = gNasoma
 		insert ch_leak
 			gmax_ch_leak = 1/Rm
-			e_ch_leak = eleak  	
+			e_ch_leak = eleak
 	}
 
   	dend[0] {
@@ -163,7 +163,7 @@ proc insert_mechs() {
 			gmax_ch_Nav = gNadend
 		insert ch_leak
 			gmax_ch_leak = 1/Rm
-			e_ch_leak = eleak  	
+			e_ch_leak = eleak
   	}
 
   	dend[1] {
@@ -175,9 +175,9 @@ proc insert_mechs() {
 			gmax_ch_Nav = gNadend
 		insert ch_leak
 			gmax_ch_leak = 1/Rm
-			e_ch_leak = eleak  	
+			e_ch_leak = eleak
   	}
-  
+
   	axon {
 		insert ch_Kdrfast // ch_Kvsoma //ch_Kvaxon
 			gmax_ch_Kdrfast = gKvEaxon
@@ -185,7 +185,7 @@ proc insert_mechs() {
 			gmax_ch_Nav = gNaaxon
 		insert ch_leak
 			gmax_ch_leak = 1/Rm
-			e_ch_leak = eleak  	
+			e_ch_leak = eleak
   	}
 }
 
@@ -198,7 +198,7 @@ proc set_chanparams() {
 		cm = 1.3	// capacitance in uF/cm^2. default = 1.0
 		//ena = 55
 		//ek = -90
-	}  // make catau slower70e-3 	cao=2 cai=50.e-6 
+	}  // make catau slower70e-3 	cao=2 cai=50.e-6
 }
 
 
@@ -216,7 +216,7 @@ proc position(){ local i
 			pt3dchange(i, $1-x+x3d(i), $2-y+y3d(i), $3-z+z3d(i), diam3d(i))
 		}
 	}
-	x = $1  y = $2  z = $3	
+	x = $1  y = $2  z = $3
 }
 
 proc get_root() {local i localobj sref
@@ -254,8 +254,8 @@ proc define_synapses() {
 		templist = new List ()
 		for r=0, cellType[ind].SynList[celltype].count()-1 {
 			execute(cellType[ind].SynList[celltype].object(r).NewSynStr, this) // sets newSecRef
-						
-			forsec newSecRef {		
+
+			forsec newSecRef {
 				for (x,0) {
 					execute(cellType[ind].SynList[celltype].object(r).CondStr, this)
 					 if (y==1) {

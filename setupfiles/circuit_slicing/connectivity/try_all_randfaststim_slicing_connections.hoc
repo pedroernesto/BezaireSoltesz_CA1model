@@ -107,6 +107,46 @@ proc makeConnections () {local precellType, postcellType, precellStart, precellE
 	if ((PrintTerminal>0)) {print "Host ", pc.id, " connected cells."}
 }
 
+// A reduced version of 'pciter' iterator, to just get the gid of a specific cell
+// owned by some processor. This iterator is used in 'connectCells' function,
+// to get the pre-synpatic cell object corresponding to a specific cell gid
+iterator pcitr_cell() {local gid, startgid
+						// Create an iterator for use instead of standard 'for'
+						//  loop. This provides an easy way for each processor
+						//  to do a 'for' loop only over cells that it owns.
+						//
+						//  usage:
+						//  for pcitr_cell(&gid, it_start, it_end) {do stuff}
+						//   the first argument is a pointer that pcitr_cell will
+						//	  fill for you:
+						//    - gid: index of the cell in the whole network
+						//   it_start and it_end let you define the gid range over
+						//     which to iterate, usually one of the following:
+						//		- the gid range for a cell type
+						//		- the gid range for the whole network
+
+	numcycles = int($2/pc.nhost)
+	extra = $2%pc.nhost
+	addcycle=0
+	if (extra>pc.id) {addcycle=1}
+	startgid=(numcycles+addcycle)*pc.nhost+pc.id
+	if (startgid<=$3) {
+		for (gid=startgid; gid <= $3; gid += pc.nhost) {	// Just iterate through the cells on
+															//  this host(this simple statement
+															//  iterates through all the cells on
+															//  this host and only these cells because
+															//  the round-robin call made earlier dealt
+															//  the cells among the processors in an
+															//  orderly manner (like a deck of cards)
+				$&1 = gid
+				iterator_statement		// this is the code that you put inside
+										//  your pcitr loop when you call the
+										//  pcitr_cell iterator
+		}
+	}
+}
+
+
 objref params, conns2make
 objref randnum, synRand
 
@@ -257,10 +297,17 @@ func connectCells () {local r, syn, distance, counter, precellType, postcellType
 												//  postsynaptic cell should be used to make the desired number
 												//  of synapses for the suggested connection. That happens below.
 
-				// Connect only cells belonging to the same slice
+				// Use the 'pciter_cell' iterator over all cells of
+				// precellType type to get the pre-synpatic cell object
 				pregid = conns2make.x[r]
-				precell = pc.gid2cell(pregid)
-				if (cellType[precell.slice != cell.slice) {
+				for pcitr_cell(&gid, cellType[precellType].cellStartGid, cellType[precellType].cellEndGid) {
+					if (pc.gid_exists(gid) && gid == pregid) {
+						precell = pc.gid2cell(gid)
+						break
+					}
+				}
+				// Connect only cells belonging to the same slice
+				if (precell.slice != cell.slice) {
 					continue  // Transfer control to the next iteration of the for-loop statement
 				}
 
