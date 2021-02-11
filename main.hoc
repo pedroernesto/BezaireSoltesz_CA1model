@@ -356,7 +356,7 @@ V.	CONNECT THE MODEL CELLS AND CONNECT THE STIMULATION CELLS TO SOME MODEL CELLS
 
 MakeArtConns=1
 
-sprint(cmd,"./setupfiles/circuit_slicing/connectivity/%s_connections.hoc", Connectivity)
+sprint(cmd,"./connectivity/%s_connections.hoc", Connectivity)
 {load_file(cmd)}			// Loads in a particular algorithm to connect the cells in the network.
 							//  Each algorithm is specified by a different file in the connectivity
 							//  folder, and the file names are all of the format:
