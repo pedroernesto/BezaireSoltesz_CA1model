@@ -161,7 +161,7 @@ objref randnum, synRand
 //  $s3 precellType_string: the string (word) for the presynaptic cell type, the 'friendly' name
 //  $s4 postcellType_string: the string (word) for the postsynaptic cell type, the 'friendly' name
 //  $5 numpost: the number of cells of type postcellType that are owned by this processor
-func connectCells () {local r, syn, distance, counter, precellType, postcellType, j, randSynNumber, pre_zpos, post_zpos , pre_xpos, post_xpos, pre_ypos, post_ypos, numSynTypes localobj cell
+func connectCells () {local r, syn, distance, counter, precellType, postcellType, j, randSynNumber, pre_zpos, post_zpos , pre_xpos, post_xpos, pre_ypos, post_ypos, numSynTypes  localobj cell
 	// Indices of the cell types in the cellType array
 	precellType = $1
 	postcellType = $2
@@ -297,17 +297,13 @@ func connectCells () {local r, syn, distance, counter, precellType, postcellType
 												//  postsynaptic cell should be used to make the desired number
 												//  of synapses for the suggested connection. That happens below.
 
-				// Use the 'pciter_cell' iterator over all cells of
-				// precellType type to get the pre-synpatic cell object
-				pregid = conns2make.x[r]
-				if (pc.gid_exists(pregid)) {
-    				precell = pc.gid2cell(pregid)
-				}
 				// Connect only cells belonging to the same slice
-				if (precell.slice != cell.slice) {
+				post_slice_index = SliceIndList[postgid-cellType[postcellType].cellStartGid]
+				pregid = conns2make.x[r]
+				pre_slice_index  = SliceIndList[pregid-cellType[precellType].cellStartGid]
+				if (pre_slice_index != post_slice_index) {
 					continue  // Transfer control to the next iteration of the for-loop statement
 				}
-
 
 				numSynTypes = cell.pre_list.o(precellType).count()	// Get total number of potential synapse types for this combination
 																	//  of presynaptic cell type and postsynaptic cell type.

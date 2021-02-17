@@ -41,13 +41,14 @@ begintemplate CellCategoryInfo	// Define a template that describes
 	public dist, numCells, CellList, addCell, numCons, numConns, numSyns, wgtConns, numThisHost
 	public setBins, dentateYBins, dentateXBins, dentateZBins
 	public dentateYBinSize, dentateXBinSize, dentateZBinSize, is_art
-	public PosGidList
+	public PosGidList, SliceIndList
 
 	objref dist, cellpos, f1, CellList, numCons, numConns	// Define objects, including
 	objref numSyns, wgtConns, ctype, SynList, this			//  'this', which is this
 															//  instance of the class
 
 	objref PosGidList	// Gids list in the original network, which is used in cells positioning after slicing
+	objref SliceIndList	// List of label indeces for the slice the cell belongs to
 
 	strdef cellType_string, technicalType, tempString, cmd, strtomax 	// Define strings
 
