@@ -6,8 +6,14 @@ proc calcNetSize_Slicing() {local i, max_number_slices, targetCircuit_length, gi
 					//    - $2: Slices: desired number of slices along the x-direction
 					//    - gid: index of the cell in the original whole network
 
-	max_number_slices = int(LongitudinalLength/$1) > $2 ? $2 : max_number_slices // Target circuit length with number of slices desired
-	 																			// might be larger than the available x-lengh
+	// Target circuit length with number of slices desired
+	// might be larger than the available x-length
+	if (int(LongitudinalLength/$1) > $2) {
+		max_number_slices = $2
+	} else {
+		max_number_slices = (int(LongitudinalLength/$1)
+	}
+
 	if (max_number_slices != 0) {
 		targetCircuit_length = $1*max_number_slices		// x-length of the target circuit to simulate
 	}
