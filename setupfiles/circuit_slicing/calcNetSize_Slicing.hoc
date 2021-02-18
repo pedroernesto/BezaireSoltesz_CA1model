@@ -11,18 +11,17 @@ proc calcNetSize_Slicing() {local i, max_number_slices, targetCircuit_length, gi
 	if (int(LongitudinalLength/$1) > $2) {
 		max_number_slices = $2
 	} else {
-		max_number_slices = (int(LongitudinalLength/$1)
+		max_number_slices = int(LongitudinalLength/$1)
 	}
 
 	if (max_number_slices != 0) {
 		targetCircuit_length = $1*max_number_slices		// x-length of the target circuit to simulate
-	}
-	else {
+	} else {
 		targetCircuit_length = LongitudinalLength	// Desired length of just one slice is bigger than the available x-lengh
 	}
 
-	objref GidsVector = new Vector()
-	objref SlicesVector = new Vector()
+	GidsVector = new Vector()
+	SlicesVector = new Vector()
 	for i=0, numCellTypes-1 {			// For each cell type
 		for gid=cellType[i].cellStartGid, cellType[i].cellEndGid {
 
@@ -33,11 +32,10 @@ proc calcNetSize_Slicing() {local i, max_number_slices, targetCircuit_length, gi
 				if (cellType[i].numCells == 0) {
 					cellType[i].numCells = 1
 				}	// If all cells of one type are left out, let 1 included
-			}
-			else {
+			} else {
 				GidsVector.append(gid)		// Keep the orginal gid value of that cell in the whole network,
 											// for posterior positioning in the target circuit slices
-				SlicesVector.apend(int(xpos/$1))	// Slice where the cell will be placed
+				SlicesVector.append(int(xpos/$1))	// Slice where the cell will be placed
 			}
 		}
 		cellType[i].PosGidList = new Vector()
