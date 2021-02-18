@@ -1,5 +1,6 @@
 /* Created by Language version: 6.2.0 */
 /* NOT VECTORIZED */
+#define NRN_VECTORIZED 0
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -21,10 +22,18 @@ extern int _method3;
 extern double hoc_Exp(double);
 #endif
  
-#define _threadargscomma_ /**/
-#define _threadargs_ /**/
+#define nrn_init _nrn_init__iconc_Ca
+#define _nrn_initial _nrn_initial__iconc_Ca
+#define nrn_cur _nrn_cur__iconc_Ca
+#define _nrn_current _nrn_current__iconc_Ca
+#define nrn_jacob _nrn_jacob__iconc_Ca
+#define nrn_state _nrn_state__iconc_Ca
+#define _net_receive _net_receive__iconc_Ca 
+#define integrate integrate__iconc_Ca 
  
+#define _threadargscomma_ /**/
 #define _threadargsprotocomma_ /**/
+#define _threadargs_ /**/
 #define _threadargsproto_ /**/
  	/*SUPPRESS 761*/
 	/*SUPPRESS 762*/
@@ -130,6 +139,7 @@ static void _ode_spec(_NrnThread*, _Memb_list*, int);
 static void _ode_matsol(_NrnThread*, _Memb_list*, int);
  
 #define _cvode_ieq _ppvar[4]._i
+ static void _ode_matsol_instance1(_threadargsproto_);
  /* connect range variables in _p that hoc is supposed to know about */
  static const char *_mechanism[] = {
  "6.2.0",
@@ -173,7 +183,7 @@ static void nrn_alloc(Prop* _prop) {
 };
  static void _update_ion_pointer(Datum*);
  extern Symbol* hoc_lookup(const char*);
-extern void _nrn_thread_reg(int, int, void(*f)(Datum*));
+extern void _nrn_thread_reg(int, int, void(*)(Datum*));
 extern void _nrn_thread_table_reg(int, void(*)(double*, Datum*, Datum*, _NrnThread*, int));
 extern void hoc_register_tolerance(int, HocStateTolerance*, Symbol***);
 extern void _cvode_abstol( Symbol**, double*, int);
@@ -188,6 +198,11 @@ extern void _cvode_abstol( Symbol**, double*, int);
      _nrn_setdata_reg(_mechtype, _setdata);
      _nrn_thread_reg(_mechtype, 2, _update_ion_pointer);
   hoc_register_prop_size(_mechtype, 7, 5);
+  hoc_register_dparam_semantics(_mechtype, 0, "ca_ion");
+  hoc_register_dparam_semantics(_mechtype, 1, "ca_ion");
+  hoc_register_dparam_semantics(_mechtype, 2, "ca_ion");
+  hoc_register_dparam_semantics(_mechtype, 3, "#ca_ion");
+  hoc_register_dparam_semantics(_mechtype, 4, "cvodeieq");
  	nrn_writes_conc(_mechtype, 0);
  	hoc_register_cvode(_mechtype, _ode_count, _ode_map, _ode_spec, _ode_matsol);
  	hoc_register_tolerance(_mechtype, _hoc_state_tol, &_atollist);
@@ -295,6 +310,10 @@ static void _ode_map(int _ieq, double** _pv, double** _pvdot, double* _pp, Datum
  	_pv[0] = &(_ion_cai);
  }
  
+static void _ode_matsol_instance1(_threadargsproto_) {
+ _ode_matsol1 ();
+ }
+ 
 static void _ode_matsol(_NrnThread* _nt, _Memb_list* _ml, int _type) {
    Datum* _thread;
    Node* _nd; double _v; int _iml, _cntml;
@@ -308,7 +327,7 @@ static void _ode_matsol(_NrnThread* _nt, _Memb_list* _ml, int _type) {
   ica = _ion_ica;
   eca = _ion_eca;
   cai = _ion_cai;
- _ode_matsol1 ();
+ _ode_matsol_instance1(_threadargs_);
  }}
  extern void nrn_update_ion_pointer(Symbol*, Datum*, int, int);
  static void _update_ion_pointer(Datum* _ppvar) {
@@ -404,8 +423,9 @@ for (_iml = 0; _iml < _cntml; ++_iml) {
 }}
 
 static void nrn_state(_NrnThread* _nt, _Memb_list* _ml, int _type){
- double _break, _save;
-Node *_nd; double _v; int* _ni; int _iml, _cntml;
+Node *_nd; double _v = 0.0; int* _ni; int _iml, _cntml;
+double _dtsav = dt;
+if (secondorder) { dt *= 0.5; }
 #if CACHEVEC
     _ni = _ml->_nodeindices;
 #endif
@@ -422,29 +442,28 @@ for (_iml = 0; _iml < _cntml; ++_iml) {
     _nd = _ml->_nodelist[_iml];
     _v = NODEV(_nd);
   }
- _break = t + .5*dt; _save = t;
  v=_v;
 {
   cai = _ion_cai;
   ica = _ion_ica;
   eca = _ion_eca;
   cai = _ion_cai;
- { {
- for (; t < _break; t += dt) {
- error = _deriv1_advance = 1;
+ { error = _deriv1_advance = 1;
  derivimplicit(_ninits, 1, _slist1, _dlist1, _p, &t, dt, integrate, &_temp1);
 _deriv1_advance = 0;
  if(error){fprintf(stderr,"at line 77 in file iconc_Ca.mod:\n	SOLVE integrate METHOD derivimplicit\n"); nrn_complain(_p); abort_run(error);}
- 
-}}
- t = _save;
+    if (secondorder) {
+    int _i;
+    for (_i = 0; _i < 1; ++_i) {
+      _p[_slist1[_i]] += dt*_p[_dlist1[_i]];
+    }}
  } {
    eca = ktf ( _threadargs_ ) * log ( cao / cai ) ;
    }
   _ion_eca = eca;
   _ion_cai = cai;
 }}
-
+ dt = _dtsav;
 }
 
 static void terminal(){}

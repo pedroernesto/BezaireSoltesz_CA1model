@@ -1,9 +1,9 @@
 #!/bin/sh
 if test "x${NRNHOME}" = "x" ; then
-	NRNHOME="/home/pedroernesto/miniconda2/envs/CA1_BezaireSoltesz"
+	NRNHOME="/home/pedroernesto/miniconda2"
 fi
 if test "x${NRNBIN}" = "x" ; then
-	NRNBIN="/home/pedroernesto/miniconda2/envs/CA1_BezaireSoltesz/x86_64/bin/"
+	NRNBIN="/home/pedroernesto/miniconda2/x86_64/bin/"
 fi
 if test "" = "yes" ; then
 	NRNIV="${NRNBIN}nrniv.app/Contents/MacOS/nrniv"

@@ -1,5 +1,6 @@
 /* Created by Language version: 6.2.0 */
 /* NOT VECTORIZED */
+#define NRN_VECTORIZED 0
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -21,10 +22,18 @@ extern int _method3;
 extern double hoc_Exp(double);
 #endif
  
-#define _threadargscomma_ /**/
-#define _threadargs_ /**/
+#define nrn_init _nrn_init__ExpGABAab
+#define _nrn_initial _nrn_initial__ExpGABAab
+#define nrn_cur _nrn_cur__ExpGABAab
+#define _nrn_current _nrn_current__ExpGABAab
+#define nrn_jacob _nrn_jacob__ExpGABAab
+#define nrn_state _nrn_state__ExpGABAab
+#define _net_receive _net_receive__ExpGABAab 
+#define state state__ExpGABAab 
  
+#define _threadargscomma_ /**/
 #define _threadargsprotocomma_ /**/
+#define _threadargs_ /**/
 #define _threadargsproto_ /**/
  	/*SUPPRESS 761*/
 	/*SUPPRESS 762*/
@@ -179,6 +188,7 @@ static void _ode_spec(_NrnThread*, _Memb_list*, int);
 static void _ode_matsol(_NrnThread*, _Memb_list*, int);
  
 #define _cvode_ieq _ppvar[2]._i
+ static void _ode_matsol_instance1(_threadargsproto_);
  /* connect range variables in _p that hoc is supposed to know about */
  static const char *_mechanism[] = {
  "6.2.0",
@@ -241,7 +251,7 @@ static void nrn_alloc(Prop* _prop) {
 };
  static void _net_receive(Point_process*, double*, double);
  extern Symbol* hoc_lookup(const char*);
-extern void _nrn_thread_reg(int, int, void(*f)(Datum*));
+extern void _nrn_thread_reg(int, int, void(*)(Datum*));
 extern void _nrn_thread_table_reg(int, void(*)(double*, Datum*, Datum*, _NrnThread*, int));
 extern void hoc_register_tolerance(int, HocStateTolerance*, Symbol***);
 extern void _cvode_abstol( Symbol**, double*, int);
@@ -256,6 +266,9 @@ extern void _cvode_abstol( Symbol**, double*, int);
  _mechtype = nrn_get_mechtype(_mechanism[1]);
      _nrn_setdata_reg(_mechtype, _setdata);
   hoc_register_prop_size(_mechtype, 23, 3);
+  hoc_register_dparam_semantics(_mechtype, 0, "area");
+  hoc_register_dparam_semantics(_mechtype, 1, "pntproc");
+  hoc_register_dparam_semantics(_mechtype, 2, "cvodeieq");
  	hoc_register_cvode(_mechtype, _ode_count, _ode_map, _ode_spec, _ode_matsol);
  	hoc_register_tolerance(_mechtype, _hoc_state_tol, &_atollist);
  pnt_receive[_mechtype] = _net_receive;
@@ -318,12 +331,44 @@ static void _net_receive (_pnt, _args, _lflag) Point_process* _pnt; double* _arg
    else {
      _lw = _args[0] ;
      }
-   Aa = Aa + _lw * factora ;
-   Ba = Ba + _lw * factora ;
-   totala = totala + _lw ;
-   Ab = Ab + _lw * factorb / 3.37 ;
-   Bb = Bb + _lw * factorb / 3.37 ;
-   totalb = totalb + _lw / 3.37 ;
+     if (nrn_netrec_state_adjust && !cvode_active_){
+    /* discon state adjustment for cnexp case (rate uses no local variable) */
+    double __state = Aa;
+    double __primary = (Aa + _lw * factora) - __state;
+     __primary += ( 1. - exp( 0.5*dt*( ( - 1.0 ) / tau1a ) ) )*( - ( 0.0 ) / ( ( - 1.0 ) / tau1a ) - __primary );
+    Aa += __primary;
+  } else {
+ Aa = Aa + _lw * factora ;
+     }
+   if (nrn_netrec_state_adjust && !cvode_active_){
+    /* discon state adjustment for cnexp case (rate uses no local variable) */
+    double __state = Ba;
+    double __primary = (Ba + _lw * factora) - __state;
+     __primary += ( 1. - exp( 0.5*dt*( ( - 1.0 ) / tau2a ) ) )*( - ( 0.0 ) / ( ( - 1.0 ) / tau2a ) - __primary );
+    Ba += __primary;
+  } else {
+ Ba = Ba + _lw * factora ;
+     }
+ totala = totala + _lw ;
+     if (nrn_netrec_state_adjust && !cvode_active_){
+    /* discon state adjustment for cnexp case (rate uses no local variable) */
+    double __state = Ab;
+    double __primary = (Ab + _lw * factorb / 3.37) - __state;
+     __primary += ( 1. - exp( 0.5*dt*( ( - 1.0 ) / tau1b ) ) )*( - ( 0.0 ) / ( ( - 1.0 ) / tau1b ) - __primary );
+    Ab += __primary;
+  } else {
+ Ab = Ab + _lw * factorb / 3.37 ;
+     }
+   if (nrn_netrec_state_adjust && !cvode_active_){
+    /* discon state adjustment for cnexp case (rate uses no local variable) */
+    double __state = Bb;
+    double __primary = (Bb + _lw * factorb / 3.37) - __state;
+     __primary += ( 1. - exp( 0.5*dt*( ( - 1.0 ) / tau2b ) ) )*( - ( 0.0 ) / ( ( - 1.0 ) / tau2b ) - __primary );
+    Bb += __primary;
+  } else {
+ Bb = Bb + _lw * factorb / 3.37 ;
+     }
+ totalb = totalb + _lw / 3.37 ;
    } }
  
 static int _ode_count(int _type){ return 4;}
@@ -349,6 +394,10 @@ static void _ode_map(int _ieq, double** _pv, double** _pvdot, double* _pp, Datum
 	}
  }
  
+static void _ode_matsol_instance1(_threadargsproto_) {
+ _ode_matsol1 ();
+ }
+ 
 static void _ode_matsol(_NrnThread* _nt, _Memb_list* _ml, int _type) {
    Datum* _thread;
    Node* _nd; double _v; int _iml, _cntml;
@@ -358,7 +407,7 @@ static void _ode_matsol(_NrnThread* _nt, _Memb_list* _ml, int _type) {
     _p = _ml->_data[_iml]; _ppvar = _ml->_pdata[_iml];
     _nd = _ml->_nodelist[_iml];
     v = NODEV(_nd);
- _ode_matsol1 ();
+ _ode_matsol_instance1(_threadargs_);
  }}
 
 static void initmodel() {
@@ -483,8 +532,7 @@ for (_iml = 0; _iml < _cntml; ++_iml) {
 }}
 
 static void nrn_state(_NrnThread* _nt, _Memb_list* _ml, int _type){
- double _break, _save;
-Node *_nd; double _v; int* _ni; int _iml, _cntml;
+Node *_nd; double _v = 0.0; int* _ni; int _iml, _cntml;
 #if CACHEVEC
     _ni = _ml->_nodeindices;
 #endif
@@ -501,16 +549,10 @@ for (_iml = 0; _iml < _cntml; ++_iml) {
     _nd = _ml->_nodelist[_iml];
     _v = NODEV(_nd);
   }
- _break = t + .5*dt; _save = t;
  v=_v;
 {
- { {
- for (; t < _break; t += dt) {
- error =  state();
+ { error =  state();
  if(error){fprintf(stderr,"at line 91 in file ExpGABAab.mod:\n	SOLVE state METHOD cnexp\n"); nrn_complain(_p); abort_run(error);}
- 
-}}
- t = _save;
  }}}
 
 }
