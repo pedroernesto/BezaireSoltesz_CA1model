@@ -20,9 +20,9 @@ proc calcNetSize_Slicing() {local i, max_number_slices, targetCircuit_length, gi
 		targetCircuit_length = LongitudinalLength	// Desired length of just one slice is bigger than the available x-lengh
 	}
 
-	GidsVector = new Vector()
-	SlicesVector = new Vector()
 	for i=0, numCellTypes-1 {			// For each cell type
+		GidsVector = new Vector()
+		SlicesVector = new Vector()
 		for gid=cellType[i].cellStartGid, cellType[i].cellEndGid {
 
 			xpos=get_x_pos(gid,cellType[i].cellStartGid,cellType[i].dentateXBins,cellType[i].dentateYBins*cellType[i].dentateZBins,cellType[i].dentateXBinSize)
