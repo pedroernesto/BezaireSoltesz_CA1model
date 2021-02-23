@@ -243,27 +243,31 @@ func connectCells () {local r, syn, distance, counter, precellType, postcellType
 		}
 
 		for r=numpost+2, numpost+2+int(conns2make.x[0]/1)-1 {	// For each potential connection suggested by the compiled mechanism
+																// Check that the postsynaptic cell exists on this processor
+																//  and create a reference to the cell object
+
+																// Note that the compiled mechanism only suggests which cells
+																//  to connect. It does not suggest which synapses on the
+																//  postsynaptic cell should be used to make the desired number
+																//  of synapses for the suggested connection. That happens below.
+
 			if (numpost>1) {
 				postgid = conns2make.x[r+connlength]
 			} else {
 				postgid = postcellgids.x[0]
 			}
 
-			if (pc.gid_exists(postgid)) {		// Check that the postsynaptic cell exists on this processor
-				cell = pc.gid2cell(postgid)		//  and create a reference to the cell object
-
-												// Note that the compiled mechanism only suggests which cells
-												//  to connect. It does not suggest which synapses on the
-												//  postsynaptic cell should be used to make the desired number
-												//  of synapses for the suggested connection. That happens below.
+			if (pc.gid_exists(postgid)) {
 
 				// Connect only cells belonging to the same slice
-				post_slice_index = SliceIndList.x[postgid-cellType[postcellType].cellStartGid]
+				post_slice_index = cellType[postcellType].SliceIndList.x[postgid-cellType[postcellType].cellStartGid]
 				pregid = conns2make.x[r]
-				pre_slice_index = SliceIndList.x[pregid-cellType[precellType].cellStartGid]
+				pre_slice_index = cellType[precellType].SliceIndList.x[pregid-cellType[precellType].cellStartGid]
 				if (pre_slice_index != post_slice_index) {
 					continue  // Transfer control to the next iteration of the for-loop statement
 				}
+
+				cell = pc.gid2cell(postgid)
 
 				numSynTypes = cell.pre_list.o(precellType).count()	// Get total number of potential synapse types for this combination
 																	//  of presynaptic cell type and postsynaptic cell type.
@@ -300,8 +304,6 @@ func connectCells () {local r, syn, distance, counter, precellType, postcellType
 													//  average weight of the synapse) and synVar (the parameter set
 													//  to define the variance of the distribution).
 					}
-
-
 
 					for s=1,numSyns {	// Randomly pick from the available synapses
 										//  enough times to make the desired number
