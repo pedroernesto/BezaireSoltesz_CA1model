@@ -42,6 +42,7 @@ convergence onto the postsynaptic cell satisfies the desired level. However,
 this will result in a rigid, strongly interconnected network.
 ************************************************************/
 
+objref precellgids
 objref postcellgids
 objref highIndices
 
@@ -65,9 +66,12 @@ proc makeConnections () {local precellType, postcellType, precellStart, precellE
 											//  by each cell of this postsynaptic type, owned by this host
 
 		for r=0, numpost-1 {				// Fill the newly created vector with the gids
-			postcellgids.x[r] = cellType[postType].CellList[r].gid*1.0
+			// postcellgids.x[r] = cellType[postType].CellList[r].gid*1.0
+			postcellgid = cellType[postType].CellList[r].gid
+			postcellgids.x[r] = cellType[postType].PosGidList.x[postcellgid-cellType[postType].cellStartGid]
 			highIndices.x[r] = 1+RandomSeedsConn
 		}
+		precellgids = cellType[preType].PosGidList
 
 		newhighindex = 1 + RandomSeedsConn	// Set the highIndex seed used by the random number generator within
 											//  the compiled mechanism that decides the connections. By explicitly
@@ -193,7 +197,7 @@ func connectCells () {local r, syn, distance, counter, precellType, postcellType
 		params.x[25]= 1+RandomSeedsConn // newhighindex
 		params.x[26]= connlength
 
-		conns2make.fastconn(params, postcellgids, highIndices)	// Use the newly installed vector method in the following manner:
+		conns2make.fastconn(params, precellgids, postcellgids, highIndices)	// Use the newly installed vector method in the following manner:
 																//  1. Create a vector that is more than 3x as long as the number
 																//     of connections you expect to make from this presynaptic
 																//     cell type to the specific postsynaptic cells owned by this
