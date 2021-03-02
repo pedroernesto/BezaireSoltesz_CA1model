@@ -73,7 +73,6 @@ load_file("./setupfiles/circuit_slicing/CellCategoryInfo.hoc")	// Contains the t
 													//  (datasets, connectivity, and stimulation)
 
 
-
 /***********************************************************************************************
 II. SET MODEL SIZE, CELL DEFINITIONS
 ***********************************************************************************************/
@@ -148,6 +147,7 @@ calcBinSize()
 // to be used later in cells positioning
 {load_file("./setupfiles/circuit_slicing/calcNetSize_Slicing.hoc")}
 update_network_gids()
+
 
 /***********************************************************************************************
 III. SET UP PARALLEL CAPABILITY AND MEMORY USAGE RECORDER, AND WRITE OUT RUN RECEIPT
@@ -245,7 +245,7 @@ if (strcmp(UID,"0")==0 && pc.id==0) {	// if a unique ID (UID) was not already
 	}
 	UID = direx
 }//  your pcitr loop when you call the
-																			//  pcitr iterator
+//  pcitr iterator
 
 if (OK2executeSysCmds==1) {
 	{load_file("./setupfiles/save_run_info.hoc")}	// This file will ensure a unique RunName (if

@@ -6,8 +6,7 @@ proc calcNetSize_Slicing() {local i, max_number_slices, targetCircuit_length, gi
 					//    - $2: Slices: desired number of slices along the x-direction
 					//    - gid: index of the cell in the original whole network
 
-	// Target circuit length with number of slices desired
-	// might be larger than the available x-length
+	// Target circuit length with number of slices desired might be larger than the available x-lengh
 	if (int(LongitudinalLength/$1) > $2) {
 		max_number_slices = $2
 	} else {
@@ -20,9 +19,10 @@ proc calcNetSize_Slicing() {local i, max_number_slices, targetCircuit_length, gi
 		targetCircuit_length = LongitudinalLength	// Desired length of just one slice is bigger than the available x-lengh
 	}
 
+
 	for i=0, numCellTypes-1 {			// For each cell type
-		GidsVector = new Vector()
-		SlicesVector = new Vector()
+        	GidsVector = new Vector()
+        	SlicesVector = new Vector()				
 		for gid=cellType[i].cellStartGid, cellType[i].cellEndGid {
 
 			xpos=get_x_pos(gid,cellType[i].cellStartGid,cellType[i].dentateXBins,cellType[i].dentateYBins*cellType[i].dentateZBins,cellType[i].dentateXBinSize)
@@ -38,13 +38,14 @@ proc calcNetSize_Slicing() {local i, max_number_slices, targetCircuit_length, gi
 				SlicesVector.append(int(xpos/$1))	// Slice where the cell will be placed
 			}
 		}
+	
 		cellType[i].PosGidList = new Vector()
 		cellType[i].PosGidList.copy(GidsVector)	// After slicing, collects original cell Gids for this celltype,
 												// the length of which equals the number of
 												// cells left of this type in the model
-
 		cellType[i].SliceIndList = new Vector()
 		cellType[i].SliceIndList.copy(SlicesVector)
+
 	}
 }
 calcNetSize_Slicing(SliceThickness, Slices)

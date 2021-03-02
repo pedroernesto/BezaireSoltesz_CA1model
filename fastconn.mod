@@ -27,7 +27,7 @@ for each cell type (as postsynaptic cell type) - hoc
 The way to call this from hoc:
 - first, install the vector method with this argument:
 	install_fastconn()
-
+	
 - then, create a vector with the parameters for the connections
 	(parameters described below)
 - then, create a vector with the gids of the post synaptic cells
@@ -94,26 +94,27 @@ ENDVERBATIM
 VERBATIM
 
 static  double fastconn (void* vv) {
-  int finalconn, ny, nv, nz, nhigh, num_pre, num_post, gmin, gmax, steps, myflaggy, myi, postgmin, stepover;
-  double *x, *y, *v, *z, *high, a, b, c, nconv, ncell, axonal_extent;
+  int finalconn, ny, ny_pos, nz_pos, nz, nhigh, num_pre, num_post, gmin, gmax, steps, myflaggy, myi, postgmin, stepover;
+  double *x, *y, *y_pos, *z_pos, *z, *high, a, b, c, nconv, ncell, axonal_extent;
 
 	/* Get hoc vectors into c arrays */
 	finalconn = vector_instance_px(vv, &x); // x is an array corresponding
-																					// to the placeholder vector
-																					// of connections to make
+											// to the placeholder vector
+											// of connections to make
 
 	ny = vector_arg_px(1, &y); 		// y is an array of parameters
-	nv = vector_arg_px(2, &v); 		// v is an array of the presynaptic position indexes
+	ny_pos = vector_arg_px(2, &y_pos); 	// y_pos is an array of presynaptic position indexes
 
-	// nz = vector_arg_px(2, &z); // z is an array of the postsynaptic gids
-	nz = vector_arg_px(2, &z); 		// z is an array of the postsynaptic position indexes
-	nhigh = vector_arg_px(3, &high); // high is an array of the starting high indices to use
+	nz = vector_arg_px(4, &z); 		// z is an array of the postsynaptic gids
+	nz_pos = vector_arg_px(3, &z_pos); 	// z_pos is an array of postsynaptic position indexes
+	nhigh = vector_arg_px(5, &high); // high is an array of the starting high indices to use
+
 
 	/* Load the parameters from the param array */
 	gmin = y[0];	// presynaptic start gid
 	gmax = y[1];	// presynaptic end gid
 	num_pre = gmax - gmin + 1;	// number of presynaptic cells
-
+	
 	nconv = y[2];	// total number of desired connections
 	ncell = y[3];	// total number of postsynaptic cells
 	num_post = y[4];	// number of postsynaptic cells owned by this host
@@ -132,8 +133,8 @@ static  double fastconn (void* vv) {
 	/* Get positions of the presynaptic and postsynaptic cells*/
 
 	// (1) a single NxM malloc: really this is a large 1-dim array of int values
-	//     onto which we will map 2D accesses
-	//
+	//     onto which we will map 2D accesses 
+	// 
 
 	// declaration and allocation:
 
@@ -143,14 +144,14 @@ static  double fastconn (void* vv) {
 	double *postpos;    // the type is a pointer to a double (the bucket type)
 	postpos = (double *)malloc(sizeof(double)*num_post*3);
 
-	// in memory:
+	// in memory: 
 	//                   row 0       row 1     row 2 ...
-	// 2d_array -----> [ 0, 0, ... , 0, 0, ... 0, 0, ... ]
+	// 2d_array -----> [ 0, 0, ... , 0, 0, ... 0, 0, ... ] 
 
-	// access using [] notation:
-	//    cannot use [i][j] syntax because the compiler has no idea where the
-	//    next row starts within this chunk of heap space, so must use single
-	//    index value that is calculated using row and column index values and
+	// access using [] notation: 
+	//    cannot use [i][j] syntax because the compiler has no idea where the 
+	//    next row starts within this chunk of heap space, so must use single 
+	//    index value that is calculated using row and column index values and 
 	//    the column dimension
 
 	int cell;
@@ -162,18 +163,18 @@ static  double fastconn (void* vv) {
 	}
 	*/
 	for (cell=0; cell<num_pre; cell++) {
-		prepos[cell*3 + 0] = get_x_pos(v[cell], gmin, y[10], y[11]*y[12], y[13]);
-		prepos[cell*3 + 1] = get_y_pos(v[cell], gmin, y[11], y[12], y[14]);
-		prepos[cell*3 + 2] = get_z_pos(v[cell], gmin, y[12], y[15], y[16]);
+		prepos[cell*3 + 0] = get_x_pos(y_pos[cell], gmin, y[10], y[11]*y[12], y[13]);
+		prepos[cell*3 + 1] = get_y_pos(y_pos[cell], gmin, y[11], y[12], y[14]);
+		prepos[cell*3 + 2] = get_z_pos(y_pos[cell], gmin, y[12], y[15], y[16]);
 	}
 
 	for (cell=0; cell<num_post; cell++) {
-		postpos[cell*3 + 0] = get_x_pos(z[cell], postgmin, y[17], y[18]*y[19], y[20]);
-		postpos[cell*3 + 1] = get_y_pos(z[cell], postgmin, y[18], y[19], y[21]);
-		postpos[cell*3 + 2] = get_z_pos(z[cell], postgmin, y[19], y[22], y[23]);
+		postpos[cell*3 + 0] = get_x_pos(z_pos[(int)z[cell]-postgmin], postgmin, y[17], y[18]*y[19], y[20]);
+		postpos[cell*3 + 1] = get_y_pos(z_pos[(int)z[cell]-postgmin], postgmin, y[18], y[19], y[21]);
+		postpos[cell*3 + 2] = get_z_pos(z_pos[(int)z[cell]-postgmin], postgmin, y[19], y[22], y[23]);
 	}
 
-	/* calculate the distribution of desired connections*/
+	/* calculate the distribution of desired connections*/   
 	double current_distance [steps], connection_distribution [steps], distribution_denominator, conndist;
 	int step, feasible_conns_this_step [steps], desired_conns_this_step [steps];
 
@@ -204,7 +205,7 @@ static  double fastconn (void* vv) {
 	}
 
 	/* for each postsynaptic cell, find the possible connections and
-	 * make the desired number of connections where possible */
+	 * make the desired number of connections where possible */   
 	int m, n, i, q, goupto, rem, extra, szr, szp [steps];
 	double distance_between;
 	u_int32_t idx1, idx2, maxidx1; // high and low index (seeds) for MCell_Ran4
@@ -213,7 +214,7 @@ static  double fastconn (void* vv) {
 	for (n=0; n<num_post; n++) { // for each post cell
 		int myx = (int)z[n]; // get the gid of the current postsynaptic cell in int form
 		idx1 = high[n];	// reset the high index for the next postsynaptic
-						// cell. It should be set to a value that is
+						// cell. It should be set to a value that is 
 						// certainly higher than what would have been
 						// used during previous calls for this low index/gid
 						// We accomplish that by setting it equal to the
@@ -224,7 +225,7 @@ static  double fastconn (void* vv) {
 
 		double *sortedpos;    // the type is a pointer to a double (the bucket type)
 		sortedpos = (double *)malloc(sizeof(double)*num_pre*steps);
-
+		
 		//double sortedpos [num_pre][steps];
 		for (step=0; step< steps; step++) {
 			szp [step]=0; 	// initialize the szp array to 0
@@ -232,9 +233,9 @@ static  double fastconn (void* vv) {
 							// index of the array you are on for that bin)
 							// when filling the array with available
 							// connections for each bin
-			feasible_conns_this_step[step] = desired_conns_this_step[step];
+			feasible_conns_this_step[step] = desired_conns_this_step[step];		
 		}
-
+		
 		double dist;
 		for(m=0; m<num_pre; m++) { // for each pre cell
 			// calculate the distance between the pre and post cells
@@ -265,7 +266,7 @@ static  double fastconn (void* vv) {
 		// that column's "step" or "distance bin"
 		// There is also a feasible_conns_this_step array that gives the ideal # of connections
 		// for each step
-
+			
 		rem=0;extra=0;
 		for (step=0; step<steps; step++) {	// for each step except the last one
 			szr = szp [step]; // Get the number of available connections for this step
@@ -282,12 +283,12 @@ static  double fastconn (void* vv) {
 							}
 							feasible_conns_this_step[step-i] = feasible_conns_this_step[step-i] + extra;
 							feasible_conns_this_step[step] = feasible_conns_this_step[step] - extra;
-							rem = rem - extra;
+							rem = rem - extra;				
 						}
 					}
 				}
 				if (rem>0 && step<steps-1) { // if that still doesn't satisfy all the remainder
-					for(i=step+1; i<steps; i++) {
+					for(i=step+1; i<steps; i++) {				
 						if (szp [i] > feasible_conns_this_step[i]) {
 							if (szp [i] - feasible_conns_this_step[i]>rem) {
 								extra = rem;
@@ -308,19 +309,19 @@ static  double fastconn (void* vv) {
 				printf("step: %d  szp: %d  feasible_conns_this_step: %d\n", step, szp [step], feasible_conns_this_step[step]);
 			}
 		}*/
-
+	
 		rem=0;
 		for (step=0; step<steps; step++) {	// for each step
 			if (feasible_conns_this_step[step]>0) { // if this particular step wants any connections
 				/* Find all the possible connections for each distance level  */
-
+				
 				/*if (ncell==2 && num_pre==3) {
 					printf("precells=%d postcells=%d step=%d szr=%d\n", num_pre, ncell, step, szr);
 				}*/
-
+				
 				szr = szp [step]; // Get the number of available connections for this step
 				int r[szr]; // Define an array the length of the number of available connections
-				for (i=0; i< szr; i++) {
+				for (i=0; i< szr; i++) { 
 					r[i] =  sortedpos[i*steps + step];
 					//r[i] =  sortedpos [i] [step]; // Fill the array with the available connections (in terms of the pre cell)
 				}
@@ -344,15 +345,15 @@ static  double fastconn (void* vv) {
 
 				for (q=0; q<goupto; q++) { 	// for each one to make, r[q] gives the precell index in the pre_pos array (this program assumes
 											// the gid range is continuous from gmin to gmax arguments to this mechanism.
-											// n is the post-cell here.
-					x [myi] = (r[q]+gmin)*1.0;				// presynaptic gid
+											// n is the post-cell here. 
+					x [myi] = (r[q]+gmin)*1.0;				// presynaptic gid	
 					if (num_post>1) {
 						x [myi+1*stepover] = (z[n])*1.0;	// postsynaptic gid
 						//x [myi+2*stepover] = (step+1)*1.0;	// distance step
 					}
 					myi++;
 				}
-			}
+			} 
 		}
 		x [2+n] = idx1 + 1;
 		//if (idx1>maxidx1) { maxidx1=idx1;}
@@ -363,7 +364,7 @@ static  double fastconn (void* vv) {
 					// which may be less than the desired number (and
 					// hence the size of the array)
 	x [1] = num_post; // (double)maxidx1;
-
+	
 	free(prepos);
 	free(postpos);
 	return finalconn;
