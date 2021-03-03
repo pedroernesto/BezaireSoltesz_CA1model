@@ -1,4 +1,4 @@
-/* Created by Language version: 6.2.0 */
+/* Created by Language version: 7.7.0 */
 /* NOT VECTORIZED */
 #define NRN_VECTORIZED 0
 #include <stdio.h>
@@ -82,6 +82,15 @@ extern void hoc_register_limits(int, HocParmLimits*);
 extern void hoc_register_units(int, HocParmUnits*);
 extern void nrn_promote(Prop*, int, int);
 extern Memb_func* memb_func;
+ 
+#define NMODL_TEXT 1
+#if NMODL_TEXT
+static const char* nmodl_file_text;
+static const char* nmodl_filename;
+extern void hoc_reg_nmodl_text(int, const char*);
+extern void hoc_reg_nmodl_filename(int, const char*);
+#endif
+
  extern void _nrn_setdata_reg(int, void(*)(Prop*));
  static void _setdata(Prop* _prop) {
  _p = _prop->param; _ppvar = _prop->dparam;
@@ -152,7 +161,7 @@ static void _ode_matsol(_NrnThread*, _Memb_list*, int);
  static void _ode_matsol_instance1(_threadargsproto_);
  /* connect range variables in _p that hoc is supposed to know about */
  static const char *_mechanism[] = {
- "6.2.0",
+ "7.7.0",
 "ch_HCNolm",
  "gmax_ch_HCNolm",
  "g_ch_HCNolm",
@@ -208,6 +217,10 @@ extern void _cvode_abstol( Symbol**, double*, int);
  _mechtype = nrn_get_mechtype(_mechanism[1]);
      _nrn_setdata_reg(_mechtype, _setdata);
      _nrn_thread_reg(_mechtype, 2, _update_ion_pointer);
+ #if NMODL_TEXT
+  hoc_reg_nmodl_text(_mechtype, nmodl_file_text);
+  hoc_reg_nmodl_filename(_mechtype, nmodl_filename);
+#endif
   hoc_register_prop_size(_mechtype, 8, 4);
   hoc_register_dparam_semantics(_mechtype, 0, "h_ion");
   hoc_register_dparam_semantics(_mechtype, 1, "h_ion");
@@ -216,7 +229,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
  	hoc_register_cvode(_mechtype, _ode_count, _ode_map, _ode_spec, _ode_matsol);
  	hoc_register_tolerance(_mechtype, _hoc_state_tol, &_atollist);
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 ch_HCNolm /home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64/ch_HCNolm.mod\n");
+ 	ivoc_help("help ?1 ch_HCNolm /users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/ch_HCNolm.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -253,7 +266,7 @@ static int _ode_spec1(_threadargsproto_);
  static int _ode_matsol1 () {
  rates ( _threadargscomma_ v ) ;
  Dr = Dr  / (1. - dt*( ( ( ( - 1.0 ) ) ) / tau_r )) ;
- return 0;
+  return 0;
 }
  /*END CVODE*/
  
@@ -562,3 +575,136 @@ static void _initlists() {
    _t_rexp = makevector(301*sizeof(double));
 _first = 0;
 }
+
+#if NMODL_TEXT
+static const char* nmodl_filename = "/users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/ch_HCNolm.mod";
+static const char* nmodl_file_text = 
+  "TITLE Hyperpolarization-activated, CN-gated channel (voltage dependent, for O-LM cells)\n"
+  "\n"
+  "COMMENT\n"
+  "Hyperpolarization-activated, CN-gated channel (voltage dependent, for O-LM cells)\n"
+  "\n"
+  "Ions: non-specific\n"
+  "\n"
+  "Style: quasi-ohmic\n"
+  "\n"
+  "From: 1.	Maccaferri, G. and McBain, C.J. The hyperpolarization-activated current\n"
+  "	(Ih) and its contribution to pacemaker activity in rat CA1 hippocampal\n"
+  "	stratum oriens-alveus interneurons, J. Physiol. 497.1:119-130,\n"
+  "	1996.\n"
+  "\n"
+  "		V1/2 = -84.1 mV\n"
+  "		   k = 10.2\n"
+  "		reversal potential = -32.9 +/- 1.1 mV\n"
+  "\n"
+  "at -70 mV, currents were fitted by a single exponetial of t = 2.8+/- 0.76 s\n"
+  "at -120 mV, two exponentials were required, t1 = 186.3+/-33.6 ms \n"
+  "t2 = 1.04+/-0.16 s\n"
+  "\n"
+  "\n"
+  "2.	Maccaferri, G. et al. Properties of the\n"
+  "	Hyperpoarization-activated current in rat hippocampal CA1 Pyramidal\n"
+  "	cells. J. Neurophysiol. Vol. 69 No. 6:2129-2136, 1993.\n"
+  "\n"
+  "		V1/2 = -97.9 mV\n"
+  "		   k = 13.4\n"
+  "		reversal potential = -18.3 mV\n"
+  "\n"
+  "3.	Pape, H.C.  Queer current and pacemaker: The\n"
+  "	hyperpolarization-activated cation current in neurons, Annu. Rev. \n"
+  "	Physiol. 58:299-327, 1996.\n"
+  "\n"
+  "		single channel conductance is around 1 pS\n"
+  "		average channel density is below 0.5 um-2\n"
+  "		0.5 pS/um2 = 0.00005 mho/cm2 = 0.05 umho/cm2		\n"
+  "4.	Magee, J.C. Dendritic Hyperpolarization-Activated Currents Modify\n"
+  "	the Integrative Properties of Hippocampal CA1 Pyramidal Neurons, J.\n"
+  "	Neurosci., 18(19):7613-7624, 1998\n"
+  "\n"
+  "Deals with Ih in CA1 pyramidal cells.  Finds that conductance density\n"
+  "increases with distance from the soma.\n"
+  "\n"
+  "soma g = 0.0013846 mho/cm2\n"
+  "dendrite g (300-350 um away) = 0.0125 mho/cm2\n"
+  "see Table 1 in th paper\n"
+  "\n"
+  "Updates:\n"
+  "2014 December (Marianne Bezaire): documented\n"
+  "ENDCOMMENT\n"
+  "\n"
+  "\n"
+  "\n"
+  " UNITS {\n"
+  "        (mA) = (milliamp)\n"
+  "        (mV) = (millivolt)\n"
+  "}\n"
+  " \n"
+  "NEURON {\n"
+  "        SUFFIX ch_HCNolm\n"
+  "        USEION h READ eh WRITE ih VALENCE 1\n"
+  "        RANGE gmax,ih, g\n"
+  "        GLOBAL rinf, rexp, tau_r\n"
+  "        RANGE myi\n"
+  "}\n"
+  " \n"
+  "INDEPENDENT {t FROM 0 TO 1 WITH 1 (ms)}\n"
+  " \n"
+  "PARAMETER {\n"
+  "        v (mV)\n"
+  "        dt (ms)\n"
+  "        gmax = 0.001385 (mho/cm2)\n"
+  "		g (mho/cm2)\n"
+  "        eh = -32.9 (mV)\n"
+  "}\n"
+  " \n"
+  "STATE {\n"
+  "        r\n"
+  "}\n"
+  " \n"
+  "ASSIGNED {\n"
+  "        ih (mA/cm2)\n"
+  "	rinf rexp\n"
+  "	tau_r\n"
+  "	myi (mA/cm2)\n"
+  "}\n"
+  " \n"
+  "BREAKPOINT {\n"
+  "	SOLVE deriv METHOD derivimplicit\n"
+  "	g = gmax*r\n"
+  "	ih = g*(v - eh)\n"
+  "	myi = ih\n"
+  "}\n"
+  " \n"
+  "INITIAL {\n"
+  "	rates(v)\n"
+  "	r = rinf\n"
+  "}\n"
+  "\n"
+  "DERIVATIVE deriv { :Computes state variable h at current v and dt.\n"
+  "	rates(v)\n"
+  "	r' = (rinf - r)/tau_r\n"
+  "}\n"
+  "\n"
+  "\n"
+  "PROCEDURE rates(v) {  :Computes rate and other constants at current v.\n"
+  "                      :Call once from HOC to initialize inf at resting v.\n"
+  "        TABLE rinf, tau_r, rexp DEPEND dt FROM -200\n"
+  "TO 100 WITH 300\n"
+  "	rinf = 1/(1 + exp((v+84.1)/10.2))\n"
+  "	tau_r = 100 + 1/(exp(-17.9-0.116*v)+exp(-1.84+0.09*v))\n"
+  "	rexp = 1 - exp(-dt/(tau_r))\n"
+  "}\n"
+  "\n"
+  "FUNCTION efun(z) {\n"
+  "  if (fabs(z) < 1e-4) {\n"
+  "    efun = 1 - z/2\n"
+  "  } else {\n"
+  "    efun = z/(exp(z) - 1)\n"
+  "  }\n"
+  "}\n"
+  "\n"
+  " \n"
+  "UNITSON\n"
+  "\n"
+  ;
+#endif

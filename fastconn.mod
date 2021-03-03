@@ -94,20 +94,21 @@ ENDVERBATIM
 VERBATIM
 
 static  double fastconn (void* vv) {
-  int finalconn, ny, ny_pos, nz_pos, nz, nhigh, num_pre, num_post, gmin, gmax, steps, myflaggy, myi, postgmin, stepover;
-  double *x, *y, *y_pos, *z_pos, *z, *high, a, b, c, nconv, ncell, axonal_extent;
-
+  int finalconn, ny, ny_start, ny_pos, nz_start, nz_pos, nz, nhigh, num_pre, num_post, gmin, gmax, steps, myflaggy, myi, postgmin, stepover;
+  double *x, *y, *y_start, *y_pos, *z_start, *z_pos, *z, *high, a, b, c, nconv, ncell, axonal_extent;
 	/* Get hoc vectors into c arrays */
 	finalconn = vector_instance_px(vv, &x); // x is an array corresponding
-											// to the placeholder vector
-											// of connections to make
+						// to the placeholder vector
+						// of connections to make
 
 	ny = vector_arg_px(1, &y); 		// y is an array of parameters
-	ny_pos = vector_arg_px(2, &y_pos); 	// y_pos is an array of presynaptic position indexes
+	ny_start = vector_arg_px(2, &y_start);  // y_start is the reference for presynaptic position indexes
+	ny_pos = vector_arg_px(3, &y_pos); 	// y_pos is an array of presynaptic position indexes
 
-	nz = vector_arg_px(4, &z); 		// z is an array of the postsynaptic gids
-	nz_pos = vector_arg_px(3, &z_pos); 	// z_pos is an array of postsynaptic position indexes
-	nhigh = vector_arg_px(5, &high); // high is an array of the starting high indices to use
+        nz_start = vector_arg_px(4, &z_start);  // z_start is the reference for postsynaptic position indexes
+	nz_pos = vector_arg_px(5, &z_pos); 	// z_pos is an array of postsynaptic position indexes
+	nz = vector_arg_px(6, &z); 		// z is an array of the postsynaptic gids
+	nhigh = vector_arg_px(7, &high); 	// high is an array of the starting high indices to use
 
 
 	/* Load the parameters from the param array */
@@ -163,15 +164,15 @@ static  double fastconn (void* vv) {
 	}
 	*/
 	for (cell=0; cell<num_pre; cell++) {
-		prepos[cell*3 + 0] = get_x_pos(y_pos[cell], gmin, y[10], y[11]*y[12], y[13]);
-		prepos[cell*3 + 1] = get_y_pos(y_pos[cell], gmin, y[11], y[12], y[14]);
-		prepos[cell*3 + 2] = get_z_pos(y_pos[cell], gmin, y[12], y[15], y[16]);
+		prepos[cell*3 + 0] = get_x_pos(y_pos[cell], y_start[0], y[10], y[11]*y[12], y[13]);
+		prepos[cell*3 + 1] = get_y_pos(y_pos[cell], y_start[0], y[11], y[12], y[14]);
+		prepos[cell*3 + 2] = get_z_pos(y_pos[cell], y_start[0], y[12], y[15], y[16]);
 	}
 
 	for (cell=0; cell<num_post; cell++) {
-		postpos[cell*3 + 0] = get_x_pos(z_pos[(int)z[cell]-postgmin], postgmin, y[17], y[18]*y[19], y[20]);
-		postpos[cell*3 + 1] = get_y_pos(z_pos[(int)z[cell]-postgmin], postgmin, y[18], y[19], y[21]);
-		postpos[cell*3 + 2] = get_z_pos(z_pos[(int)z[cell]-postgmin], postgmin, y[19], y[22], y[23]);
+		postpos[cell*3 + 0] = get_x_pos(z_pos[(int)z[cell]-postgmin], z_start[0], y[17], y[18]*y[19], y[20]);
+		postpos[cell*3 + 1] = get_y_pos(z_pos[(int)z[cell]-postgmin], z_start[0], y[18], y[19], y[21]);
+		postpos[cell*3 + 2] = get_z_pos(z_pos[(int)z[cell]-postgmin], z_start[0], y[19], y[22], y[23]);
 	}
 
 	/* calculate the distribution of desired connections*/   

@@ -1,4 +1,4 @@
-/* Created by Language version: 6.2.0 */
+/* Created by Language version: 7.7.0 */
 /* NOT VECTORIZED */
 #define NRN_VECTORIZED 0
 #include <stdio.h>
@@ -82,6 +82,15 @@ extern void hoc_register_limits(int, HocParmLimits*);
 extern void hoc_register_units(int, HocParmUnits*);
 extern void nrn_promote(Prop*, int, int);
 extern Memb_func* memb_func;
+ 
+#define NMODL_TEXT 1
+#if NMODL_TEXT
+static const char* nmodl_file_text;
+static const char* nmodl_filename;
+extern void hoc_reg_nmodl_text(int, const char*);
+extern void hoc_reg_nmodl_filename(int, const char*);
+#endif
+
  extern void _nrn_setdata_reg(int, void(*)(Prop*));
  static void _setdata(Prop* _prop) {
  _p = _prop->param; _ppvar = _prop->dparam;
@@ -178,7 +187,7 @@ static void _ode_matsol(_NrnThread*, _Memb_list*, int);
  static void _ode_matsol_instance1(_threadargsproto_);
  /* connect range variables in _p that hoc is supposed to know about */
  static const char *_mechanism[] = {
- "6.2.0",
+ "7.7.0",
 "ch_HCNp",
  "e_ch_HCNp",
  "gmax_ch_HCNp",
@@ -227,12 +236,16 @@ extern void _cvode_abstol( Symbol**, double*, int);
  	register_mech(_mechanism, nrn_alloc,nrn_cur, nrn_jacob, nrn_state, nrn_init, hoc_nrnpointerindex, 0);
  _mechtype = nrn_get_mechtype(_mechanism[1]);
      _nrn_setdata_reg(_mechtype, _setdata);
+ #if NMODL_TEXT
+  hoc_reg_nmodl_text(_mechtype, nmodl_file_text);
+  hoc_reg_nmodl_filename(_mechtype, nmodl_filename);
+#endif
   hoc_register_prop_size(_mechtype, 9, 1);
   hoc_register_dparam_semantics(_mechtype, 0, "cvodeieq");
  	hoc_register_cvode(_mechtype, _ode_count, _ode_map, _ode_spec, _ode_matsol);
  	hoc_register_tolerance(_mechtype, _hoc_state_tol, &_atollist);
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 ch_HCNp /home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64/ch_HCNp.mod\n");
+ 	ivoc_help("help ?1 ch_HCNp /users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/ch_HCNp.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -300,7 +313,7 @@ static void _hoc_bett(void) {
  static int _ode_matsol1 () {
  rate ( _threadargscomma_ v ) ;
  Dl = Dl  / (1. - dt*( ( ( ( - 1.0 ) ) ) / taul )) ;
- return 0;
+  return 0;
 }
  /*END CVODE*/
  static int states () {_reset=0;
@@ -497,3 +510,104 @@ static void _initlists() {
  _slist1[0] = &(l) - _p;  _dlist1[0] = &(Dl) - _p;
 _first = 0;
 }
+
+#if NMODL_TEXT
+static const char* nmodl_filename = "/users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/ch_HCNp.mod";
+static const char* nmodl_file_text = 
+  "TITLE Hyperpolarization-activated, CN-gated channel (voltage dependent)\n"
+  "\n"
+  "COMMENT\n"
+  "Hyperpolarization-activated, CN-gated channel (voltage dependent)\n"
+  "\n"
+  "Ions: non-specific\n"
+  "\n"
+  "Style: quasi-ohmic\n"
+  "\n"
+  "From: Magee 1998 for distal dendrites, default values are for dendrites and low Na\n"
+  "\n"
+  "Updates:\n"
+  "2014 December (Marianne Bezaire): documented\n"
+  "ENDCOMMENT\n"
+  "\n"
+  "\n"
+  "UNITS {\n"
+  "	(mA) = (milliamp)\n"
+  "	(mV) = (millivolt)\n"
+  "\n"
+  "}\n"
+  "\n"
+  "PARAMETER {\n"
+  "	v 		(mV)\n"
+  "	e  		(mV)        \n"
+  "	celsius 	(degC)\n"
+  "	gmax=.0001 	(mho/cm2)\n"
+  "	vhalfl=-90   	(mV)\n"
+  "	vhalft=-75   	(mV)\n"
+  "	a0t=0.011      	(/ms)\n"
+  "	zetal=4    	(1)\n"
+  "	zetat=2.2    	(1)\n"
+  "	gmt=.4   	(1)\n"
+  "	q10=4.5\n"
+  "	qtl=1\n"
+  "}\n"
+  "\n"
+  "\n"
+  "NEURON {\n"
+  "	SUFFIX ch_HCNp\n"
+  "	NONSPECIFIC_CURRENT i\n"
+  "	RANGE gmax, vhalfl, myi, e, g\n"
+  "	GLOBAL linf,taul\n"
+  "}\n"
+  "\n"
+  "STATE {\n"
+  "	l\n"
+  "}\n"
+  "\n"
+  "ASSIGNED {\n"
+  "	i (mA/cm2)\n"
+  "	myi (mA/cm2)\n"
+  "	linf      \n"
+  "	taul\n"
+  "	g\n"
+  "}\n"
+  "\n"
+  "INITIAL {\n"
+  "	rate(v)\n"
+  "	l=linf\n"
+  "}\n"
+  "\n"
+  "\n"
+  "BREAKPOINT {\n"
+  "	SOLVE states METHOD cnexp\n"
+  "	g = gmax*l\n"
+  "	i = g*(v-e)\n"
+  "	myi = i\n"
+  "}\n"
+  "\n"
+  "\n"
+  "FUNCTION alpl(v(mV)) {\n"
+  "	alpl = exp(0.0378*zetal*(v-vhalfl)) \n"
+  "}\n"
+  "\n"
+  "FUNCTION alpt(v(mV)) {\n"
+  "	alpt = exp(0.0378*zetat*(v-vhalft)) \n"
+  "}\n"
+  "\n"
+  "FUNCTION bett(v(mV)) {\n"
+  "	bett = exp(0.0378*zetat*gmt*(v-vhalft)) \n"
+  "}\n"
+  "\n"
+  "DERIVATIVE states {     : exact when v held constant; integrates over dt step\n"
+  "	rate(v)\n"
+  "	l' =  (linf - l)/taul\n"
+  "}\n"
+  "\n"
+  "PROCEDURE rate(v (mV)) { :callable from hoc\n"
+  "	LOCAL a,qt\n"
+  "	qt=q10^((celsius-33)/10)\n"
+  "	a = alpt(v)\n"
+  "	linf = 1/(1+ alpl(v))\n"
+  "	taul = bett(v)/(qtl*qt*a0t*(1+a))\n"
+  "}\n"
+  ;
+#endif

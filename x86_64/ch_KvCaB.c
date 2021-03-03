@@ -1,4 +1,4 @@
-/* Created by Language version: 6.2.0 */
+/* Created by Language version: 7.7.0 */
 /* NOT VECTORIZED */
 #define NRN_VECTORIZED 0
 #include <stdio.h>
@@ -86,6 +86,15 @@ extern void hoc_register_limits(int, HocParmLimits*);
 extern void hoc_register_units(int, HocParmUnits*);
 extern void nrn_promote(Prop*, int, int);
 extern Memb_func* memb_func;
+ 
+#define NMODL_TEXT 1
+#if NMODL_TEXT
+static const char* nmodl_file_text;
+static const char* nmodl_filename;
+extern void hoc_reg_nmodl_text(int, const char*);
+extern void hoc_reg_nmodl_filename(int, const char*);
+#endif
+
  extern void _nrn_setdata_reg(int, void(*)(Prop*));
  static void _setdata(Prop* _prop) {
  _p = _prop->param; _ppvar = _prop->dparam;
@@ -182,7 +191,7 @@ static void _ode_matsol(_NrnThread*, _Memb_list*, int);
  static void _ode_matsol_instance1(_threadargsproto_);
  /* connect range variables in _p that hoc is supposed to know about */
  static const char *_mechanism[] = {
- "6.2.0",
+ "7.7.0",
 "ch_KvCaB",
  "gmax_ch_KvCaB",
  0,
@@ -243,6 +252,10 @@ extern void _cvode_abstol( Symbol**, double*, int);
  _mechtype = nrn_get_mechtype(_mechanism[1]);
      _nrn_setdata_reg(_mechtype, _setdata);
      _nrn_thread_reg(_mechtype, 2, _update_ion_pointer);
+ #if NMODL_TEXT
+  hoc_reg_nmodl_text(_mechtype, nmodl_file_text);
+  hoc_reg_nmodl_filename(_mechtype, nmodl_filename);
+#endif
   hoc_register_prop_size(_mechtype, 9, 5);
   hoc_register_dparam_semantics(_mechtype, 0, "k_ion");
   hoc_register_dparam_semantics(_mechtype, 1, "k_ion");
@@ -252,11 +265,13 @@ extern void _cvode_abstol( Symbol**, double*, int);
  	hoc_register_cvode(_mechtype, _ode_count, _ode_map, _ode_spec, _ode_matsol);
  	hoc_register_tolerance(_mechtype, _hoc_state_tol, &_atollist);
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 ch_KvCaB /home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64/ch_KvCaB.mod\n");
+ 	ivoc_help("help ?1 ch_KvCaB /users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/ch_KvCaB.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
- static double FARADAY = 96.4853;
+ 
+#define FARADAY _nrnunit_FARADAY[_nrnunit_use_legacy_]
+static double _nrnunit_FARADAY[2] = {0x1.81f0fae775425p+6, 96.4853}; /* 96.4853321233100161 */
  static double R = 8.313424;
 static int _reset;
 static char *modelname = "Calcium activated potassium channel (voltage dependent)";
@@ -290,7 +305,7 @@ static int _ode_spec1(_threadargsproto_);
  static int _ode_matsol1 () {
  rate ( _threadargscomma_ v , cai ) ;
  Do = Do  / (1. - dt*( ( ( ( - 1.0 ) ) ) / otau )) ;
- return 0;
+  return 0;
 }
  /*END CVODE*/
  static int state () {_reset=0;
@@ -546,3 +561,133 @@ static void _initlists() {
  _slist1[0] = &(o) - _p;  _dlist1[0] = &(Do) - _p;
 _first = 0;
 }
+
+#if NMODL_TEXT
+static const char* nmodl_filename = "/users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/ch_KvCaB.mod";
+static const char* nmodl_file_text = 
+  "TITLE Calcium activated potassium channel (voltage dependent)\n"
+  "\n"
+  "COMMENT\n"
+  "Ca2+-activated K+ channel (voltage dependent)\n"
+  "\n"
+  "Ions: k\n"
+  "\n"
+  "Style: quasi-ohmic\n"
+  "\n"
+  "From: Modified from Moczydlowski and Latorre (1983) J. Gen. Physiol. 82\n"
+  "\n"
+  "Updates:\n"
+  "2014 December (Marianne Bezaire): documented\n"
+  "ENDCOMMENT\n"
+  "\n"
+  "\n"
+  "VERBATIM\n"
+  "#include <stdlib.h> /* 	Include this library so that the following\n"
+  "						(innocuous) warning does not appear:\n"
+  "						 In function '_thread_cleanup':\n"
+  "						 warning: incompatible implicit declaration of \n"
+  "						          built-in function 'free'  */\n"
+  "ENDVERBATIM\n"
+  "\n"
+  "UNITS {\n"
+  "	(molar) = (1/liter)\n"
+  "}\n"
+  "\n"
+  "UNITS {\n"
+  "	(mV) =	(millivolt)\n"
+  "	(mA) =	(milliamp)\n"
+  "	(mM) =	(millimolar)\n"
+  "}\n"
+  "\n"
+  "NEURON {\n"
+  "	SUFFIX ch_KvCaB\n"
+  "	USEION k READ ek WRITE ik\n"
+  "	USEION ca READ cai VALENCE 2\n"
+  "	:USEION nca READ ncai VALENCE 2\n"
+  "	:USEION lca READ lcai VALENCE 2\n"
+  "	:USEION tca READ tcai VALENCE 2\n"
+  "	RANGE gmax, g, ik\n"
+  "	RANGE myi\n"
+  "	GLOBAL oinf, otau	: these two are not thread safe\n"
+  "    THREADSAFE\n"
+  "}\n"
+  "\n"
+  "UNITS {\n"
+  "	FARADAY = (faraday)  (kilocoulombs)\n"
+  "	R = 8.313424 (joule/degC)\n"
+  "}\n"
+  "\n"
+  "PARAMETER {	: clean up the PARAMETER and ASSIGNED blocks\n"
+  "	gmax=.01	(mho/cm2)	: Maximum Permeability\n"
+  "\n"
+  "	d1 = .84\n"
+  "	d2 = 1.	\n"
+  "	k1 = .48e-3	(mM)\n"
+  "	k2 = .13e-6	(mM)\n"
+  "	:cai = 5.e-5	(mM)\n"
+  "	cai (mM)\n"
+  "	\n"
+  "	abar = .28	(/ms)\n"
+  "	bbar = .48	(/ms)\n"
+  "	\n"
+  "	st=1		(1)\n"
+  "}\n"
+  "\n"
+  "ASSIGNED {	: clean up the PARAMETER and ASSIGNED blocks\n"
+  "      celsius (degC) : temperature - set in hoc; default is 6.3\n"
+  "	v			(mV)\n"
+  "\n"
+  "	:lcai		(mV)\n"
+  "	:ncai		(mV)\n"
+  "	:tcai		(mV)\n"
+  "\n"
+  "	ek			(mV)\n"
+  "	ik			(mA/cm2)\n"
+  "\n"
+  "	oinf\n"
+  "	otau		(ms)\n"
+  "	g		(mho/cm2)\n"
+  "	myi (mA/cm2)\n"
+  "}\n"
+  "\n"
+  "INITIAL {\n"
+  "	:cai= ncai + lcai : + tcai\n"
+  "        rate(v,cai)\n"
+  "        o=oinf\n"
+  "}\n"
+  "\n"
+  "STATE {	o }		: fraction of open channels\n"
+  "\n"
+  "BREAKPOINT {\n"
+  "	SOLVE state METHOD cnexp\n"
+  "	g = gmax*o^st\n"
+  "	ik = g*(v - ek)\n"
+  "	myi = ik\n"
+  "}\n"
+  "\n"
+  "DERIVATIVE state {	: exact when v held constant; integrates over dt step\n"
+  "	:cai= ncai + lcai : + tcai\n"
+  "	rate(v, cai)\n"
+  "	o' = (oinf - o)/otau\n"
+  "}\n"
+  "\n"
+  "FUNCTION alp(v (mV), c (mM)) (1/ms) { :callable from hoc\n"
+  "	alp = c*abar/(c + exp1(k1,d1,v))\n"
+  "}\n"
+  "\n"
+  "FUNCTION bet(v (mV), c (mM)) (1/ms) { :callable from hoc\n"
+  "	bet = bbar/(1 + c/exp1(k2,d2,v))\n"
+  "}\n"
+  "\n"
+  "FUNCTION exp1(k (mM), d, v (mV)) (mM) { :callable from hoc\n"
+  "	exp1 = k*exp(-2*d*FARADAY*v/R/(273.15 + celsius))\n"
+  "}\n"
+  "\n"
+  "PROCEDURE rate(v (mV), c (mM)) { :callable from hoc\n"
+  "	LOCAL a\n"
+  "	a = alp(v,c)\n"
+  "	otau = 1/(a + bet(v, c))\n"
+  "	oinf = a*otau\n"
+  "}\n"
+  ;
+#endif

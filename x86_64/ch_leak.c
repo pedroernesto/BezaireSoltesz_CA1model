@@ -1,4 +1,4 @@
-/* Created by Language version: 6.2.0 */
+/* Created by Language version: 7.7.0 */
 /* NOT VECTORIZED */
 #define NRN_VECTORIZED 0
 #include <stdio.h>
@@ -72,6 +72,15 @@ extern void hoc_register_limits(int, HocParmLimits*);
 extern void hoc_register_units(int, HocParmUnits*);
 extern void nrn_promote(Prop*, int, int);
 extern Memb_func* memb_func;
+ 
+#define NMODL_TEXT 1
+#if NMODL_TEXT
+static const char* nmodl_file_text;
+static const char* nmodl_filename;
+extern void hoc_reg_nmodl_text(int, const char*);
+extern void hoc_reg_nmodl_filename(int, const char*);
+#endif
+
  extern void _nrn_setdata_reg(int, void(*)(Prop*));
  static void _setdata(Prop* _prop) {
  _p = _prop->param; _ppvar = _prop->dparam;
@@ -116,7 +125,7 @@ static void nrn_state(_NrnThread*, _Memb_list*, int);
 static void  nrn_jacob(_NrnThread*, _Memb_list*, int);
  /* connect range variables in _p that hoc is supposed to know about */
  static const char *_mechanism[] = {
- "6.2.0",
+ "7.7.0",
 "ch_leak",
  "g_ch_leak",
  "gmax_ch_leak",
@@ -155,9 +164,13 @@ extern void _cvode_abstol( Symbol**, double*, int);
  	register_mech(_mechanism, nrn_alloc,nrn_cur, nrn_jacob, nrn_state, nrn_init, hoc_nrnpointerindex, 0);
  _mechtype = nrn_get_mechtype(_mechanism[1]);
      _nrn_setdata_reg(_mechtype, _setdata);
+ #if NMODL_TEXT
+  hoc_reg_nmodl_text(_mechtype, nmodl_file_text);
+  hoc_reg_nmodl_filename(_mechtype, nmodl_filename);
+#endif
   hoc_register_prop_size(_mechtype, 6, 0);
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 ch_leak /home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64/ch_leak.mod\n");
+ 	ivoc_help("help ?1 ch_leak /users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/ch_leak.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -277,3 +290,65 @@ static void _initlists() {
   if (!_first) return;
 _first = 0;
 }
+
+#if NMODL_TEXT
+static const char* nmodl_filename = "/users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/ch_leak.mod";
+static const char* nmodl_file_text = 
+  "TITLE leak conductance (voltage independent)\n"
+  "\n"
+  "COMMENT\n"
+  "leak conductance (voltage independent)\n"
+  "\n"
+  "Ions: non-specific\n"
+  "\n"
+  "Style: quasi-ohmic\n"
+  "\n"
+  "From: unknown\n"
+  "\n"
+  "Updates:\n"
+  "2014 December (Marianne Bezaire): documented\n"
+  "ENDCOMMENT\n"
+  "\n"
+  "\n"
+  "VERBATIM\n"
+  "#include <stdlib.h> /* 	Include this library so that the following\n"
+  "						(innocuous) warning does not appear:\n"
+  "						 In function '_thread_cleanup':\n"
+  "						 warning: incompatible implicit declaration of \n"
+  "						          built-in function 'free'  */\n"
+  "ENDVERBATIM\n"
+  "\n"
+  "UNITS {\n"
+  "	(mA) =(milliamp)\n"
+  "	(mV) =(millivolt)\n"
+  "}\n"
+  " \n"
+  "NEURON { \n"
+  "	SUFFIX ch_leak \n"
+  "	NONSPECIFIC_CURRENT i\n"
+  "	RANGE gmax, e, i\n"
+  "	RANGE myi, g\n"
+  "    THREADSAFE\n"
+  "}\n"
+  " \n"
+  "PARAMETER {\n"
+  "	g (mho/cm2)		: conductance of the leak channels    \n"
+  "	gmax (mho/cm2)		: conductance of the leak channels    \n"
+  "	e (mV)			: reversal potential of the leak channels\n"
+  "}\n"
+  "\n"
+  "ASSIGNED {	: assigned variables are by default RANGE, but not available to hoc (unless RANGE in NEURON block)	     		\n"
+  "	v (mV) 			: membrane voltage\n"
+  "					: available to all mechanisms by default, but for\n"
+  "					: cross-simulator fluency, it is included here \n"
+  "	i (mA/cm2)		: current through the leak channels\n"
+  "	myi (mA/cm2)\n"
+  "} \n"
+  "\n"
+  "BREAKPOINT {\n"
+  "	g = gmax\n"
+  "	i = g*(v-e)	: solve for the current (at each dt)\n"
+  "	myi = i\n"
+  "}\n"
+  ;
+#endif

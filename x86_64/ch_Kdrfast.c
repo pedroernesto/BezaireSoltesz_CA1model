@@ -1,4 +1,4 @@
-/* Created by Language version: 6.2.0 */
+/* Created by Language version: 7.7.0 */
 /* NOT VECTORIZED */
 #define NRN_VECTORIZED 0
 #include <stdio.h>
@@ -89,6 +89,15 @@ extern void hoc_register_limits(int, HocParmLimits*);
 extern void hoc_register_units(int, HocParmUnits*);
 extern void nrn_promote(Prop*, int, int);
 extern Memb_func* memb_func;
+ 
+#define NMODL_TEXT 1
+#if NMODL_TEXT
+static const char* nmodl_file_text;
+static const char* nmodl_filename;
+extern void hoc_reg_nmodl_text(int, const char*);
+extern void hoc_reg_nmodl_filename(int, const char*);
+#endif
+
  extern void _nrn_setdata_reg(int, void(*)(Prop*));
  static void _setdata(Prop* _prop) {
  _p = _prop->param; _ppvar = _prop->dparam;
@@ -147,7 +156,7 @@ static void  nrn_jacob(_NrnThread*, _Memb_list*, int);
 static int _ode_count(int);
  /* connect range variables in _p that hoc is supposed to know about */
  static const char *_mechanism[] = {
- "6.2.0",
+ "7.7.0",
 "ch_Kdrfast",
  "gmax_ch_Kdrfast",
  0,
@@ -199,13 +208,17 @@ extern void _cvode_abstol( Symbol**, double*, int);
  _mechtype = nrn_get_mechtype(_mechanism[1]);
      _nrn_setdata_reg(_mechtype, _setdata);
      _nrn_thread_reg(_mechtype, 2, _update_ion_pointer);
+ #if NMODL_TEXT
+  hoc_reg_nmodl_text(_mechtype, nmodl_file_text);
+  hoc_reg_nmodl_filename(_mechtype, nmodl_filename);
+#endif
   hoc_register_prop_size(_mechtype, 11, 3);
   hoc_register_dparam_semantics(_mechtype, 0, "k_ion");
   hoc_register_dparam_semantics(_mechtype, 1, "k_ion");
   hoc_register_dparam_semantics(_mechtype, 2, "k_ion");
  	hoc_register_cvode(_mechtype, _ode_count, 0, 0, 0);
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 ch_Kdrfast /home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64/ch_Kdrfast.mod\n");
+ 	ivoc_help("help ?1 ch_Kdrfast /users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/ch_Kdrfast.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -504,3 +517,137 @@ static void _initlists() {
    _t_ntau = makevector(201*sizeof(double));
 _first = 0;
 }
+
+#if NMODL_TEXT
+static const char* nmodl_filename = "/users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/ch_Kdrfast.mod";
+static const char* nmodl_file_text = 
+  "TITLE Fast delayed rectifier potassium channel (voltage dependent)\n"
+  "\n"
+  "COMMENT\n"
+  "Fast delayed rectifier potassium channel (voltage dependent)\n"
+  "\n"
+  "Ions: k\n"
+  "\n"
+  "Style: quasi-ohmic\n"
+  "\n"
+  "From: Yuen and Durand, 1991 (squid axon)\n"
+  "\n"
+  "Updates:\n"
+  "2014 December (Marianne Bezaire): documented\n"
+  "? ? ?: further shifted the voltage dependence by 65 mV\n"
+  "? ? (Aradi): shifted the voltage dependence by 16 mV\n"
+  "ENDCOMMENT\n"
+  "\n"
+  "\n"
+  "VERBATIM\n"
+  "#include <stdlib.h> /* 	Include this library so that the following\n"
+  "						(innocuous) warning does not appear:\n"
+  "						 In function '_thread_cleanup':\n"
+  "						 warning: incompatible implicit declaration of \n"
+  "						          built-in function 'free'  */\n"
+  "ENDVERBATIM\n"
+  " \n"
+  "UNITS {\n"
+  "	(mA) =(milliamp)\n"
+  "	(mV) =(millivolt)\n"
+  "	(uF) = (microfarad)\n"
+  "	(molar) = (1/liter)\n"
+  "	(nA) = (nanoamp)\n"
+  "	(mM) = (millimolar)\n"
+  "	(um) = (micron)\n"
+  "	FARADAY = 96520 (coul)\n"
+  "	R = 8.3134	(joule/degC)\n"
+  "}\n"
+  " \n"
+  "NEURON { \n"
+  "	SUFFIX ch_Kdrfast \n"
+  "	USEION k READ ek WRITE ik VALENCE 1\n"
+  "	RANGE g, gmax, ninf, ntau, ik\n"
+  "	RANGE myi\n"
+  "	THREADSAFE\n"
+  "}\n"
+  " \n"
+  "PARAMETER {\n"
+  "	v (mV) \n"
+  "	celsius (degC) : temperature - set in hoc; default is 6.3\n"
+  "	dt (ms) \n"
+  "\n"
+  "	ek  (mV)\n"
+  "	gmax (mho/cm2)\n"
+  "}\n"
+  " \n"
+  "STATE {\n"
+  "	n	\n"
+  "}\n"
+  " \n"
+  "ASSIGNED {		     \n"
+  "	g (mho/cm2)\n"
+  "	ik (mA/cm2)\n"
+  "	ninf\n"
+  "	ntau (ms)\n"
+  "	nexp\n"
+  "	myi (mA/cm2)\n"
+  "} \n"
+  "\n"
+  "BREAKPOINT {\n"
+  "	SOLVE states\n"
+  "	g = gmax*n*n*n*n\n"
+  "	ik = g*(v-ek)\n"
+  "	myi =  ik\n"
+  "}\n"
+  " \n"
+  "UNITSOFF\n"
+  " \n"
+  "INITIAL {\n"
+  "	trates(v)\n"
+  "\n"
+  "	n = ninf\n"
+  "}\n"
+  "\n"
+  "PROCEDURE states() {	:Computes state variables m, h, and n \n"
+  "	trates(v)	:      at the current v and dt.       \n"
+  "	n = n + nexp*(ninf-n)\n"
+  "}\n"
+  " \n"
+  "LOCAL q10\n"
+  "PROCEDURE rates(v) {  :Computes rate and other constants at current v.\n"
+  "                      :Call once from HOC to initialize inf at resting v.\n"
+  "	LOCAL  alpha, beta, sum\n"
+  "	:q10 = 3^((celsius - 6.3)/10)\n"
+  "	q10 = 3^((celsius - 34)/10)\n"
+  "		\n"
+  "	:\"nf\" fKDR activation system\n"
+  "	alpha = -0.07*vtrap((v+65-47),-6)\n"
+  "	beta = 0.264/exp((v+65-22)/40)\n"
+  "	sum = alpha+beta        \n"
+  "	ntau = 1/sum\n"
+  "	ninf = alpha/sum	\n"
+  "}\n"
+  " \n"
+  "PROCEDURE trates(v) {  :Computes rate and other constants at current v.\n"
+  "                      :Call once from HOC to initialize inf at resting v.\n"
+  "	LOCAL tinc\n"
+  "	TABLE ninf, nexp, ntau\n"
+  "	DEPEND dt, celsius\n"
+  "	FROM -100 TO 100 WITH 200\n"
+  "						   \n"
+  "	rates(v)	: not consistently executed from here if usetable_hh == 1\n"
+  "	: so don't expect the tau values to be tracking along with\n"
+  "	: the inf values in hoc\n"
+  "\n"
+  "	tinc = -dt * q10\n"
+  "	nexp = 1 - exp(tinc/ntau)\n"
+  "}\n"
+  " \n"
+  "FUNCTION vtrap(x,y) {  :Traps for 0 in denominator of rate eqns.\n"
+  "        if (fabs(x/y) < 1e-6) {\n"
+  "                vtrap = y*(1 - x/y/2)\n"
+  "        }else{  \n"
+  "                vtrap = x/(exp(x/y) - 1)\n"
+  "        }\n"
+  "}\n"
+  " \n"
+  "UNITSON\n"
+  "\n"
+  ;
+#endif

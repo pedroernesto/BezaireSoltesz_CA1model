@@ -1,4 +1,4 @@
-/* Created by Language version: 6.2.0 */
+/* Created by Language version: 7.7.0 */
 /* NOT VECTORIZED */
 #define NRN_VECTORIZED 0
 #include <stdio.h>
@@ -91,6 +91,15 @@ extern void hoc_register_limits(int, HocParmLimits*);
 extern void hoc_register_units(int, HocParmUnits*);
 extern void nrn_promote(Prop*, int, int);
 extern Memb_func* memb_func;
+ 
+#define NMODL_TEXT 1
+#if NMODL_TEXT
+static const char* nmodl_file_text;
+static const char* nmodl_filename;
+extern void hoc_reg_nmodl_text(int, const char*);
+extern void hoc_reg_nmodl_filename(int, const char*);
+#endif
+
  extern void _nrn_setdata_reg(int, void(*)(Prop*));
  static void _setdata(Prop* _prop) {
  _p = _prop->param; _ppvar = _prop->dparam;
@@ -185,7 +194,7 @@ static void _ode_matsol(_NrnThread*, _Memb_list*, int);
  static void _ode_matsol_instance1(_threadargsproto_);
  /* connect range variables in _p that hoc is supposed to know about */
  static const char *_mechanism[] = {
- "6.2.0",
+ "7.7.0",
 "ch_CavL",
  "gmax_ch_CavL",
  0,
@@ -242,6 +251,10 @@ extern void _cvode_abstol( Symbol**, double*, int);
  _mechtype = nrn_get_mechtype(_mechanism[1]);
      _nrn_setdata_reg(_mechtype, _setdata);
      _nrn_thread_reg(_mechtype, 2, _update_ion_pointer);
+ #if NMODL_TEXT
+  hoc_reg_nmodl_text(_mechtype, nmodl_file_text);
+  hoc_reg_nmodl_filename(_mechtype, nmodl_filename);
+#endif
   hoc_register_prop_size(_mechtype, 10, 6);
   hoc_register_dparam_semantics(_mechtype, 0, "ca_ion");
   hoc_register_dparam_semantics(_mechtype, 1, "ca_ion");
@@ -252,7 +265,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
  	hoc_register_cvode(_mechtype, _ode_count, _ode_map, _ode_spec, _ode_matsol);
  	hoc_register_tolerance(_mechtype, _hoc_state_tol, &_atollist);
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 ch_CavL /home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64/ch_CavL.mod\n");
+ 	ivoc_help("help ?1 ch_CavL /users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/ch_CavL.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -457,7 +470,7 @@ static void _hoc_bet(void) {
  static int _ode_matsol1 () {
  rate ( _threadargscomma_ v ) ;
  Dm = Dm  / (1. - dt*( ( ( ( - 1.0 ) ) ) / mtau )) ;
- return 0;
+  return 0;
 }
  /*END CVODE*/
  static int state () {_reset=0;
@@ -685,3 +698,139 @@ static void _initlists() {
  _slist1[0] = &(m) - _p;  _dlist1[0] = &(Dm) - _p;
 _first = 0;
 }
+
+#if NMODL_TEXT
+static const char* nmodl_filename = "/users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/ch_CavL.mod";
+static const char* nmodl_file_text = 
+  "TITLE L-type calcium channel (voltage dependent)\n"
+  " \n"
+  "COMMENT\n"
+  "L-Type Ca2+ channel (voltage dependent)\n"
+  "\n"
+  "Ions: ca\n"
+  "\n"
+  "Style: ghk\n"
+  "\n"
+  "From: Jaffe et al, 1994\n"
+  "\n"
+  "\n"
+  "Updates:\n"
+  "2014 December (Marianne Bezaire): documented\n"
+  "ENDCOMMENT\n"
+  "\n"
+  "\n"
+  "VERBATIM\n"
+  "#include <stdlib.h> /* 	Include this library so that the following\n"
+  "						(innocuous) warning does not appear:\n"
+  "						 In function '_thread_cleanup':\n"
+  "						 warning: incompatible implicit declaration of \n"
+  "						          built-in function 'free'  */\n"
+  "ENDVERBATIM\n"
+  "\n"
+  "UNITS {\n"
+  "	(mA) = (milliamp)\n"
+  "	(mV) = (millivolt)\n"
+  "	(molar) = (1/liter)\n"
+  "	(mM) = (millimolar)\n"
+  "	FARADAY = 96520 (coul)\n"
+  "	R = 8.3134 (joule/degC)\n"
+  "	KTOMV = .0853 (mV/degC)\n"
+  "}\n"
+  "\n"
+  "PARAMETER {\n"
+  "	v (mV)\n"
+  "      celsius (degC) : temperature - set in hoc; default is 6.3\n"
+  "	gmax		 (mho/cm2)\n"
+  "	ki=.001 (mM)\n"
+  "	cai (mM)\n"
+  "	cao (mM)\n"
+  "        tfa=1\n"
+  "}\n"
+  "\n"
+  "\n"
+  "NEURON {\n"
+  "	SUFFIX ch_CavL\n"
+  "	USEION ca READ cai, cao, eca WRITE ica VALENCE 2 \n"
+  "    RANGE gmax, cai, ica, eca\n"
+  " 	RANGE myi, g\n"
+  "    GLOBAL minf,mtau	: neither of these are thread safe\n"
+  "    THREADSAFE\n"
+  "}\n"
+  "\n"
+  "STATE {\n"
+  "	m\n"
+  "}\n"
+  "\n"
+  "ASSIGNED {\n"
+  "	ica (mA/cm2)\n"
+  "        g (mho/cm2)\n"
+  "        minf\n"
+  "        mtau   (ms)\n"
+  "	eca (mV)   \n"
+  "	myi (mA/cm2)\n"
+  "\n"
+  "}\n"
+  "\n"
+  "INITIAL {\n"
+  "	rate(v)\n"
+  "	m = minf\n"
+  "	VERBATIM\n"
+  "	cai=_ion_cai;\n"
+  "	ENDVERBATIM\n"
+  "}\n"
+  "\n"
+  "BREAKPOINT {\n"
+  "	SOLVE state METHOD cnexp\n"
+  "	g = gmax*m*m*h2(cai)\n"
+  "	ica = g*ghk(v,cai,cao)\n"
+  "	myi = ica\n"
+  "}\n"
+  "\n"
+  "FUNCTION h2(cai(mM)) {\n"
+  "	h2 = ki/(ki+cai)\n"
+  "}\n"
+  "\n"
+  "FUNCTION ghk(v(mV), ci(mM), co(mM)) (mV) {\n"
+  "        LOCAL nu,f\n"
+  "\n"
+  "        f = KTF(celsius)/2\n"
+  "        nu = v/f\n"
+  "        ghk=-f*(1. - (ci/co)*exp(nu))*efun(nu)\n"
+  "}\n"
+  "\n"
+  "FUNCTION KTF(celsius (DegC)) (mV) {\n"
+  "        KTF = ((25./293.15)*(celsius + 273.15))\n"
+  "}\n"
+  "\n"
+  "\n"
+  "FUNCTION efun(z) {\n"
+  "	if (fabs(z) < 1e-4) {\n"
+  "		efun = 1 - z/2\n"
+  "	}else{\n"
+  "		efun = z/(exp(z) - 1)\n"
+  "	}\n"
+  "}\n"
+  "\n"
+  "FUNCTION alp(v(mV)) (1/ms) {\n"
+  "	TABLE FROM -150 TO 150 WITH 200\n"
+  "	alp = 15.69*(-1.0*v+81.5)/(exp((-1.0*v+81.5)/10.0)-1.0)\n"
+  "}\n"
+  "\n"
+  "FUNCTION bet(v(mV)) (1/ms) {\n"
+  "	TABLE FROM -150 TO 150 WITH 200\n"
+  "	bet = 0.29*exp(-v/10.86)\n"
+  "}\n"
+  "\n"
+  "DERIVATIVE state {  \n"
+  "	rate(v)\n"
+  "	m' = (minf - m)/mtau\n"
+  "}\n"
+  "\n"
+  "PROCEDURE rate(v (mV)) { :callable from hoc\n"
+  "	LOCAL a\n"
+  "	a = alp(v)\n"
+  "	mtau = 1/(tfa*(a + bet(v)))\n"
+  "	minf = tfa*a*mtau\n"
+  "}\n"
+  ;
+#endif

@@ -1,4 +1,4 @@
-/* Created by Language version: 6.2.0 */
+/* Created by Language version: 7.7.0 */
 /* NOT VECTORIZED */
 #define NRN_VECTORIZED 0
 #include <stdio.h>
@@ -87,6 +87,15 @@ extern void hoc_register_limits(int, HocParmLimits*);
 extern void hoc_register_units(int, HocParmUnits*);
 extern void nrn_promote(Prop*, int, int);
 extern Memb_func* memb_func;
+ 
+#define NMODL_TEXT 1
+#if NMODL_TEXT
+static const char* nmodl_file_text;
+static const char* nmodl_filename;
+extern void hoc_reg_nmodl_text(int, const char*);
+extern void hoc_reg_nmodl_filename(int, const char*);
+#endif
+
  extern void _nrn_setdata_reg(int, void(*)(Prop*));
  static void _setdata(Prop* _prop) {
  _p = _prop->param; _ppvar = _prop->dparam;
@@ -137,7 +146,7 @@ static void  nrn_jacob(_NrnThread*, _Memb_list*, int);
 static int _ode_count(int);
  /* connect range variables in _p that hoc is supposed to know about */
  static const char *_mechanism[] = {
- "6.2.0",
+ "7.7.0",
 "ch_KCaS",
  "gmax_ch_KCaS",
  0,
@@ -195,6 +204,10 @@ extern void _cvode_abstol( Symbol**, double*, int);
  _mechtype = nrn_get_mechtype(_mechanism[1]);
      _nrn_setdata_reg(_mechtype, _setdata);
      _nrn_thread_reg(_mechtype, 2, _update_ion_pointer);
+ #if NMODL_TEXT
+  hoc_reg_nmodl_text(_mechtype, nmodl_file_text);
+  hoc_reg_nmodl_filename(_mechtype, nmodl_filename);
+#endif
   hoc_register_prop_size(_mechtype, 12, 4);
   hoc_register_dparam_semantics(_mechtype, 0, "k_ion");
   hoc_register_dparam_semantics(_mechtype, 1, "k_ion");
@@ -202,7 +215,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
   hoc_register_dparam_semantics(_mechtype, 3, "ca_ion");
  	hoc_register_cvode(_mechtype, _ode_count, 0, 0, 0);
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 ch_KCaS /home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64/ch_KCaS.mod\n");
+ 	ivoc_help("help ?1 ch_KCaS /users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/ch_KCaS.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -404,3 +417,103 @@ static void _initlists() {
   if (!_first) return;
 _first = 0;
 }
+
+#if NMODL_TEXT
+static const char* nmodl_filename = "/users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/ch_KCaS.mod";
+static const char* nmodl_file_text = 
+  "TITLE calcium-activated potassium channel (non-voltage-dependent)\n"
+  "\n"
+  "COMMENT\n"
+  "Ca2+ activated K+ channel (not voltage dependent)\n"
+  "\n"
+  "From:  original said for granule cells, but used in all the cell types\n"
+  "\n"
+  "Updates:\n"
+  "2014 December (Marianne Bezaire): documented\n"
+  "ENDCOMMENT\n"
+  "\n"
+  "\n"
+  "VERBATIM\n"
+  "#include <stdlib.h> /* 	Include this library so that the following\n"
+  "						(innocuous) warning does not appear:\n"
+  "						 In function '_thread_cleanup':\n"
+  "						 warning: incompatible implicit declaration of \n"
+  "						          built-in function 'free'  */\n"
+  "ENDVERBATIM\n"
+  "\n"
+  "UNITS {\n"
+  "        (molar) = (1/liter)\n"
+  "        (mM)    = (millimolar)\n"
+  "	(mA)	= (milliamp)\n"
+  "	(mV)	= (millivolt)\n"
+  "}\n"
+  "\n"
+  "NEURON {\n"
+  "	SUFFIX ch_KCaS\n"
+  "	USEION k READ ek WRITE ik VALENCE 1\n"
+  "	USEION ca READ cai VALENCE 2\n"
+  "	RANGE g, gmax, qinf, qtau, ik\n"
+  "	RANGE myi\n"
+  "    THREADSAFE\n"
+  "}\n"
+  "\n"
+  "INDEPENDENT {t FROM 0 TO 1 WITH 1 (ms)}\n"
+  "\n"
+  "PARAMETER {\n"
+  "      celsius (degC) : temperature - set in hoc; default is 6.3\n"
+  "	v		(mV)\n"
+  "	dt		(ms)\n"
+  "	gmax  (mho/cm2)\n"
+  "	ek	(mV)\n"
+  "	cai (mM)\n"
+  "}\n"
+  "\n"
+  "STATE { q }\n"
+  "\n"
+  "ASSIGNED {\n"
+  "	ik (mA/cm2) \n"
+  "	g (mho/cm2) \n"
+  "	qinf \n"
+  "	qtau (ms) \n"
+  "	qexp\n"
+  "	myi (mA/cm2)\n"
+  "}\n"
+  "\n"
+  "\n"
+  "BREAKPOINT {          :Computes i=g*q^2*(v-ek)\n"
+  "	SOLVE state\n"
+  "    g = gmax * q*q\n"
+  "	ik = g * (v-ek)\n"
+  "	myi = ik\n"
+  "}\n"
+  "\n"
+  "UNITSOFF\n"
+  ": verbatim blocks are not thread safe (perhaps related, this mechanism cannot be used with cvode)\n"
+  "INITIAL {\n"
+  "	q=qinf\n"
+  "	rate(cai)\n"
+  "}\n"
+  "\n"
+  "PROCEDURE state() {  :Computes state variable q at current v and dt.\n"
+  "	:cai = ncai + lcai + tcai\n"
+  "	rate(cai)\n"
+  "	q = q + (qinf-q) * qexp\n"
+  "}\n"
+  "\n"
+  "LOCAL q10\n"
+  "PROCEDURE rate(cai) {  :Computes rate and other constants at current v.\n"
+  "	LOCAL alpha, beta, tinc\n"
+  "	q10 = 3^((celsius - 34)/10) : set to 1 for the cutsuridis model?\n"
+  "		:\"q\" activation system\n"
+  "alpha = 1.25e1 * cai * cai\n"
+  "beta = 0.00025 \n"
+  "\n"
+  "	qtau = 1 /(alpha + beta)/q10\n"
+  "	qinf = alpha * qtau\n"
+  "	tinc = -dt\n"
+  "	qexp = 1 - exp(tinc/qtau)\n"
+  "}\n"
+  "\n"
+  "UNITSON\n"
+  ;
+#endif

@@ -1,4 +1,4 @@
-/* Created by Language version: 6.2.0 */
+/* Created by Language version: 7.7.0 */
 /* NOT VECTORIZED */
 #define NRN_VECTORIZED 0
 #include <stdio.h>
@@ -80,6 +80,15 @@ extern void hoc_register_limits(int, HocParmLimits*);
 extern void hoc_register_units(int, HocParmUnits*);
 extern void nrn_promote(Prop*, int, int);
 extern Memb_func* memb_func;
+ 
+#define NMODL_TEXT 1
+#if NMODL_TEXT
+static const char* nmodl_file_text;
+static const char* nmodl_filename;
+extern void hoc_reg_nmodl_text(int, const char*);
+extern void hoc_reg_nmodl_filename(int, const char*);
+#endif
+
  extern void _nrn_setdata_reg(int, void(*)(Prop*));
  static void _setdata(Prop* _prop) {
  _p = _prop->param; _ppvar = _prop->dparam;
@@ -142,7 +151,7 @@ static void _ode_matsol(_NrnThread*, _Memb_list*, int);
  static void _ode_matsol_instance1(_threadargsproto_);
  /* connect range variables in _p that hoc is supposed to know about */
  static const char *_mechanism[] = {
- "6.2.0",
+ "7.7.0",
 "iconc_Ca",
  "catau_iconc_Ca",
  "caiinf_iconc_Ca",
@@ -197,6 +206,10 @@ extern void _cvode_abstol( Symbol**, double*, int);
  _mechtype = nrn_get_mechtype(_mechanism[1]);
      _nrn_setdata_reg(_mechtype, _setdata);
      _nrn_thread_reg(_mechtype, 2, _update_ion_pointer);
+ #if NMODL_TEXT
+  hoc_reg_nmodl_text(_mechtype, nmodl_file_text);
+  hoc_reg_nmodl_filename(_mechtype, nmodl_filename);
+#endif
   hoc_register_prop_size(_mechtype, 7, 5);
   hoc_register_dparam_semantics(_mechtype, 0, "ca_ion");
   hoc_register_dparam_semantics(_mechtype, 1, "ca_ion");
@@ -207,7 +220,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
  	hoc_register_cvode(_mechtype, _ode_count, _ode_map, _ode_spec, _ode_matsol);
  	hoc_register_tolerance(_mechtype, _hoc_state_tol, &_atollist);
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 iconc_Ca /home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64/iconc_Ca.mod\n");
+ 	ivoc_help("help ?1 iconc_Ca /users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/iconc_Ca.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -245,7 +258,7 @@ static int _ode_spec1(_threadargsproto_);
 }
  static int _ode_matsol1 () {
  Dcai = Dcai  / (1. - dt*( ( ( ( - 1.0 ) ) ) / catau )) ;
- return 0;
+  return 0;
 }
  /*END CVODE*/
  
@@ -475,3 +488,96 @@ static void _initlists() {
  _slist2[0] = &(cai) - _p;
 _first = 0;
 }
+
+#if NMODL_TEXT
+static const char* nmodl_filename = "/users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/iconc_Ca.mod";
+static const char* nmodl_file_text = 
+  "TITLE intracellular calcium accumulation\n"
+  "\n"
+  "COMMENT\n"
+  "intracellular Ca2+ accumulation\n"
+  "From: \n"
+  "Notes:\n"
+  "	calcium accumulation into a volume of area*depth next to the\n"
+  "	membrane with a decay (time constant tau) to resting level\n"
+  "	given by the global calcium variable cai0_ca_ion\n"
+  "	\n"
+  "Ions: ca\n"
+  "\n"
+  "From: Modified from Aradi & Holmes 1999\n"
+  "\n"
+  "Updates:\n"
+  "2014 December (Marianne Bezaire): documented\n"
+  "ENDCOMMENT\n"
+  "\n"
+  "\n"
+  "\n"
+  "VERBATIM\n"
+  "#include <stdlib.h> /* 	Include this library so that the following\n"
+  "						(innocuous) warning does not appear:\n"
+  "						 In function '_thread_cleanup':\n"
+  "						 warning: incompatible implicit declaration of \n"
+  "						          built-in function 'free'  */\n"
+  "ENDVERBATIM\n"
+  "\n"
+  "NEURON {\n"
+  "SUFFIX iconc_Ca\n"
+  "USEION ca READ cai, ica, eca WRITE eca, cai VALENCE 2\n"
+  "RANGE caiinf, catau, cai, eca\n"
+  "THREADSAFE\n"
+  "}\n"
+  "\n"
+  "UNITS {\n"
+  "	(mV) = (millivolt)\n"
+  "	(molar) = (1/liter)\n"
+  "	(mM) = (milli/liter)\n"
+  "	(mA) = (milliamp)\n"
+  "	FARADAY = 96520 (coul)\n"
+  "	R = 8.3134	(joule/degC)\n"
+  "}\n"
+  "\n"
+  "INDEPENDENT {t FROM 0 TO 100 WITH 100 (ms)}\n"
+  "\n"
+  "PARAMETER {\n"
+  "    celsius (degC) : temperature - set in hoc; default is 6.3\n"
+  "	depth = 200 (nm)	: assume volume = area*depth\n"
+  "	catau = 9 (ms)\n"
+  "	caiinf = 50.e-6 (mM)	: takes precedence over cai0_ca_ion\n"
+  "			: Do not forget to initialize in hoc if different\n"
+  "			: from this default.\n"
+  "	cao = 2 (mM)\n"
+  "	ica (mA/cm2)\n"
+  "}\n"
+  "\n"
+  "ASSIGNED {\n"
+  "	eca (mV)\n"
+  "}\n"
+  "\n"
+  "STATE {\n"
+  "	cai\n"
+  "}\n"
+  "\n"
+  ": verbatim blocks are not thread safe (perhaps related, this mechanism cannot be used with cvode)\n"
+  "INITIAL {\n"
+  "	:VERBATIM	/* what is the point of this? */	\n"
+  "	:cai = _ion_cai;\n"
+  "	:ENDVERBATIM\n"
+  "	cai = caiinf	\n"
+  "	eca = ktf() * log(cao/caiinf)	\n"
+  "}\n"
+  "\n"
+  "\n"
+  "BREAKPOINT {\n"
+  "	SOLVE integrate METHOD derivimplicit\n"
+  "	eca = ktf() * log(cao/cai)	\n"
+  "}\n"
+  "\n"
+  "DERIVATIVE integrate {\n"
+  "cai' = -(ica)/depth/FARADAY * (1e7) + (caiinf - cai)/catau\n"
+  "}\n"
+  "\n"
+  "FUNCTION ktf() (mV) {\n"
+  "	ktf = (1000)*R*(celsius +273.15)/(2*FARADAY)\n"
+  "} \n"
+  ;
+#endif

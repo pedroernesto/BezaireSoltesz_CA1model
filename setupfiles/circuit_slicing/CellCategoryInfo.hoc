@@ -41,7 +41,7 @@ begintemplate CellCategoryInfo	// Define a template that describes
 	public dist, numCells, CellList, addCell, numCons, numConns, numSyns, wgtConns, numThisHost
 	public setBins, dentateYBins, dentateXBins, dentateZBins
 	public dentateYBinSize, dentateXBinSize, dentateZBinSize, is_art
-	public PosGidList, SliceIndList
+	public PosGidStart, PosGidList, SliceIndList
 
 	objref dist, cellpos, f1, CellList, numCons, numConns	// Define objects, including
 	objref numSyns, wgtConns, ctype, SynList, this			//  'this', which is this
@@ -74,6 +74,7 @@ begintemplate CellCategoryInfo	// Define a template that describes
 		cellStartGid = $3 			// The smallest gid (unique ID number) associated with this cell
 									//  type; the first number in gid range for this type (all cells
 									//  of this type have consecutive numbers in the gid range).
+		PosGidStart = $3
 
 		numCells = $4				// Number of cells of this type in the model (note that this may
 									//  be changed depending on the Scale parameter of the model).

@@ -1,4 +1,4 @@
-/* Created by Language version: 6.2.0 */
+/* Created by Language version: 7.7.0 */
 /* VECTORIZED */
 #define NRN_VECTORIZED 1
 #include <stdio.h>
@@ -89,6 +89,15 @@ extern void hoc_register_limits(int, HocParmLimits*);
 extern void hoc_register_units(int, HocParmUnits*);
 extern void nrn_promote(Prop*, int, int);
 extern Memb_func* memb_func;
+ 
+#define NMODL_TEXT 1
+#if NMODL_TEXT
+static const char* nmodl_file_text;
+static const char* nmodl_filename;
+extern void hoc_reg_nmodl_text(int, const char*);
+extern void hoc_reg_nmodl_filename(int, const char*);
+#endif
+
  extern Prop* nrn_point_prop_;
  static int _pointtype;
  static void* _hoc_create_pnt(_ho) Object* _ho; { void* create_point_process();
@@ -160,7 +169,7 @@ static void nrn_state(_NrnThread*, _Memb_list*, int);
 }
  /* connect range variables in _p that hoc is supposed to know about */
  static const char *_mechanism[] = {
- "6.2.0",
+ "7.7.0",
 "SGate",
  "period",
  "number",
@@ -223,6 +232,10 @@ extern void _cvode_abstol( Symbol**, double*, int);
 	 _hoc_create_pnt, _hoc_destroy_pnt, _member_func);
  _mechtype = nrn_get_mechtype(_mechanism[1]);
      _nrn_setdata_reg(_mechtype, _setdata);
+ #if NMODL_TEXT
+  hoc_reg_nmodl_text(_mechtype, nmodl_file_text);
+  hoc_reg_nmodl_filename(_mechtype, nmodl_filename);
+#endif
   hoc_register_prop_size(_mechtype, 12, 4);
   hoc_register_dparam_semantics(_mechtype, 0, "area");
   hoc_register_dparam_semantics(_mechtype, 1, "pntproc");
@@ -233,11 +246,13 @@ extern void _cvode_abstol( Symbol**, double*, int);
  pnt_receive[_mechtype] = _net_receive;
  pnt_receive_size[_mechtype] = 1;
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 SGate /home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64/sgate.mod\n");
+ 	ivoc_help("help ?1 SGate /users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/sgate.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
- static double PI = 3.14159;
+ 
+#define PI _nrnunit_PI[_nrnunit_use_legacy_]
+static double _nrnunit_PI[2] = {0x1.921fb54442d18p+1, 3.14159}; /* 3.14159265358979312 */
 static int _reset;
 static char *modelname = "";
 
@@ -453,4 +468,167 @@ _first = 0;
 
 #if defined(__cplusplus)
 } /* extern "C" */
+#endif
+
+#if NMODL_TEXT
+static const char* nmodl_filename = "/users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/sgate.mod";
+static const char* nmodl_file_text = 
+  ": sgate.mod\n"
+  ": draws from netstim.mod 2212 2008-09-08 14:32:26Z hines\n"
+  ": Passes a fraction of \"input\" events that arrive while it is on.\n"
+  ": The fraction fluctuates between 1 (100%) and 1-depth (0<=depth<=1)\n"
+  ": and is governed by\n"
+  ":   p(t) = 1 + depth*(cos(2*PI*(t-start)/period) - 1)/2\n"
+  ":   p(t) = 1 + depth*(cos(2*PI*(t-phase)/period) - 1)/2\n"
+  ": where\n"
+  ":   depth = modulation depth (0..1, 1 == pass all, 0 == pass none, 0.5 = pass half)\n"
+  ":   period = duration of a modulation cycle\n"
+  ":   start = time at which modulation begins\n"
+  ": Gate is on for \"number\" modulation cycles\n"
+  "\n"
+  "COMMENT\n"
+  "Supplied (written?) by Ted Carnevale\n"
+  "This mechanism can be combined with a NetStim that has noise=1 \n"
+  "to implement a non-homogeneous Poisson process.\n"
+  "Quoting from http://en.wikipedia.org/wiki/Non-homogeneous_Poisson_process\n"
+  "retrieved on 5/1/2012:\n"
+  "\"To simulate a non-homogeneous Poisson process with intensity function \n"
+  "\n"
+  "(t), \n"
+  "choose a sufficiently large \n"
+  "\n"
+  " so that \n"
+  "\n"
+  "(t) = \n"
+  "\n"
+  " p(t) and simulate a Poisson \n"
+  "process with rate parameter \n"
+  "\n"
+  ". Accept an event from the Poisson simulation at \n"
+  "time t with probability p(t).\"\n"
+  "This statement cited Ross, Sheldon M. (2006). Simulation. Academic Press. p. 32.\n"
+  "Note:  fifth edition is planned for 11/29/2012\n"
+  "ENDCOMMENT\n"
+  "\n"
+  "NEURON  { \n"
+  "  ARTIFICIAL_CELL SGate : \"Stochastic Gate\"\n"
+  "  RANGE period, number, start, phase\n"
+  "  RANGE depth, gid, randi\n"
+  "  THREADSAFE : only true if every instance has its own distinct Random\n"
+  "  POINTER donotuse\n"
+  "}\n"
+  "\n"
+  "UNITS {\n"
+  "  PI = (pi) (1)\n"
+  "}\n"
+  "\n"
+  "PARAMETER {\n"
+  "  period = 100 (ms) <1e-9,1e9>: duration of a modulation cycle (msec)\n"
+  "  number = 1 <0,1e9> : number of modulation cycles\n"
+  "  start = 50 (ms) : start of first cycle\n"
+  "  depth = 0 <0,1> : modulation depth\n"
+  "  phase = 0 (ms): peak of first cycle\n"
+  "	gid = 0\n"
+  "	randi = 0\n"
+  "}\n"
+  "\n"
+  "ASSIGNED {\n"
+  "  on (1)\n"
+  "  donotuse\n"
+  "  numtogo (1) : how many modulation cycles remain to be launched\n"
+  "  r (1)\n"
+  "}\n"
+  "\n"
+  "INITIAL {\n"
+  "  if (period < 0) { period = 1e9 }\n"
+  "  if (number < 0) { number = 0 }\n"
+  "  if (start < 0) { start = 0 }\n"
+  "  if (phase < 0) { phase = 0 }\n"
+  "  if (depth < 0) { depth = 0 }\n"
+  "  if (depth > 1) { depth = 1 }\n"
+  "\n"
+  "  on = 0 : off--no events pass\n"
+  "  if (number > 0) {\n"
+  "    numtogo = number\n"
+  "    net_send(start, 1) : to turn gate on\n"
+  "  }\n"
+  "}  \n"
+  "\n"
+  "PROCEDURE seed(x) {\n"
+  "  set_seed(x)\n"
+  "}\n"
+  "\n"
+  "VERBATIM\n"
+  "double nrn_random_pick(void* r);\n"
+  "void* nrn_random_arg(int argpos);\n"
+  "ENDVERBATIM\n"
+  "\n"
+  "FUNCTION erand() {\n"
+  "VERBATIM\n"
+  "  if (_p_donotuse) {\n"
+  "    /*\n"
+  "    :Supports separate independent but reproducible streams for\n"
+  "    : each instance. However, the corresponding hoc Random\n"
+  "    : distribution MUST be set to Random.uniform(0,1)\n"
+  "    */\n"
+  "    _lerand = nrn_random_pick(_p_donotuse);\n"
+  "  }else{\n"
+  "    /* only can be used in main thread */\n"
+  "    if (_nt != nrn_threads) {\n"
+  "hoc_execerror(\"multithread random in NetStim\",\" only via hoc Random\");\n"
+  "    }\n"
+  "ENDVERBATIM\n"
+  "    : the old standby. Cannot use if reproducible parallel sim\n"
+  "    : independent of nhost or which host this instance is on\n"
+  "    : is desired, since each instance on this cpu draws from\n"
+  "    : the same stream\n"
+  "    erand = scop_random()\n"
+  "VERBATIM\n"
+  "  }\n"
+  "ENDVERBATIM\n"
+  "}\n"
+  "\n"
+  "PROCEDURE noiseFromRandom() {\n"
+  "VERBATIM\n"
+  " {\n"
+  "  void** pv = (void**)(&_p_donotuse);\n"
+  "  if (ifarg(1)) {\n"
+  "    *pv = nrn_random_arg(1);\n"
+  "  }else{\n"
+  "    *pv = (void*)0;\n"
+  "  }\n"
+  " }\n"
+  "ENDVERBATIM\n"
+  "}\n"
+  "\n"
+  ":   p(t) = 1 + depth*(cos(2*PI*(t-phase)/period) - 1)/2\n"
+  "\n"
+  "FUNCTION p(t (ms)) {\n"
+  "  p = 0\n"
+  "  if (on == 1) {\n"
+  "    p = 1 + depth*(cos(2*PI*(t-phase)/period) - 1)/2\n"
+  "  }\n"
+  "}\n"
+  "\n"
+  ": flag  action\n"
+  ": 0     if ON, decide whether to pass event\n"
+  ": 1     decide whether to start a modulation cycle\n"
+  "NET_RECEIVE (w) {\n"
+  "  if (flag == 0) { : external event\n"
+  "    if (on == 1) {\n"
+  "      : decide whether to pass this event\n"
+  "        r = erand()\n"
+  "        if (r < p(t)) { net_event(t) }\n"
+  "    }\n"
+  "  } else if (flag == 1) {\n"
+  "    if (numtogo>0) { : launch a new cycle\n"
+  "      on = 1\n"
+  "      numtogo = numtogo-1\n"
+  "      net_send(period, 1) : to end this cycle\n"
+  "    } else { : all done\n"
+  "      on = 0\n"
+  "    }\n"
+  "  }\n"
+  "}\n"
+  ;
 #endif

@@ -1,4 +1,4 @@
-/* Created by Language version: 6.2.0 */
+/* Created by Language version: 7.7.0 */
 /* NOT VECTORIZED */
 #define NRN_VECTORIZED 0
 #include <stdio.h>
@@ -76,6 +76,15 @@ extern void hoc_register_limits(int, HocParmLimits*);
 extern void hoc_register_units(int, HocParmUnits*);
 extern void nrn_promote(Prop*, int, int);
 extern Memb_func* memb_func;
+ 
+#define NMODL_TEXT 1
+#if NMODL_TEXT
+static const char* nmodl_file_text;
+static const char* nmodl_filename;
+extern void hoc_reg_nmodl_text(int, const char*);
+extern void hoc_reg_nmodl_filename(int, const char*);
+#endif
+
  extern void _nrn_setdata_reg(int, void(*)(Prop*));
  static void _setdata(Prop* _prop) {
  _p = _prop->param; _ppvar = _prop->dparam;
@@ -129,7 +138,7 @@ static void  nrn_init(_NrnThread*, _Memb_list*, int);
 static void nrn_state(_NrnThread*, _Memb_list*, int);
  /* connect range variables in _p that hoc is supposed to know about */
  static const char *_mechanism[] = {
- "6.2.0",
+ "7.7.0",
 "xtra",
  "rx_xtra",
  "x_xtra",
@@ -176,6 +185,10 @@ extern void _cvode_abstol( Symbol**, double*, int);
  	register_mech(_mechanism, nrn_alloc,(void*)0, (void*)0, (void*)0, nrn_init, hoc_nrnpointerindex, 0);
  _mechtype = nrn_get_mechtype(_mechanism[1]);
      _nrn_setdata_reg(_mechtype, _setdata);
+ #if NMODL_TEXT
+  hoc_reg_nmodl_text(_mechtype, nmodl_file_text);
+  hoc_reg_nmodl_filename(_mechtype, nmodl_filename);
+#endif
   hoc_register_prop_size(_mechtype, 5, 3);
   hoc_register_dparam_semantics(_mechtype, 0, "pointer");
   hoc_register_dparam_semantics(_mechtype, 1, "pointer");
@@ -183,7 +196,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
  	hoc_reg_ba(_mechtype, _ba1, 11);
  	hoc_reg_ba(_mechtype, _ba2, 22);
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 xtra /home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64/xtra.mod\n");
+ 	ivoc_help("help ?1 xtra /users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/xtra.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -277,3 +290,140 @@ static void _initlists() {
   if (!_first) return;
 _first = 0;
 }
+
+#if NMODL_TEXT
+static const char* nmodl_filename = "/users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/xtra.mod";
+static const char* nmodl_file_text = 
+  ": $Id: xtra.mod,v 1.3 2009/02/24 00:52:07 ted Exp ted $\n"
+  "\n"
+  "COMMENT\n"
+  "This mechanism is intended to be used in conjunction \n"
+  "with the extracellular mechanism.  Pointers specified \n"
+  "at the hoc level must be used to connect the \n"
+  "extracellular mechanism's e_extracellular and i_membrane \n"
+  "to this mechanism's ex and im, respectively.\n"
+  "\n"
+  "xtra does three useful things:\n"
+  "\n"
+  "1. Serves as a target for Vector.play() to facilitate \n"
+  "extracellular stimulation.  Assumes that one has initialized \n"
+  "a Vector to hold the time sequence of the stimulus current.\n"
+  "This Vector is to be played into the GLOBAL variable is \n"
+  "(GLOBAL so only one Vector.play() needs to be executed), \n"
+  "which is multiplied by the RANGE variable rx (\"transfer \n"
+  "resistance between the stimulus electrode and the local \n"
+  "node\").  This product, called ex in this mechanism, is the \n"
+  "extracellular potential at the local node, i.e. is used to \n"
+  "drive local e_extracellular.\n"
+  "\n"
+  "2. Reports the contribution of local i_membrane to the \n"
+  "total signal that would be picked up by an extracellular \n"
+  "recording electrode.  This is computed as the product of rx, \n"
+  "i_membrane (called im in this mechanism), and the surface area \n"
+  "of the local segment, and is reported as er.  The total \n"
+  "extracellularly recorded potential is the sum of all er_xtra \n"
+  "over all segments in all sections, and is to be computed at \n"
+  "the hoc level, e.g. with code like\n"
+  "\n"
+  "func fieldrec() { local sum\n"
+  "  sum = 0\n"
+  "  forall {\n"
+  "    if (ismembrane(\"xtra\")) {\n"
+  "      for (x,0) sum += er_xtra(x)\n"
+  "    }\n"
+  "  }\n"
+  "  return sum\n"
+  "}\n"
+  "\n"
+  "Bipolar recording, i.e. recording the difference in potential \n"
+  "between two extracellular electrodes, can be achieved with no \n"
+  "change to either this NMODL code or fieldrec(); the values of \n"
+  "rx will reflect the difference between the potentials at the \n"
+  "recording electrodes caused by the local membrane current, so \n"
+  "some rx will be negative and others positive.  The same rx \n"
+  "can be used for bipolar stimulation.\n"
+  "\n"
+  "Multiple monopolar or bipolar extracellular recording and \n"
+  "stimulation can be accommodated by changing this mod file to \n"
+  "include additional rx, er, and is, and changing fieldrec() \n"
+  "to a proc.\n"
+  "\n"
+  "3. Allows local storage of xyz coordinates interpolated from \n"
+  "the pt3d data.  These coordinates are used by hoc code that \n"
+  "computes the transfer resistance that couples the membrane \n"
+  "to extracellular stimulating and recording electrodes.\n"
+  "\n"
+  "\n"
+  "Prior to NEURON 5.5, the SOLVE statement in the BREAKPOINT block \n"
+  "used METHOD cvode_t so that the adaptive integrators wouldn't miss \n"
+  "the stimulus.  Otherwise, the BREAKPOINT block would have been called \n"
+  "_after_ the integration step, rather than from within cvodes/ida, \n"
+  "causing this mechanism to fail to deliver a stimulus current \n"
+  "when the adaptive integrator is used.\n"
+  "\n"
+  "With NEURON 5.5 and later, this mechanism abandons the BREAKPOINT \n"
+  "block and uses the two new blocks BEFORE BREAKPOINT and  \n"
+  "AFTER BREAKPOINT, like this--\n"
+  "\n"
+  "BEFORE BREAKPOINT { : before each cy' = f(y,t) setup\n"
+  "  ex = is*rx*(1e6)\n"
+  "}\n"
+  "AFTER SOLVE { : after each solution step\n"
+  "  er = (10)*rx*im*area\n"
+  "}\n"
+  "\n"
+  "This ensures that the stimulus potential is computed prior to the \n"
+  "solution step, and that the recorded potential is computed after.\n"
+  "ENDCOMMENT\n"
+  "\n"
+  "NEURON {\n"
+  "	SUFFIX xtra\n"
+  "	RANGE rx, er\n"
+  "	RANGE x, y, z\n"
+  "	GLOBAL is\n"
+  "	POINTER im, ex\n"
+  "	GLOBAL lfp\n"
+  "}\n"
+  "\n"
+  "PARAMETER {\n"
+  "	: default transfer resistance between stim electrodes and axon\n"
+  "	rx = 1 (megohm) : mV/nA\n"
+  "	x = 0 (1) : spatial coords\n"
+  "	y = 0 (1)\n"
+  "	z = 0 (1)\n"
+  "}\n"
+  "\n"
+  "ASSIGNED {\n"
+  "	v (millivolts)\n"
+  "	is (milliamp)\n"
+  "	ex (millivolts)\n"
+  "	im (milliamp/cm2)\n"
+  "	er (microvolts)\n"
+  "	area (micron2)\n"
+  "	lfp (microvolts)\n"
+  "}\n"
+  "\n"
+  "INITIAL {\n"
+  "	ex = is*rx*(1e6)\n"
+  "	er = (10)*rx*im*area\n"
+  "	lfp = lfp + er\n"
+  ": this demonstrates that area is known\n"
+  ": UNITSOFF\n"
+  ": printf(\"area = %f\\n\", area)\n"
+  ": UNITSON\n"
+  "}\n"
+  "\n"
+  "\n"
+  "\n"
+  "BEFORE BREAKPOINT { : before each cy' = f(y,t) setup\n"
+  "  ex = is*rx*(1e6)\n"
+  "  lfp = 0\n"
+  "}\n"
+  "\n"
+  "AFTER SOLVE { : after each solution step\n"
+  "	er = (10)*rx*im*area	\n"
+  "	lfp = lfp + er\n"
+  "}\n"
+  "\n"
+  ;
+#endif

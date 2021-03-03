@@ -1,4 +1,4 @@
-/* Created by Language version: 6.2.0 */
+/* Created by Language version: 7.7.0 */
 /* NOT VECTORIZED */
 #define NRN_VECTORIZED 0
 #include <stdio.h>
@@ -94,6 +94,15 @@ extern void hoc_register_limits(int, HocParmLimits*);
 extern void hoc_register_units(int, HocParmUnits*);
 extern void nrn_promote(Prop*, int, int);
 extern Memb_func* memb_func;
+ 
+#define NMODL_TEXT 1
+#if NMODL_TEXT
+static const char* nmodl_file_text;
+static const char* nmodl_filename;
+extern void hoc_reg_nmodl_text(int, const char*);
+extern void hoc_reg_nmodl_filename(int, const char*);
+#endif
+
  extern void _nrn_setdata_reg(int, void(*)(Prop*));
  static void _setdata(Prop* _prop) {
  _p = _prop->param; _ppvar = _prop->dparam;
@@ -186,7 +195,7 @@ static void  nrn_jacob(_NrnThread*, _Memb_list*, int);
 static int _ode_count(int);
  /* connect range variables in _p that hoc is supposed to know about */
  static const char *_mechanism[] = {
- "6.2.0",
+ "7.7.0",
 "ch_Navbis",
  "gmax_ch_Navbis",
  0,
@@ -241,13 +250,17 @@ extern void _cvode_abstol( Symbol**, double*, int);
  _mechtype = nrn_get_mechtype(_mechanism[1]);
      _nrn_setdata_reg(_mechtype, _setdata);
      _nrn_thread_reg(_mechtype, 2, _update_ion_pointer);
+ #if NMODL_TEXT
+  hoc_reg_nmodl_text(_mechtype, nmodl_file_text);
+  hoc_reg_nmodl_filename(_mechtype, nmodl_filename);
+#endif
   hoc_register_prop_size(_mechtype, 16, 3);
   hoc_register_dparam_semantics(_mechtype, 0, "na_ion");
   hoc_register_dparam_semantics(_mechtype, 1, "na_ion");
   hoc_register_dparam_semantics(_mechtype, 2, "na_ion");
  	hoc_register_cvode(_mechtype, _ode_count, 0, 0, 0);
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 ch_Navbis /home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64/ch_Navbis.mod\n");
+ 	ivoc_help("help ?1 ch_Navbis /users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/ch_Navbis.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -599,3 +612,157 @@ static void _initlists() {
    _t_htau = makevector(201*sizeof(double));
 _first = 0;
 }
+
+#if NMODL_TEXT
+static const char* nmodl_filename = "/users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/ch_Navbis.mod";
+static const char* nmodl_file_text = 
+  "TITLE sodium channel (voltage dependent, slightly higher threshold)\n"
+  "\n"
+  "COMMENT\n"
+  "sodium channel (voltage dependent, slightly higher threshold)\n"
+  "\n"
+  "Ions: na\n"
+  "\n"
+  "Style: quasi-ohmic\n"
+  "\n"
+  "From: modified from ch_Nav to have a slightly higher threshold, \n"
+  "	  suitable for bistratified cells\n"
+  "\n"
+  "Updates:\n"
+  "2014 December (Marianne Bezaire): documented\n"
+  "ENDCOMMENT\n"
+  "\n"
+  "VERBATIM\n"
+  "#include <stdlib.h> \n"
+  "/* 	Include this library so that the following (innocuous) warning does not appear:\n"
+  "		In function '_thread_cleanup':\n"
+  "		warning: incompatible implicit declaration of built-in function 'free'  */\n"
+  "ENDVERBATIM\n"
+  "\n"
+  "UNITS {\n"
+  "	(mA) =(milliamp)\n"
+  "	(mV) =(millivolt)\n"
+  "	(uF) = (microfarad)\n"
+  "	(molar) = (1/liter)\n"
+  "	(nA) = (nanoamp)\n"
+  "	(mM) = (millimolar)\n"
+  "	(um) = (micron)\n"
+  "	FARADAY = 96520 (coul)\n"
+  "	R = 8.3134	(joule/degC)\n"
+  "}\n"
+  " \n"
+  "NEURON { \n"
+  "	SUFFIX ch_Navbis\n"
+  "	USEION na READ ena WRITE ina VALENCE 1\n"
+  "	RANGE g, gmax, minf, mtau, hinf, htau, ina, m, h\n"
+  "	RANGE myi\n"
+  "	THREADSAFE\n"
+  "}\n"
+  " \n"
+  "PARAMETER {\n"
+  "	ena  (mV)\n"
+  "	gmax (mho/cm2)   \n"
+  "\n"
+  "	mAlphC = -0.2 (1)\n"
+  "	mAlphV = 38 (mV)\n"
+  "	mBetaC = 0.5 (1)\n"
+  "	mBetaV = 10 (mV)\n"
+  "\n"
+  "	hAlphC = 0.23 (1)\n"
+  "	hAlphV = 62 (mV)\n"
+  "	hBetaC = 2 (1)\n"
+  "	hBetaV = 9.5 (mV)\n"
+  "}\n"
+  " \n"
+  "STATE {\n"
+  "	m h\n"
+  "}\n"
+  " \n"
+  "ASSIGNED {\n"
+  "	v (mV) \n"
+  "	celsius (degC) : temperature - set in hoc; default is 6.3\n"
+  "	dt (ms) \n"
+  "\n"
+  "	g (mho/cm2)\n"
+  "	ina (mA/cm2)\n"
+  "	minf\n"
+  "	hinf\n"
+  "	mtau (ms)\n"
+  "	htau (ms)\n"
+  "	mexp\n"
+  "	hexp \n"
+  "	myi (mA/cm2)\n"
+  "} \n"
+  "\n"
+  "BREAKPOINT {\n"
+  "	SOLVE states\n"
+  "	g = gmax*m*m*m*h  \n"
+  "	ina = g*(v - ena)\n"
+  "	myi = ina\n"
+  "}\n"
+  " \n"
+  "UNITSOFF\n"
+  " \n"
+  "INITIAL {\n"
+  "	trates(v)\n"
+  "	m = minf\n"
+  "	h = hinf\n"
+  "}\n"
+  "\n"
+  "PROCEDURE states() {	:Computes state variables m, h, and n \n"
+  "	trates(v)			:      at the current v and dt.\n"
+  "	m = m + mexp*(minf-m)\n"
+  "	h = h + hexp*(hinf-h)\n"
+  "}\n"
+  " \n"
+  "LOCAL q10	: declare outside a block so available to whole mechanism\n"
+  "PROCEDURE rates(v) {  :Computes rate and other constants at current v.\n"
+  "                      :Call once from HOC to initialize inf at resting v.\n"
+  "	LOCAL  alpha, beta, sum	: only available to block; must be first line in block\n"
+  "\n"
+  "	q10 = 3^((celsius - 34)/10)\n"
+  "\n"
+  "	:\"m\" sodium activation system - act and inact cross at -40\n"
+  "	alpha = mAlphC*vtrap((v+mAlphV),-5)\n"
+  "	beta = mBetaC*vtrap((v+mBetaV),5)\n"
+  "	sum = alpha+beta        \n"
+  "	mtau = 1/sum \n"
+  "	minf = alpha/sum\n"
+  "	\n"
+  "	:\"h\" sodium inactivation system\n"
+  "	alpha = hAlphC/exp((v+hAlphV)/20)\n"
+  "	beta = hBetaC/(1+exp((v+hBetaV)/-10))\n"
+  "	sum = alpha+beta\n"
+  "	htau = 1/sum \n"
+  "	hinf = alpha/sum 	\n"
+  "}\n"
+  " \n"
+  "PROCEDURE trates(v) {  :Computes rate and other constants at current v.\n"
+  "                      :Call once from HOC to initialize inf at resting v.\n"
+  "	LOCAL tinc	: only available to block; must be first line in block\n"
+  "	TABLE minf, mexp, hinf, hexp, mtau, htau\n"
+  "	DEPEND dt, celsius, mAlphV, mAlphC, mBetaV, mBetaC, hAlphV, hAlphC, hBetaV, hBetaC\n"
+  "	FROM -100 TO 100 WITH 200\n"
+  "                                   \n"
+  "	rates(v)	: not consistently executed from here if usetable_hh == 1\n"
+  "				: so don't expect the tau values to be tracking along with\n"
+  "				: the inf values in hoc\n"
+  "\n"
+  "	tinc = -dt * q10\n"
+  "\n"
+  "	mexp = 1 - exp(tinc/mtau)\n"
+  "	hexp = 1 - exp(tinc/htau)\n"
+  " }\n"
+  " \n"
+  "FUNCTION vtrap(x,y) {  :Traps for 0 in denominator of rate eqns.\n"
+  "	if (fabs(x/y) < 1e-6) {\n"
+  "		vtrap = y*(1 - x/y/2)\n"
+  "	}else{  \n"
+  "		vtrap = x/(exp(x/y) - 1)\n"
+  "	}\n"
+  "}\n"
+  " \n"
+  "UNITSON\n"
+  "\n"
+  ;
+#endif

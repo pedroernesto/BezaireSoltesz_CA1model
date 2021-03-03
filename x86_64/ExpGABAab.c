@@ -1,4 +1,4 @@
-/* Created by Language version: 6.2.0 */
+/* Created by Language version: 7.7.0 */
 /* NOT VECTORIZED */
 #define NRN_VECTORIZED 0
 #include <stdio.h>
@@ -91,6 +91,15 @@ extern void hoc_register_limits(int, HocParmLimits*);
 extern void hoc_register_units(int, HocParmUnits*);
 extern void nrn_promote(Prop*, int, int);
 extern Memb_func* memb_func;
+ 
+#define NMODL_TEXT 1
+#if NMODL_TEXT
+static const char* nmodl_file_text;
+static const char* nmodl_filename;
+extern void hoc_reg_nmodl_text(int, const char*);
+extern void hoc_reg_nmodl_filename(int, const char*);
+#endif
+
  extern Prop* nrn_point_prop_;
  static int _pointtype;
  static void* _hoc_create_pnt(_ho) Object* _ho; { void* create_point_process();
@@ -191,7 +200,7 @@ static void _ode_matsol(_NrnThread*, _Memb_list*, int);
  static void _ode_matsol_instance1(_threadargsproto_);
  /* connect range variables in _p that hoc is supposed to know about */
  static const char *_mechanism[] = {
- "6.2.0",
+ "7.7.0",
 "ExpGABAab",
  "tau1a",
  "tau2a",
@@ -265,6 +274,10 @@ extern void _cvode_abstol( Symbol**, double*, int);
 	 _hoc_create_pnt, _hoc_destroy_pnt, _member_func);
  _mechtype = nrn_get_mechtype(_mechanism[1]);
      _nrn_setdata_reg(_mechtype, _setdata);
+ #if NMODL_TEXT
+  hoc_reg_nmodl_text(_mechtype, nmodl_file_text);
+  hoc_reg_nmodl_filename(_mechtype, nmodl_filename);
+#endif
   hoc_register_prop_size(_mechtype, 23, 3);
   hoc_register_dparam_semantics(_mechtype, 0, "area");
   hoc_register_dparam_semantics(_mechtype, 1, "pntproc");
@@ -274,7 +287,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
  pnt_receive[_mechtype] = _net_receive;
  pnt_receive_size[_mechtype] = 1;
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 ExpGABAab /home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64/ExpGABAab.mod\n");
+ 	ivoc_help("help ?1 ExpGABAab /users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/ExpGABAab.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -306,7 +319,7 @@ static int _ode_spec1(_threadargsproto_);
  DBa = DBa  / (1. - dt*( ( - 1.0 ) / tau2a )) ;
  DAb = DAb  / (1. - dt*( ( - 1.0 ) / tau1b )) ;
  DBb = DBb  / (1. - dt*( ( - 1.0 ) / tau2b )) ;
- return 0;
+  return 0;
 }
  /*END CVODE*/
  static int state () {_reset=0;
@@ -568,3 +581,127 @@ static void _initlists() {
  _slist1[3] = &(Bb) - _p;  _dlist1[3] = &(DBb) - _p;
 _first = 0;
 }
+
+#if NMODL_TEXT
+static const char* nmodl_filename = "/users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/ExpGABAab.mod";
+static const char* nmodl_file_text = 
+  "COMMENT\n"
+  "Two state kinetic scheme synapse described by rise time tau1,\n"
+  "and decay time constant tau2. The normalized peak condunductance is 1.\n"
+  "Decay time MUST be greater than rise time.\n"
+  "\n"
+  "The solution of A->G->bath with rate constants 1/tau1 and 1/tau2 is\n"
+  " A = a*exp(-t/tau1) and\n"
+  " G = a*tau2/(tau2-tau1)*(-exp(-t/tau1) + exp(-t/tau2))\n"
+  "	where tau1 < tau2\n"
+  "\n"
+  "If tau2-tau1 -> 0 then we have a alphasynapse.\n"
+  "and if tau1 -> 0 then we have just single exponential decay.\n"
+  "\n"
+  "The factor is evaluated in the\n"
+  "initial block such that an event of weight 1 generates a\n"
+  "peak conductance of 1.\n"
+  "\n"
+  "Because the solution is a sum of exponentials, the\n"
+  "coupled equations can be solved as a pair of independent equations\n"
+  "by the more efficient cnexp method.\n"
+  "\n"
+  "ENDCOMMENT\n"
+  "\n"
+  "NEURON {\n"
+  "	POINT_PROCESS ExpGABAab\n"
+  "	RANGE tau1a, tau2a, tau1b, tau2b, ea, eb, i, sid, cid\n"
+  "	NONSPECIFIC_CURRENT i\n"
+  "\n"
+  "	RANGE ga, gb\n"
+  "	GLOBAL totala, totalb\n"
+  "}\n"
+  "\n"
+  "UNITS {\n"
+  "	(nA) = (nanoamp)\n"
+  "	(mV) = (millivolt)\n"
+  "	(uS) = (microsiemens)\n"
+  "}\n"
+  "\n"
+  "PARAMETER {\n"
+  "	tau1a=.1 (ms) <1e-9,1e9>\n"
+  "	tau2a = 10 (ms) <1e-9,1e9>\n"
+  "	ea=0	(mV)\n"
+  "	tau1b=.1 (ms) <1e-9,1e9>\n"
+  "	tau2b = 10 (ms) <1e-9,1e9>\n"
+  "	eb=0	(mV)\n"
+  "	sid = -1 (1) : synapse id, from cell template\n"
+  "	cid = -1 (1) : id of cell to which this synapse is attached\n"
+  "}\n"
+  "\n"
+  "ASSIGNED {\n"
+  "	v (mV)\n"
+  "	i (nA)\n"
+  "	ga (uS)\n"
+  "	factora\n"
+  "	totala (uS)\n"
+  "	gb (uS)\n"
+  "	factorb\n"
+  "	totalb (uS)\n"
+  "}\n"
+  "\n"
+  "STATE {\n"
+  "	Aa (uS)\n"
+  "	Ba (uS)\n"
+  "	Ab (uS)\n"
+  "	Bb (uS)\n"
+  "}\n"
+  "\n"
+  "INITIAL {\n"
+  "	LOCAL tpa, tpb\n"
+  "	totala = 0\n"
+  "	totalb = 0\n"
+  "	if (tau1a/tau2a > .9999) {\n"
+  "		tau1a = .9999*tau2a\n"
+  "	}\n"
+  "	if (tau1b/tau2b > .9999) {\n"
+  "		tau1b = .9999*tau2b\n"
+  "	}\n"
+  "	Aa = 0\n"
+  "	Ba = 0\n"
+  "	Ab = 0\n"
+  "	Bb = 0\n"
+  "	tpa = (tau1a*tau2a)/(tau2a - tau1a) * log(tau2a/tau1a)\n"
+  "	factora = -exp(-tpa/tau1a) + exp(-tpa/tau2a)\n"
+  "	factora = 1/factora\n"
+  "	tpb = (tau1b*tau2b)/(tau2b - tau1b) * log(tau2b/tau1b)\n"
+  "	factorb = -exp(-tpb/tau1b) + exp(-tpb/tau2b)\n"
+  "	factorb = 1/factorb\n"
+  "}\n"
+  "\n"
+  "BREAKPOINT {\n"
+  "	SOLVE state METHOD cnexp\n"
+  "	ga = Ba - Aa\n"
+  "	gb = Bb - Ab\n"
+  "	i = ga*(v - ea) + gb*(v - eb)\n"
+  "}\n"
+  "\n"
+  "DERIVATIVE state {\n"
+  "	Aa' = -Aa/tau1a\n"
+  "	Ba' = -Ba/tau2a\n"
+  "	Ab' = -Ab/tau1b\n"
+  "	Bb' = -Bb/tau2b\n"
+  "}\n"
+  "\n"
+  "NET_RECEIVE(weight (uS)) {\n"
+  "	LOCAL srcid, w\n"
+  "	if (weight > 999) {\n"
+  "		srcid = floor(weight/1000) - 1\n"
+  "		w = weight - (srcid+1)*1000\n"
+  "	}else{\n"
+  "		w = weight\n"
+  "	}\n"
+  "	Aa = Aa + w*factora\n"
+  "	Ba = Ba + w*factora\n"
+  "	totala = totala+w\n"
+  "	Ab = Ab + w*factorb/3.37\n"
+  "	Bb = Bb + w*factorb/3.37\n"
+  "	totalb = totalb+w/3.37\n"
+  "}\n"
+  ;
+#endif

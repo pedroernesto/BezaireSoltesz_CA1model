@@ -111,6 +111,7 @@ proc makeConnections () {local precellType, postcellType, precellStart, precellE
 objref params, conns2make
 objref randnum, synRand
 objref precell_posindeces, postcell_posindeces
+objref pre_posStart, post_posStart
 
 // This function does the meat of the work here. It gets called for each presynaptic cell type x postsynaptic cell type
 //  combination, and attempts to find specific presynaptic cells that can connect to each postsynaptic cell (each
@@ -124,16 +125,17 @@ objref precell_posindeces, postcell_posindeces
 //  $s4 postcellType_string: the string (word) for the postsynaptic cell type, the 'friendly' name
 //  $5 numpost: the number of cells of type postcellType that are owned by this processor
 
-func connectCells () {local r, syn, distance, counter, precellType, postcellType, j, randSynNumber, pre_zpos, post_zpos , pre_xpos, post_xpos, pre_ypos, post_ypos, numSynTypes localobj cell
+func connectCells () {local r, syn, distance, counter, precellType, postcellType, j, randSynNumber, pre_zpos, post_zpos, pre_xpos, post_xpos, pre_ypos, post_ypos, numSynTypes localobj cell
 
 		// Indices of the cell types in the cellType array
 		precellType = $1
 		postcellType = $2
 
+		// Position indices of the cells in the cellType array
 		precell_posindeces = new Vector()
-                postcell_posindeces = new Vector()
 		precell_posindeces.copy(cellType[precellType].PosGidList)
-                postcell_posindeces.copy(cellType[postcellType].PosGidList)
+		postcell_posindeces = new Vector()
+		postcell_posindeces.copy(cellType[postcellType].PosGidList)
 
 		// Properties of the connections between the presynaptic cell type and postsynaptic cell type
 		synWeight = cellType[$1].wgtConns.x[$2]
@@ -202,8 +204,11 @@ func connectCells () {local r, syn, distance, counter, precellType, postcellType
 			params.x[25]= 1+RandomSeedsConn // newhighindex
 			params.x[26]= connlength
 
+            pre_posStart = new Vector(1,cellType[precellType].PosGidStart)
+            post_posStart = new Vector(1,cellType[postcellType].PosGidStart)
 
-			conns2make.fastconn(params, precell_posindeces, postcell_posindeces, postcellgids, highIndices)	// Use the newly installed vector method in the following manner:
+			conns2make.fastconn(params, pre_posStart, precell_posindeces, post_posStart, postcell_posindeces, postcellgids, highIndices)
+																	// Use the newly installed vector method in the following manner:
 																	//  1. Create a vector that is more than 3x as long as the number
 																	//     of connections you expect to make from this presynaptic
 																	//     cell type to the specific postsynaptic cells owned by this
@@ -264,16 +269,16 @@ func connectCells () {local r, syn, distance, counter, precellType, postcellType
 				if (numpost>1) {
 					postgid = conns2make.x[r+connlength]
 				} else {
-					postgid = postcellgids.x[0]
+					postgid = int(postcellgids.x[0])
 				}
 
-                // Connect only cells belonging to the same slice
-                pregid = conns2make.x[r]
-                pre_slice_index = cellType[precellType].SliceIndList.x[pregid-cellType[precellType].cellStartGid]
-                post_slice_index = cellType[postcellType].SliceIndList.x[postgid-cellType[postcellType].cellStartGid]
-                if (pc.gid_exists(postgid) && (pre_slice_index == post_slice_index)) {
-				// if (pc.gid_exists(postgid)) {
+                		// Connect only cells belonging to the same slice
+                		pregid = conns2make.x[r]
+			        pre_slice_index = cellType[precellType].SliceIndList.x[pregid-cellType[precellType].cellStartGid]
+                		post_slice_index = cellType[postcellType].SliceIndList.x[postgid-cellType[postcellType].cellStartGid]
+			        if (pc.gid_exists(postgid) && (pre_slice_index == post_slice_index)) {
 					cell = pc.gid2cell(postgid)
+
 
 					numSynTypes = cell.pre_list.o(precellType).count()	// Get total number of potential synapse types for this combination
 																		//  of presynaptic cell type and postsynaptic cell type.
@@ -309,8 +314,6 @@ func connectCells () {local r, syn, distance, counter, precellType, postcellType
 																								//  to define the variance of the distribution).
 						}
 
-
-
 						for s=1,numSyns {	// Randomly pick from the available synapses
 											//  enough times to make the desired number
 											//  of synapses per connection.
@@ -320,8 +323,11 @@ func connectCells () {local r, syn, distance, counter, precellType, postcellType
 								conDelay =  3 	// Axonal conduction delay + synapse delay (time between when the presynaptic cell spikes
 												//  and the synapse on the postsynaptic cell is activated)
 							} else { // Don't use the z dimension when computing distances for now - we'll save that for another time
-								xpos=xpos_algorithm(conns2make.x[r],cellType[precellType].numCells,cellType[precellType].cellStartGid,cellType[precellType].dentateXBins,cellType[precellType].dentateYBins*cellType[precellType].dentateZBins,cellType[precellType].dentateXBinSize)	// Algorithmically generate cell position
-								ypos=ypos_algorithm(conns2make.x[r],cellType[precellType].numCells,cellType[precellType].cellStartGid,cellType[precellType].dentateYBins,cellType[precellType].dentateZBins,cellType[precellType].dentateYBinSize)	// Algorithmically generate cell position
+								// xpos=xpos_algorithm(conns2make.x[r],cellType[precellType].numCells,cellType[precellType].cellStartGid,cellType[precellType].dentateXBins,cellType[precellType].dentateYBins*cellType[precellType].dentateZBins,cellType[precellType].dentateXBinSize)	// Algorithmically generate cell position
+								// ypos=ypos_algorithm(conns2make.x[r],cellType[precellType].numCells,cellType[precellType].cellStartGid,cellType[precellType].dentateYBins,cellType[precellType].dentateZBins,cellType[precellType].dentateYBinSize)	// Algorithmically generate cell position
+								pos_index = precell_posindeces.x[pregid-cellType[precellType].cellStartGid]
+								xpos=xpos_algorithm(pos_index,cellType[precellType].numCells,cellType[precellType].PosGidStart,cellType[precellType].dentateXBins,cellType[precellType].dentateYBins*cellType[precellType].dentateZBins,cellType[precellType].dentateXBinSize)	// Algorithmically generate cell position
+								ypos=ypos_algorithm(pos_index,cellType[precellType].numCells,cellType[precellType].PosGidStart,cellType[precellType].dentateYBins,cellType[precellType].dentateZBins,cellType[precellType].dentateYBinSize)	// Algorithmically generate cell position
 								conDelay = int(10*sqrt((xpos - cell.x)*(xpos - cell.x) + (ypos - cell.y)*(ypos - cell.y))/AxConVel)/10 + 0.5 // use 0.5 for the synaptic cleft delay; this also ensures the delay will never be set to 0, which would error the program
 								if (conDelay<dt || conDelay%dt>0 || conDelay/dt>=255) {
 									print "BAD CONDELAY: host ", pc.id, " precell: ", conns2make.x[r], ", postcell: ", conns2make.x[r+connlength], ", conDelay = ", conDelay

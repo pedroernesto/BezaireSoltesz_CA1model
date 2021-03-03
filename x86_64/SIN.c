@@ -1,4 +1,4 @@
-/* Created by Language version: 6.2.0 */
+/* Created by Language version: 7.7.0 */
 /* VECTORIZED */
 #define NRN_VECTORIZED 1
 #include <stdio.h>
@@ -77,6 +77,15 @@ extern void hoc_register_limits(int, HocParmLimits*);
 extern void hoc_register_units(int, HocParmUnits*);
 extern void nrn_promote(Prop*, int, int);
 extern Memb_func* memb_func;
+ 
+#define NMODL_TEXT 1
+#if NMODL_TEXT
+static const char* nmodl_file_text;
+static const char* nmodl_filename;
+extern void hoc_reg_nmodl_text(int, const char*);
+extern void hoc_reg_nmodl_filename(int, const char*);
+#endif
+
  extern Prop* nrn_point_prop_;
  static int _pointtype;
  static void* _hoc_create_pnt(_ho) Object* _ho; { void* create_point_process();
@@ -142,7 +151,7 @@ static void  nrn_jacob(_NrnThread*, _Memb_list*, int);
 }
  /* connect range variables in _p that hoc is supposed to know about */
  static const char *_mechanism[] = {
- "6.2.0",
+ "7.7.0",
 "sinstim",
  "freq",
  "del",
@@ -198,15 +207,21 @@ extern void _cvode_abstol( Symbol**, double*, int);
 	 _hoc_create_pnt, _hoc_destroy_pnt, _member_func);
  _mechtype = nrn_get_mechtype(_mechanism[1]);
      _nrn_setdata_reg(_mechtype, _setdata);
+ #if NMODL_TEXT
+  hoc_reg_nmodl_text(_mechtype, nmodl_file_text);
+  hoc_reg_nmodl_filename(_mechtype, nmodl_filename);
+#endif
   hoc_register_prop_size(_mechtype, 8, 2);
   hoc_register_dparam_semantics(_mechtype, 0, "area");
   hoc_register_dparam_semantics(_mechtype, 1, "pntproc");
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 sinstim /home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64/SIN.mod\n");
+ 	ivoc_help("help ?1 sinstim /users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/SIN.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
- static double PI = 3.14159;
+ 
+#define PI _nrnunit_PI[_nrnunit_use_legacy_]
+static double _nrnunit_PI[2] = {0x1.921fb54442d18p+1, 3.14159}; /* 3.14159265358979312 */
 static int _reset;
 static char *modelname = "";
 
@@ -335,4 +350,39 @@ _first = 0;
 
 #if defined(__cplusplus)
 } /* extern "C" */
+#endif
+
+#if NMODL_TEXT
+static const char* nmodl_filename = "/users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/SIN.mod";
+static const char* nmodl_file_text = 
+  "INDEPENDENT {t FROM 0 TO 1 WITH 1 (ms)}\n"
+  "\n"
+  "NEURON {\n"
+  "  POINT_PROCESS sinstim\n"
+  "  RANGE del, dur, amp, baseamp, i, freq\n"
+  "  NONSPECIFIC_CURRENT i\n"
+  "}\n"
+  "\n"
+  "UNITS {\n"
+  "  (nA) = (nanoamp)\n"
+  "  PI  = (pi) (1)\n"
+  "}\n"
+  "\n"
+  "PARAMETER {\n"
+  "  freq = 5 (Hz)\n"
+  "  del = 0  (ms)\n"
+  "  dur = 1e10 (ms)\n"
+  "  amp = 0 (nA)\n"
+  "  baseamp = 0 (nA)\n"
+  "}\n"
+  "ASSIGNED { i (nA) }\n"
+  "\n"
+  "BREAKPOINT {\n"
+  "  if (t>del && t<dur+del) {\n"
+  "    i = -baseamp - sin(2*PI*freq*(t-del)/1000.)*amp\n"
+  "  } else {\n"
+  "    i = 0.0\n"
+  "  }\n"
+  "}\n"
+  ;
 #endif

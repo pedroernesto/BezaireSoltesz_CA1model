@@ -1,4 +1,4 @@
-/* Created by Language version: 6.2.0 */
+/* Created by Language version: 7.7.0 */
 /* NOT VECTORIZED */
 #define NRN_VECTORIZED 0
 #include <stdio.h>
@@ -84,6 +84,15 @@ extern void hoc_register_limits(int, HocParmLimits*);
 extern void hoc_register_units(int, HocParmUnits*);
 extern void nrn_promote(Prop*, int, int);
 extern Memb_func* memb_func;
+ 
+#define NMODL_TEXT 1
+#if NMODL_TEXT
+static const char* nmodl_file_text;
+static const char* nmodl_filename;
+extern void hoc_reg_nmodl_text(int, const char*);
+extern void hoc_reg_nmodl_filename(int, const char*);
+#endif
+
  extern void _nrn_setdata_reg(int, void(*)(Prop*));
  static void _setdata(Prop* _prop) {
  _p = _prop->param; _ppvar = _prop->dparam;
@@ -171,7 +180,7 @@ static void _ode_matsol(_NrnThread*, _Memb_list*, int);
  static void _ode_matsol_instance1(_threadargsproto_);
  /* connect range variables in _p that hoc is supposed to know about */
  static const char *_mechanism[] = {
- "6.2.0",
+ "7.7.0",
 "ch_Kdrp",
  "e_ch_Kdrp",
  "gmax_ch_Kdrp",
@@ -227,6 +236,10 @@ extern void _cvode_abstol( Symbol**, double*, int);
  _mechtype = nrn_get_mechtype(_mechanism[1]);
      _nrn_setdata_reg(_mechtype, _setdata);
      _nrn_thread_reg(_mechtype, 2, _update_ion_pointer);
+ #if NMODL_TEXT
+  hoc_reg_nmodl_text(_mechtype, nmodl_file_text);
+  hoc_reg_nmodl_filename(_mechtype, nmodl_filename);
+#endif
   hoc_register_prop_size(_mechtype, 9, 4);
   hoc_register_dparam_semantics(_mechtype, 0, "k_ion");
   hoc_register_dparam_semantics(_mechtype, 1, "k_ion");
@@ -235,7 +248,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
  	hoc_register_cvode(_mechtype, _ode_count, _ode_map, _ode_spec, _ode_matsol);
  	hoc_register_tolerance(_mechtype, _hoc_state_tol, &_atollist);
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 ch_Kdrp /home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64/ch_Kdrp.mod\n");
+ 	ivoc_help("help ?1 ch_Kdrp /users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/ch_Kdrp.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -290,7 +303,7 @@ static void _hoc_betn(void) {
  static int _ode_matsol1 () {
  rates ( _threadargscomma_ v ) ;
  Dn = Dn  / (1. - dt*( ( ( ( - 1.0 ) ) ) / taun )) ;
- return 0;
+  return 0;
 }
  /*END CVODE*/
  static int states () {_reset=0;
@@ -505,3 +518,100 @@ static void _initlists() {
  _slist1[0] = &(n) - _p;  _dlist1[0] = &(Dn) - _p;
 _first = 0;
 }
+
+#if NMODL_TEXT
+static const char* nmodl_filename = "/users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/ch_Kdrp.mod";
+static const char* nmodl_file_text = 
+  "TITLE Delayed rectifier potassium channel (voltage dependent)\n"
+  "\n"
+  "COMMENT\n"
+  "Delayed rectifier potassium channel (voltage dependent)\n"
+  "\n"
+  "Ions: k\n"
+  "\n"
+  "Style: quasi-ohmic\n"
+  "\n"
+  "From: Klee Ficker and Heinemann\n"
+  "\n"
+  "Updates:\n"
+  "2014 December (Marianne Bezaire): documented\n"
+  "1997 (Michele Migliore): modified to account for Dax et al.\n"
+  "ENDCOMMENT\n"
+  "\n"
+  "\n"
+  "UNITS {\n"
+  "	(mA) = (milliamp)\n"
+  "	(mV) = (millivolt)\n"
+  "\n"
+  "}\n"
+  "\n"
+  "PARAMETER {\n"
+  "	v (mV)\n"
+  "	ek (mV)		: must be explicitely def. in hoc\n"
+  "	e\n"
+  "	celsius		(degC)\n"
+  "	gmax=.003 (mho/cm2)\n"
+  "	vhalfn=13   (mV)\n"
+  "	a0n=0.02      (/ms)\n"
+  "	zetan=-3    (1)\n"
+  "	gmn=0.7  (1)\n"
+  "	nmax=2  (1)\n"
+  "	q10=1\n"
+  "}\n"
+  "\n"
+  "\n"
+  "NEURON {\n"
+  "	SUFFIX ch_Kdrp\n"
+  "	USEION k READ ek WRITE ik\n"
+  "    RANGE gmax, myi, e, g\n"
+  "	GLOBAL ninf,taun\n"
+  "}\n"
+  "\n"
+  "STATE {\n"
+  "	n\n"
+  "}\n"
+  "\n"
+  "ASSIGNED {\n"
+  "	ik (mA/cm2)\n"
+  "	myi (mA/cm2)\n"
+  "	ninf\n"
+  "	g\n"
+  "	taun\n"
+  "}\n"
+  "\n"
+  "BREAKPOINT {\n"
+  "	SOLVE states METHOD cnexp\n"
+  "	g = gmax*n\n"
+  "	ik = g*(v-ek)\n"
+  "	myi = ik\n"
+  "}\n"
+  "\n"
+  "INITIAL {\n"
+  "	rates(v)\n"
+  "	n=ninf\n"
+  "}\n"
+  "\n"
+  "\n"
+  "FUNCTION alpn(v(mV)) {\n"
+  "	alpn = exp(1.e-3*zetan*(v-vhalfn)*9.648e4/(8.315*(273.16+celsius))) \n"
+  "}\n"
+  "\n"
+  "FUNCTION betn(v(mV)) {\n"
+  "	betn = exp(1.e-3*zetan*gmn*(v-vhalfn)*9.648e4/(8.315*(273.16+celsius))) \n"
+  "}\n"
+  "\n"
+  "DERIVATIVE states {     : exact when v held constant; integrates over dt step\n"
+  "	rates(v)\n"
+  "	n' = (ninf - n)/taun\n"
+  "}\n"
+  "\n"
+  "PROCEDURE rates(v (mV)) { :callable from hoc\n"
+  "	LOCAL a,qt\n"
+  "	qt=q10^((celsius-24)/10)\n"
+  "	a = alpn(v)\n"
+  "	ninf = 1/(1+a)\n"
+  "	taun = betn(v)/(qt*a0n*(1+a))\n"
+  "	if (taun<nmax) {taun=nmax}\n"
+  "}\n"
+  ;
+#endif

@@ -1,4 +1,4 @@
-/* Created by Language version: 6.2.0 */
+/* Created by Language version: 7.7.0 */
 /* NOT VECTORIZED */
 #define NRN_VECTORIZED 0
 #include <stdio.h>
@@ -106,7 +106,7 @@ static void  nrn_init(_NrnThread*, _Memb_list*, int);
 static void nrn_state(_NrnThread*, _Memb_list*, int);
  /* connect range variables in _p that hoc is supposed to know about */
  static const char *_mechanism[] = {
- "6.2.0",
+ "7.7.0",
 "fastconn",
  0,
  0,
@@ -135,7 +135,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
 	int _vectorized = 0;
   _initlists();
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 fastconn /home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64/fastconn.mod\n");
+ 	ivoc_help("help ?1 fastconn /users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/fastconn.mod\n");
  }
 static int _reset;
 static char *modelname = "";
@@ -163,18 +163,23 @@ extern double get_z_pos(double gid, double gmin, double BinNumZ, double binSizeZ
 /*VERBATIM*/
 
 static  double fastconn (void* vv) {
-  int finalconn, ny, nz, nhigh, num_pre, num_post, gmin, gmax, steps, myflaggy, myi, postgmin, stepover;
-  double *x, *y, *z, *high, a, b, c, nconv, ncell, axonal_extent;
-
+  int finalconn, ny, ny_start, ny_pos, nz_start, nz_pos, nz, nhigh, num_pre, num_post, gmin, gmax, steps, myflaggy, myi, postgmin, stepover;
+  double *x, *y, *y_start, *y_pos, *z_start, *z_pos, *z, *high, a, b, c, nconv, ncell, axonal_extent;
 	/* Get hoc vectors into c arrays */
 	finalconn = vector_instance_px(vv, &x); // x is an array corresponding
-											// to the placeholder vector
-											// of connections to make
+						// to the placeholder vector
+						// of connections to make
 
-	ny = vector_arg_px(1, &y); // y is an array of parameters
-	nz = vector_arg_px(2, &z); // z is an array of the postsynaptic gids
-	nhigh = vector_arg_px(3, &high); // high is an array of the starting high indices to use
-	
+	ny = vector_arg_px(1, &y); 		// y is an array of parameters
+	ny_start = vector_arg_px(2, &y_start);  // y_start is the reference for presynaptic position indexes
+	ny_pos = vector_arg_px(3, &y_pos); 	// y_pos is an array of presynaptic position indexes
+
+        nz_start = vector_arg_px(4, &z_start);  // z_start is the reference for postsynaptic position indexes
+	nz_pos = vector_arg_px(5, &z_pos); 	// z_pos is an array of postsynaptic position indexes
+	nz = vector_arg_px(6, &z); 		// z is an array of the postsynaptic gids
+	nhigh = vector_arg_px(7, &high); 	// high is an array of the starting high indices to use
+
+
 	/* Load the parameters from the param array */
 	gmin = y[0];	// presynaptic start gid
 	gmax = y[1];	// presynaptic end gid
@@ -220,17 +225,23 @@ static  double fastconn (void* vv) {
 	//    the column dimension
 
 	int cell;
-
+	/*
 	for (cell=0; cell<num_pre; cell++) {
 		prepos[cell*3 + 0] = get_x_pos(cell+gmin, gmin, y[10], y[11]*y[12], y[13]);
 		prepos[cell*3 + 1] = get_y_pos(cell+gmin, gmin, y[11], y[12], y[14]);
 		prepos[cell*3 + 2] = get_z_pos(cell+gmin, gmin, y[12], y[15], y[16]);
 	}
+	*/
+	for (cell=0; cell<num_pre; cell++) {
+		prepos[cell*3 + 0] = get_x_pos(y_pos[cell], y_start[0], y[10], y[11]*y[12], y[13]);
+		prepos[cell*3 + 1] = get_y_pos(y_pos[cell], y_start[0], y[11], y[12], y[14]);
+		prepos[cell*3 + 2] = get_z_pos(y_pos[cell], y_start[0], y[12], y[15], y[16]);
+	}
 
 	for (cell=0; cell<num_post; cell++) {
-		postpos[cell*3 + 0] = get_x_pos(z[cell], postgmin, y[17], y[18]*y[19], y[20]);
-		postpos[cell*3 + 1] = get_y_pos(z[cell], postgmin, y[18], y[19], y[21]);
-		postpos[cell*3 + 2] = get_z_pos(z[cell], postgmin, y[19], y[22], y[23]);
+		postpos[cell*3 + 0] = get_x_pos(z_pos[(int)z[cell]-postgmin], z_start[0], y[17], y[18]*y[19], y[20]);
+		postpos[cell*3 + 1] = get_y_pos(z_pos[(int)z[cell]-postgmin], z_start[0], y[18], y[19], y[21]);
+		postpos[cell*3 + 2] = get_z_pos(z_pos[(int)z[cell]-postgmin], z_start[0], y[19], y[22], y[23]);
 	}
 
 	/* calculate the distribution of desired connections*/   

@@ -1,4 +1,4 @@
-/* Created by Language version: 6.2.0 */
+/* Created by Language version: 7.7.0 */
 /* NOT VECTORIZED */
 #define NRN_VECTORIZED 0
 #include <stdio.h>
@@ -81,6 +81,15 @@ extern void hoc_register_limits(int, HocParmLimits*);
 extern void hoc_register_units(int, HocParmUnits*);
 extern void nrn_promote(Prop*, int, int);
 extern Memb_func* memb_func;
+ 
+#define NMODL_TEXT 1
+#if NMODL_TEXT
+static const char* nmodl_file_text;
+static const char* nmodl_filename;
+extern void hoc_reg_nmodl_text(int, const char*);
+extern void hoc_reg_nmodl_filename(int, const char*);
+#endif
+
  extern void _nrn_setdata_reg(int, void(*)(Prop*));
  static void _setdata(Prop* _prop) {
  _p = _prop->param; _ppvar = _prop->dparam;
@@ -141,7 +150,7 @@ static void _ode_matsol(_NrnThread*, _Memb_list*, int);
  static void _ode_matsol_instance1(_threadargsproto_);
  /* connect range variables in _p that hoc is supposed to know about */
  static const char *_mechanism[] = {
- "6.2.0",
+ "7.7.0",
 "ch_HCN",
  "gmax_ch_HCN",
  "e_ch_HCN",
@@ -190,12 +199,16 @@ extern void _cvode_abstol( Symbol**, double*, int);
  	register_mech(_mechanism, nrn_alloc,nrn_cur, nrn_jacob, nrn_state, nrn_init, hoc_nrnpointerindex, 0);
  _mechtype = nrn_get_mechtype(_mechanism[1]);
      _nrn_setdata_reg(_mechtype, _setdata);
+ #if NMODL_TEXT
+  hoc_reg_nmodl_text(_mechtype, nmodl_file_text);
+  hoc_reg_nmodl_filename(_mechtype, nmodl_filename);
+#endif
   hoc_register_prop_size(_mechtype, 10, 1);
   hoc_register_dparam_semantics(_mechtype, 0, "cvodeieq");
  	hoc_register_cvode(_mechtype, _ode_count, _ode_map, _ode_spec, _ode_matsol);
  	hoc_register_tolerance(_mechtype, _hoc_state_tol, &_atollist);
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 ch_HCN /home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64/ch_HCN.mod\n");
+ 	ivoc_help("help ?1 ch_HCN /users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/ch_HCN.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -238,7 +251,7 @@ static int _ode_spec1(_threadargsproto_);
  static int _ode_matsol1 () {
  trates ( _threadargscomma_ v ) ;
  Dh = Dh  / (1. - dt*( ( ( ( - 1.0 ) ) ) / slow_tau )) ;
- return 0;
+  return 0;
 }
  /*END CVODE*/
  static int states () {_reset=0;
@@ -486,3 +499,120 @@ static void _initlists() {
    _t_slow_tau = makevector(221*sizeof(double));
 _first = 0;
 }
+
+#if NMODL_TEXT
+static const char* nmodl_filename = "/users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/ch_HCN.mod";
+static const char* nmodl_file_text = 
+  "TITLE Hyperpolarization-activated, CN-gated channel (voltage dependent)\n"
+  "\n"
+  "COMMENT\n"
+  "Hyperpolarization-activated, CN-gated channel (voltage dependent)\n"
+  "\n"
+  "Ions: non-specific\n"
+  "\n"
+  "Style: quasi-ohmic\n"
+  "\n"
+  "From: Chen et al (2001), distal dendrite, control h channel\n"
+  "(modeling by Ildiko Aradi, iaradi@uci.edu)\n"
+  "\n"
+  "Updates:\n"
+  "2014 December (Marianne Bezaire): documented, only slow tau used, fake\n"
+  "ion switched to a non-specific current\n"
+  "ENDCOMMENT\n"
+  "\n"
+  "\n"
+  "VERBATIM\n"
+  "#include <stdlib.h> /* 	Include this library so that the following\n"
+  "						(innocuous) warning does not appear:\n"
+  "						 In function '_thread_cleanup':\n"
+  "						 warning: incompatible implicit declaration of \n"
+  "						          built-in function 'free'  */\n"
+  "ENDVERBATIM\n"
+  " \n"
+  "UNITS {\n"
+  "	(mA) =(milliamp)\n"
+  "	(mV) =(millivolt)\n"
+  "	(uF) = (microfarad)\n"
+  "	(molar) = (1/liter)\n"
+  "	(nA) = (nanoamp)\n"
+  "	(mM) = (millimolar)\n"
+  "	(um) = (micron)\n"
+  "	FARADAY = 96520 (coul)\n"
+  "	R = 8.3134	(joule/degC)\n"
+  "}\n"
+  " \n"
+  "NEURON { \n"
+  "	SUFFIX ch_HCN \n"
+  "	NONSPECIFIC_CURRENT i\n"
+  "	RANGE gmax, g, i, e\n"
+  "	RANGE hinf\n"
+  "	RANGE slow_tau :, fast_tau\n"
+  "	RANGE myi\n"
+  "}\n"
+  " \n"
+  " \n"
+  "PARAMETER {\n"
+  "	gmax  (mho/cm2)\n"
+  "	e (mV)\n"
+  "}\n"
+  " \n"
+  "STATE {\n"
+  "	h\n"
+  "}\n"
+  " \n"
+  "ASSIGNED {\n"
+  "	v (mV) \n"
+  "	celsius (degC)\n"
+  "	dt (ms)    \n"
+  "  \n"
+  "	g (mho/cm2)\n"
+  " 	i (mA/cm2)\n"
+  "	\n"
+  "	hinf \n"
+  " 	:fast_tau (ms)\n"
+  " 	slow_tau (ms) \n"
+  " 	myi (mA/cm2)\n"
+  "} \n"
+  "\n"
+  "BREAKPOINT {\n"
+  "	SOLVE states METHOD cnexp\n"
+  "		\n"
+  "	g = gmax*h*h\n"
+  "	i = g*(v - e)\n"
+  "	myi = i\n"
+  "}\n"
+  " \n"
+  "UNITSOFF\n"
+  " \n"
+  "INITIAL { : called from hoc to calculate hinf at resting potential\n"
+  "	trates(v)\n"
+  "	h = hinf\n"
+  "}\n"
+  "\n"
+  "DERIVATIVE states {	:computes h at current v and dt \n"
+  "	trates(v)\n"
+  "	h' = (hinf-h)/slow_tau :  + (hinf-h)/fast_tau\n"
+  "}\n"
+  " \n"
+  "LOCAL q10\n"
+  "PROCEDURE trates(v) {  :Computes rate and other constants at current v.\n"
+  "	TABLE hinf, slow_tau : , fast_tau\n"
+  "	DEPEND celsius \n"
+  "	FROM -120 TO 100 WITH 220\n"
+  "                           \n"
+  "    :q10 = 3^((celsius - 6.3)/10)\n"
+  "    q10 = 3^((celsius - 34)/10)\n"
+  "       \n"
+  "	hinf =  1 / (1 + exp( (v+91)/10 ))\n"
+  "\n"
+  "	:\"hyf\" FAST CONTROL Hype activation system\n"
+  "	:fast_tau = (14.9 + 14.1 / (1+exp(-(v+95.2)/0.5)))/q10\n"
+  "\n"
+  "	:\"hys\" SLOW CONTROL Hype activation system\n"
+  "	slow_tau = (80*1.5 + .75*172.7 / (1+exp(-(v+59.3)/-0.83)))/q10\n"
+  "\n"
+  "}\n"
+  "\n"
+  "UNITSON\n"
+  ;
+#endif

@@ -1,4 +1,4 @@
-/* Created by Language version: 6.2.0 */
+/* Created by Language version: 7.7.0 */
 /* NOT VECTORIZED */
 #define NRN_VECTORIZED 0
 #include <stdio.h>
@@ -94,6 +94,15 @@ extern void hoc_register_limits(int, HocParmLimits*);
 extern void hoc_register_units(int, HocParmUnits*);
 extern void nrn_promote(Prop*, int, int);
 extern Memb_func* memb_func;
+ 
+#define NMODL_TEXT 1
+#if NMODL_TEXT
+static const char* nmodl_file_text;
+static const char* nmodl_filename;
+extern void hoc_reg_nmodl_text(int, const char*);
+extern void hoc_reg_nmodl_filename(int, const char*);
+#endif
+
  extern void _nrn_setdata_reg(int, void(*)(Prop*));
  static void _setdata(Prop* _prop) {
  _p = _prop->param; _ppvar = _prop->dparam;
@@ -153,7 +162,7 @@ static void  nrn_jacob(_NrnThread*, _Memb_list*, int);
 static int _ode_count(int);
  /* connect range variables in _p that hoc is supposed to know about */
  static const char *_mechanism[] = {
- "6.2.0",
+ "7.7.0",
 "ch_CavN",
  "gmax_ch_CavN",
  0,
@@ -207,13 +216,17 @@ extern void _cvode_abstol( Symbol**, double*, int);
  _mechtype = nrn_get_mechtype(_mechanism[1]);
      _nrn_setdata_reg(_mechtype, _setdata);
      _nrn_thread_reg(_mechtype, 2, _update_ion_pointer);
+ #if NMODL_TEXT
+  hoc_reg_nmodl_text(_mechtype, nmodl_file_text);
+  hoc_reg_nmodl_filename(_mechtype, nmodl_filename);
+#endif
   hoc_register_prop_size(_mechtype, 16, 3);
   hoc_register_dparam_semantics(_mechtype, 0, "ca_ion");
   hoc_register_dparam_semantics(_mechtype, 1, "ca_ion");
   hoc_register_dparam_semantics(_mechtype, 2, "ca_ion");
  	hoc_register_cvode(_mechtype, _ode_count, 0, 0, 0);
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 ch_CavN /home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64/ch_CavN.mod\n");
+ 	ivoc_help("help ?1 ch_CavN /users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/ch_CavN.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -542,3 +555,148 @@ static void _initlists() {
    _t_dtau = makevector(201*sizeof(double));
 _first = 0;
 }
+
+#if NMODL_TEXT
+static const char* nmodl_filename = "/users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/ch_CavN.mod";
+static const char* nmodl_file_text = 
+  "TITLE N-type calcium channel (voltage dependent)\n"
+  " \n"
+  "COMMENT\n"
+  "N-Type Ca2+ channel (voltage dependent)\n"
+  "\n"
+  "Ions: ca\n"
+  "\n"
+  "Style: quasi-ohmic\n"
+  "\n"
+  "From: Aradi and Holmes, 1999\n"
+  "\n"
+  "Updates:\n"
+  "2014 December (Marianne Bezaire): documented\n"
+  "ENDCOMMENT\n"
+  "\n"
+  "VERBATIM\n"
+  "#include <stdlib.h> /* 	Include this library so that the following\n"
+  "						(innocuous) warning does not appear:\n"
+  "						 In function '_thread_cleanup':\n"
+  "						 warning: incompatible implicit declaration of \n"
+  "						          built-in function 'free'  */\n"
+  "ENDVERBATIM\n"
+  " \n"
+  "UNITS {\n"
+  "	(mA) =(milliamp)\n"
+  "	(mV) =(millivolt)\n"
+  "	(molar) = (1/liter)\n"
+  "	(mM) = (millimolar)\n"
+  "	FARADAY = 96520 (coul)\n"
+  "	R = 8.3134	(joule/degC)\n"
+  "}\n"
+  " \n"
+  " \n"
+  "NEURON {\n"
+  "	SUFFIX ch_CavN				: The name of the mechanism\n"
+  "	USEION ca READ eca WRITE ica VALENCE 2 \n"
+  "	RANGE g\n"
+  "	RANGE gmax\n"
+  "	RANGE cinf, ctau, dinf, dtau\n"
+  "	RANGE myi\n"
+  "	THREADSAFE\n"
+  "}\n"
+  " \n"
+  "INDEPENDENT {t FROM 0 TO 100 WITH 100 (ms)}\n"
+  "\n"
+  "\n"
+  "PARAMETER {\n"
+  "	v (mV) 					: membrane potential\n"
+  "      celsius (degC) : temperature - set in hoc; default is 6.3\n"
+  "	gmax (mho/cm2)		: conductance flux - defined in CavT but not here\n"
+  "}\n"
+  " \n"
+  "STATE {\n"
+  "	c d		\n"
+  "}\n"
+  " \n"
+  "ASSIGNED {			: assigned (where?)\n"
+  "	dt (ms) 				: simulation time step\n"
+  "\n"
+  "	ica (mA/cm2)	: current flux\n"
+  "	g (mho/cm2)	: conductance flux\n"
+  "	eca (mV)		: reversal potential\n"
+  "\n"
+  "	cinf dinf\n"
+  "	ctau (ms)\n"
+  "	dtau (ms) \n"
+  "	cexp dexp      \n"
+  "	myi (mA/cm2)\n"
+  "}\n"
+  "\n"
+  "BREAKPOINT {\n"
+  "	SOLVE states : what is the method? let's specify one\n"
+  "    g = gmax*c*c*d\n"
+  "	ica = g*(v-eca)\n"
+  "	myi = ica\n"
+  "}\n"
+  " \n"
+  "UNITSOFF\n"
+  " \n"
+  "INITIAL {\n"
+  "	trates(v)\n"
+  "	c = cinf\n"
+  "	d = dinf\n"
+  "}\n"
+  "\n"
+  "? states : verbatim blocks are not thread safe (perhaps related, this mechanism cannot be used with cvode)\n"
+  "PROCEDURE states() {	:Computes state variables m, h, and n \n"
+  "        trates(v)	:      at the current v and dt.\n"
+  "	c = c + cexp*(cinf-c)\n"
+  "	d = d + dexp*(dinf-d)\n"
+  "        :VERBATIM				\n"
+  "        :return 0;\n"
+  "        :ENDVERBATIM\n"
+  "}\n"
+  " \n"
+  "LOCAL q10\n"
+  "\n"
+  "PROCEDURE rates(v) {  :Computes rate and other constants at current v.\n"
+  "                      :Call once from HOC to initialize inf at resting v.\n"
+  "        LOCAL  alpha, beta, sum\n"
+  "       :q10 = 3^((celsius - 6.3)/10)\n"
+  "       q10 = 3^((celsius - 34)/10)\n"
+  "                :\"c\" NCa activation system\n"
+  "        alpha = -0.19*vtrap(v-19.88,-10)\n"
+  "	beta = 0.046*exp(-v/20.73)\n"
+  "	sum = alpha+beta        \n"
+  "	ctau = 1/sum      cinf = alpha/sum\n"
+  "                :\"d\" NCa inactivation system\n"
+  "	alpha = 0.00016*exp(-v/48.4) : this is multiplied, not divided in Aradi & Holmes formula\n"
+  "	beta = 1/(exp((-v+39)/10)+1)\n"
+  "	sum = alpha+beta        \n"
+  "	dtau = 1/sum      dinf = alpha/sum\n"
+  "}\n"
+  "\n"
+  "PROCEDURE trates(v) {  :Computes rate and other constants at current v.\n"
+  "                      :Call once from HOC to initialize inf at resting v.\n"
+  "	LOCAL tinc\n"
+  "	TABLE  cinf, cexp, dinf, dexp, ctau, dtau\n"
+  "	DEPEND dt, celsius FROM -100 TO 100 WITH 200\n"
+  "                           \n"
+  "	rates(v)	: not consistently executed from here if usetable_hh == 1\n"
+  "				: so don't expect the tau values to be tracking along with\n"
+  "				: the inf values in hoc\n"
+  "\n"
+  "	tinc = -dt * q10\n"
+  "	cexp = 1 - exp(tinc/ctau)\n"
+  "	dexp = 1 - exp(tinc/dtau)\n"
+  "}\n"
+  "\n"
+  "FUNCTION vtrap(x,y) {  :Traps for 0 in denominator of rate eqns.\n"
+  "	if (fabs(x/y) < 1e-6) {\n"
+  "		vtrap = y*(1 - x/y/2)\n"
+  "	}else{  \n"
+  "		vtrap = x/(exp(x/y) - 1)\n"
+  "	}\n"
+  "}\n"
+  "\n"
+  "UNITSON\n"
+  "\n"
+  ;
+#endif

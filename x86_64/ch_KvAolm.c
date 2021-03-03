@@ -1,4 +1,4 @@
-/* Created by Language version: 6.2.0 */
+/* Created by Language version: 7.7.0 */
 /* NOT VECTORIZED */
 #define NRN_VECTORIZED 0
 #include <stdio.h>
@@ -83,6 +83,15 @@ extern void hoc_register_limits(int, HocParmLimits*);
 extern void hoc_register_units(int, HocParmUnits*);
 extern void nrn_promote(Prop*, int, int);
 extern Memb_func* memb_func;
+ 
+#define NMODL_TEXT 1
+#if NMODL_TEXT
+static const char* nmodl_file_text;
+static const char* nmodl_filename;
+extern void hoc_reg_nmodl_text(int, const char*);
+extern void hoc_reg_nmodl_filename(int, const char*);
+#endif
+
  extern void _nrn_setdata_reg(int, void(*)(Prop*));
  static void _setdata(Prop* _prop) {
  _p = _prop->param; _ppvar = _prop->dparam;
@@ -165,7 +174,7 @@ static void _ode_matsol(_NrnThread*, _Memb_list*, int);
  static void _ode_matsol_instance1(_threadargsproto_);
  /* connect range variables in _p that hoc is supposed to know about */
  static const char *_mechanism[] = {
- "6.2.0",
+ "7.7.0",
 "ch_KvAolm",
  "gmax_ch_KvAolm",
  0,
@@ -221,6 +230,10 @@ extern void _cvode_abstol( Symbol**, double*, int);
  _mechtype = nrn_get_mechtype(_mechanism[1]);
      _nrn_setdata_reg(_mechtype, _setdata);
      _nrn_thread_reg(_mechtype, 2, _update_ion_pointer);
+ #if NMODL_TEXT
+  hoc_reg_nmodl_text(_mechtype, nmodl_file_text);
+  hoc_reg_nmodl_filename(_mechtype, nmodl_filename);
+#endif
   hoc_register_prop_size(_mechtype, 10, 4);
   hoc_register_dparam_semantics(_mechtype, 0, "k_ion");
   hoc_register_dparam_semantics(_mechtype, 1, "k_ion");
@@ -229,7 +242,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
  	hoc_register_cvode(_mechtype, _ode_count, _ode_map, _ode_spec, _ode_matsol);
  	hoc_register_tolerance(_mechtype, _hoc_state_tol, &_atollist);
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 ch_KvAolm /home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64/ch_KvAolm.mod\n");
+ 	ivoc_help("help ?1 ch_KvAolm /users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/ch_KvAolm.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -269,7 +282,7 @@ static int _ode_spec1(_threadargsproto_);
  static int _ode_matsol1 () {
  Da = Da  / (1. - dt*( ( ( ( - 1.0 ) ) ) / ( tau_a ) )) ;
  Db = Db  / (1. - dt*( ( ( ( - 1.0 ) ) ) / ( tau_b ) )) ;
- return 0;
+  return 0;
 }
  /*END CVODE*/
  
@@ -590,3 +603,126 @@ static void _initlists() {
    _t_tau_b = makevector(301*sizeof(double));
 _first = 0;
 }
+
+#if NMODL_TEXT
+static const char* nmodl_filename = "/users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/ch_KvAolm.mod";
+static const char* nmodl_file_text = 
+  "TITLE A-type potassium channel (voltage dependent, for O-LM cell)\n"
+  "\n"
+  "COMMENT\n"
+  "A-type potassium channel (voltage dependent, for O-LM cell)\n"
+  "\n"
+  "Ions: k\n"
+  "\n"
+  "Style: quasi-ohmic\n"
+  "\n"
+  "From: 1.	Zhang, L. and McBain, J. Voltage-gated potassium currents in\n"
+  "	stratum oriens-alveus inhibitory neurons of the rat CA1\n"
+  "	hippocampus, J. Physiol. 488.3:647-660, 1995.\n"
+  "\n"
+  "		Activation V1/2 = -14 mV\n"
+  "		slope = 16.6\n"
+  "		activation t = 5 ms\n"
+  "		Inactivation V1/2 = -71 mV\n"
+  "		slope = 7.3\n"
+  "		inactivation t = 15 ms\n"
+  "		recovery from inactivation = 142 ms\n"
+  "\n"
+  "2.	Martina, M. et al. Functional and Molecular Differences between\n"
+  "	Voltage-gated K+ channels of fast-spiking interneurons and pyramidal\n"
+  "	neurons of rat hippocampus, J. Neurosci. 18(20):8111-8125, 1998.	\n"
+  "	(only the gmax is from this paper)\n"
+  "\n"
+  "		gmax = 0.0175 mho/cm2\n"
+  "		Activation V1/2 = -6.2 +/- 3.3 mV\n"
+  "		slope = 23.0 +/- 0.7 mV\n"
+  "		Inactivation V1/2 = -75.5 +/- 2.5 mV\n"
+  "		slope = 8.5 +/- 0.8 mV\n"
+  "		recovery from inactivation t = 165 +/- 49 ms  \n"
+  "\n"
+  "3.	Warman, E.N. et al.  Reconstruction of Hippocampal CA1 pyramidal\n"
+  "	cell electrophysiology by computer simulation, J. Neurophysiol.\n"
+  "	71(6):2033-2045, 1994.\n"
+  "\n"
+  "		gmax = 0.01 mho/cm2\n"
+  "		(number taken from the work by Numann et al. in guinea pig\n"
+  "		CA1 neurons)\n"
+  "\n"
+  "Updates:\n"
+  "2014 December (Marianne Bezaire): documented\n"
+  "ENDCOMMENT\n"
+  "\n"
+  "\n"
+  "UNITS {\n"
+  "        (mA) = (milliamp)\n"
+  "        (mV) = (millivolt)\n"
+  "}\n"
+  " \n"
+  "NEURON {\n"
+  "        SUFFIX ch_KvAolm\n"
+  "        USEION k READ ek WRITE ik\n"
+  "        RANGE gmax,ik\n"
+  "        GLOBAL ainf, binf, aexp, bexp, tau_b\n"
+  "        RANGE myi, g\n"
+  "}\n"
+  " \n"
+  "INDEPENDENT {t FROM 0 TO 1 WITH 1 (ms)}\n"
+  " \n"
+  "PARAMETER {\n"
+  "        v (mV)\n"
+  "        p = 5 (degC)\n"
+  "        dt (ms)\n"
+  "        gmax = 0.0165 (mho/cm2)	:from Martina et al.\n"
+  "        ek = -90 (mV)\n"
+  "	tau_a = 5 (ms)\n"
+  "}\n"
+  " \n"
+  "STATE {\n"
+  "        a b\n"
+  "}\n"
+  " \n"
+  "ASSIGNED {\n"
+  "        ik (mA/cm2)\n"
+  "	ainf binf aexp bexp\n"
+  "	tau_b\n"
+  "	myi (mA/cm2)\n"
+  "	g (mho/cm2)\n"
+  "}\n"
+  " \n"
+  "BREAKPOINT {\n"
+  "        SOLVE deriv METHOD derivimplicit\n"
+  "		g = gmax*a*b\n"
+  "        ik = g*(v - ek)\n"
+  "	myi = ik\n"
+  "}\n"
+  " \n"
+  "INITIAL {\n"
+  "	rates(v)\n"
+  "	a = ainf\n"
+  "	b = binf\n"
+  "}\n"
+  "\n"
+  "DERIVATIVE deriv {  :Computes state variables m, h, and n rates(v)      \n"
+  "		: at the current v and dt.\n"
+  "        a' = (ainf - a)/(tau_a)\n"
+  "        b' = (binf - b)/(tau_b)\n"
+  "}\n"
+  " \n"
+  "PROCEDURE rates(v) {  :Computes rate and other constants at current v.\n"
+  "                      :Call once from HOC to initialize inf at resting v.\n"
+  "        LOCAL alpha_b, beta_b\n"
+  "	TABLE ainf, aexp, binf, bexp, tau_a, tau_b  DEPEND dt, p FROM -200\n"
+  "TO 100 WITH 300\n"
+  "	alpha_b = 0.000009/exp((v-26)/18.5)\n"
+  "	beta_b = 0.014/(exp((v+70)/(-11))+0.2)\n"
+  "        ainf = 1/(1 + exp(-(v + 14)/16.6))\n"
+  "        aexp = 1 - exp(-dt/(tau_a))\n"
+  "	tau_b = 1/(alpha_b + beta_b)\n"
+  "        binf = 1/(1 + exp((v + 71)/7.3))\n"
+  "        bexp = 1 - exp(-dt/(tau_b))\n"
+  "}\n"
+  " \n"
+  "UNITSON\n"
+  "\n"
+  ;
+#endif

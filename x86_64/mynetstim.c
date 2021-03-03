@@ -1,4 +1,4 @@
-/* Created by Language version: 6.2.0 */
+/* Created by Language version: 7.7.0 */
 /* VECTORIZED */
 #define NRN_VECTORIZED 1
 #include <stdio.h>
@@ -100,6 +100,15 @@ extern void hoc_register_limits(int, HocParmLimits*);
 extern void hoc_register_units(int, HocParmUnits*);
 extern void nrn_promote(Prop*, int, int);
 extern Memb_func* memb_func;
+ 
+#define NMODL_TEXT 1
+#if NMODL_TEXT
+static const char* nmodl_file_text;
+static const char* nmodl_filename;
+extern void hoc_reg_nmodl_text(int, const char*);
+extern void hoc_reg_nmodl_filename(int, const char*);
+#endif
+
  extern Prop* nrn_point_prop_;
  static int _pointtype;
  static void* _hoc_create_pnt(_ho) Object* _ho; { void* create_point_process();
@@ -178,7 +187,7 @@ static void nrn_state(_NrnThread*, _Memb_list*, int);
 }
  /* connect range variables in _p that hoc is supposed to know about */
  static const char *_mechanism[] = {
- "6.2.0",
+ "7.7.0",
 "MyNetStim",
  "interval",
  "number",
@@ -249,6 +258,10 @@ extern void _cvode_abstol( Symbol**, double*, int);
 	 _hoc_create_pnt, _hoc_destroy_pnt, _member_func);
  _mechtype = nrn_get_mechtype(_mechanism[1]);
      _nrn_setdata_reg(_mechtype, _setdata);
+ #if NMODL_TEXT
+  hoc_reg_nmodl_text(_mechtype, nmodl_file_text);
+  hoc_reg_nmodl_filename(_mechtype, nmodl_filename);
+#endif
   hoc_register_prop_size(_mechtype, 16, 4);
   hoc_register_dparam_semantics(_mechtype, 0, "area");
   hoc_register_dparam_semantics(_mechtype, 1, "pntproc");
@@ -259,7 +272,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
  pnt_receive[_mechtype] = _net_receive;
  pnt_receive_size[_mechtype] = 1;
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 MyNetStim /home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64/mynetstim.mod\n");
+ 	ivoc_help("help ?1 MyNetStim /users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/mynetstim.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -563,4 +576,215 @@ _first = 0;
 
 #if defined(__cplusplus)
 } /* extern "C" */
+#endif
+
+#if NMODL_TEXT
+static const char* nmodl_filename = "/users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/mynetstim.mod";
+static const char* nmodl_file_text = 
+  ": $Id: netstim.mod 2212 2008-09-08 14:32:26Z hines $\n"
+  ": comments at end\n"
+  "\n"
+  "NEURON	{ \n"
+  "  ARTIFICIAL_CELL MyNetStim\n"
+  "  RANGE interval, number, start\n"
+  "  RANGE noise\n"
+  "  RANGE sid, cid\n"
+  "  RANGE xpos, ypos, zpos, gid, randi\n"
+  "  THREADSAFE : only true if every instance has its own distinct Random\n"
+  "  POINTER donotuse\n"
+  "}\n"
+  "\n"
+  "PARAMETER {\n"
+  "	interval	= 10 (ms) <1e-9,1e9>: time between spikes (msec)\n"
+  "	number	= 10 <0,1e9>	: number of spikes (independent of noise)\n"
+  "	start		= 50 (ms)	: start of first spike\n"
+  "	noise		= 0 <0,1>	: amount of randomness (0.0 - 1.0)\n"
+  "	sid = -1 (1) : synapse id, from cell template\n"
+  "	cid = -1 (1) : id of cell to which this synapse is attached\n"
+  "	xpos = 0\n"
+  "	ypos = 0\n"
+  "	zpos = 0\n"
+  "	gid = 0\n"
+  "	randi = 0\n"
+  "}\n"
+  "\n"
+  "ASSIGNED {\n"
+  "	event (ms)\n"
+  "	on\n"
+  "	ispike\n"
+  "	donotuse\n"
+  "}\n"
+  "\n"
+  "PROCEDURE seed(a) {\n"
+  "	set_seed(a)\n"
+  "}\n"
+  "\n"
+  "INITIAL {\n"
+  "	on = 0 : off\n"
+  "	ispike = 0\n"
+  "	if (noise < 0) {\n"
+  "		noise = 0\n"
+  "	}\n"
+  "	if (noise > 1) {\n"
+  "		noise = 1\n"
+  "	}\n"
+  "	if (start >= 0 && number > 0) {\n"
+  "		on = 1\n"
+  "		: randomize the first spike so on average it occurs at\n"
+  "		: start + noise*interval\n"
+  "		event = start + invl(interval) - interval*(1. - noise)\n"
+  "		: but not earlier than 0\n"
+  "		if (event < 0) {\n"
+  "			event = 0\n"
+  "		}\n"
+  "		net_send(event, 3)\n"
+  "	}\n"
+  "}	\n"
+  "\n"
+  "PROCEDURE init_sequence(t(ms)) {\n"
+  "	if (number > 0) {\n"
+  "		on = 1\n"
+  "		event = 0\n"
+  "		ispike = 0\n"
+  "	}\n"
+  "}\n"
+  "\n"
+  "FUNCTION is_art() {\n"
+  "	is_art=1\n"
+  "}\n"
+  "\n"
+  "PROCEDURE position(a, b, c) { \n"
+  "	xpos = a\n"
+  "	ypos = b\n"
+  "	zpos = c\n"
+  "}\n"
+  "\n"
+  "FUNCTION invl(mean (ms)) (ms) {\n"
+  "	if (mean <= 0.) {\n"
+  "		mean = .01 (ms) : I would worry if it were 0.\n"
+  "	}\n"
+  "	if (noise == 0) {\n"
+  "		invl = mean\n"
+  "	}else{\n"
+  "		invl = (1. - noise)*mean + noise*mean*erand()\n"
+  "	}\n"
+  "}\n"
+  "VERBATIM\n"
+  "double nrn_random_pick(void* r);\n"
+  "void* nrn_random_arg(int argpos);\n"
+  "ENDVERBATIM\n"
+  "\n"
+  "FUNCTION erand() {\n"
+  "VERBATIM\n"
+  "	if (_p_donotuse) {\n"
+  "		/*\n"
+  "		:Supports separate independent but reproducible streams for\n"
+  "		: each instance. However, the corresponding hoc Random\n"
+  "		: distribution MUST be set to Random.negexp(1)\n"
+  "		*/\n"
+  "		_lerand = nrn_random_pick(_p_donotuse);\n"
+  "	}else{\n"
+  "		/* only can be used in main thread */\n"
+  "		if (_nt != nrn_threads) {\n"
+  "hoc_execerror(\"multithread random in NetStim\",\" only via hoc Random\");\n"
+  "		}\n"
+  "ENDVERBATIM\n"
+  "		: the old standby. Cannot use if reproducible parallel sim\n"
+  "		: independent of nhost or which host this instance is on\n"
+  "		: is desired, since each instance on this cpu draws from\n"
+  "		: the same stream\n"
+  "		erand = exprand(1)\n"
+  "VERBATIM\n"
+  "	}\n"
+  "ENDVERBATIM\n"
+  "}\n"
+  "\n"
+  "PROCEDURE noiseFromRandom() {\n"
+  "VERBATIM\n"
+  " {\n"
+  "	void** pv = (void**)(&_p_donotuse);\n"
+  "	if (ifarg(1)) {\n"
+  "		*pv = nrn_random_arg(1);\n"
+  "	}else{\n"
+  "		*pv = (void*)0;\n"
+  "	}\n"
+  " }\n"
+  "ENDVERBATIM\n"
+  "}\n"
+  "\n"
+  "PROCEDURE next_invl() {\n"
+  "	if (number > 0) {\n"
+  "		event = invl(interval)\n"
+  "	}\n"
+  "	if (ispike >= number) {\n"
+  "		on = 0\n"
+  "	}\n"
+  "}\n"
+  "\n"
+  "NET_RECEIVE (w) {\n"
+  "	if (flag == 0) { : external event\n"
+  "		if (w > 0 && on == 0) { : turn on spike sequence\n"
+  "			: but not if a netsend is on the queue\n"
+  "			init_sequence(t)\n"
+  "			: randomize the first spike so on average it occurs at\n"
+  "			: noise*interval (most likely interval is always 0)\n"
+  "			next_invl()\n"
+  "			event = event - interval*(1. - noise)\n"
+  "			net_send(event, 1)\n"
+  "		}else if (w < 0) { : turn off spiking definitively\n"
+  "			on = 0\n"
+  "		}\n"
+  "	}\n"
+  "	if (flag == 3) { : from INITIAL\n"
+  "		if (on == 1) { : but ignore if turned off by external event\n"
+  "			init_sequence(t)\n"
+  "			net_send(0, 1)\n"
+  "		}\n"
+  "	}\n"
+  "	if (flag == 1 && on == 1) {\n"
+  "		ispike = ispike + 1\n"
+  "		net_event(t)\n"
+  "		next_invl()\n"
+  "		if (on == 1) {\n"
+  "			net_send(event, 1)\n"
+  "		}\n"
+  "	}\n"
+  "}\n"
+  "\n"
+  "COMMENT\n"
+  "Presynaptic spike generator\n"
+  "---------------------------\n"
+  "\n"
+  "This mechanism has been written to be able to use synapses in a single\n"
+  "neuron receiving various types of presynaptic trains.  This is a \"fake\"\n"
+  "presynaptic compartment containing a spike generator.  The trains\n"
+  "of spikes can be either periodic or noisy (Poisson-distributed)\n"
+  "\n"
+  "Parameters;\n"
+  "   noise: 	between 0 (no noise-periodic) and 1 (fully noisy)\n"
+  "   interval: 	mean time between spikes (ms)\n"
+  "   number: 	number of spikes (independent of noise)\n"
+  "\n"
+  "Written by Z. Mainen, modified by A. Destexhe, The Salk Institute\n"
+  "\n"
+  "Modified by Michael Hines for use with CVode\n"
+  "The intrinsic bursting parameters have been removed since\n"
+  "generators can stimulate other generators to create complicated bursting\n"
+  "patterns with independent statistics (see below)\n"
+  "\n"
+  "Modified by Michael Hines to use logical event style with NET_RECEIVE\n"
+  "This stimulator can also be triggered by an input event.\n"
+  "If the stimulator is in the on==0 state (no net_send events on queue)\n"
+  " and receives a positive weight\n"
+  "event, then the stimulator changes to the on=1 state and goes through\n"
+  "its entire spike sequence before changing to the on=0 state. During\n"
+  "that time it ignores any positive weight events. If, in an on!=0 state,\n"
+  "the stimulator receives a negative weight event, the stimulator will\n"
+  "change to the on==0 state. In the on==0 state, it will ignore any ariving\n"
+  "net_send events. A change to the on==1 state immediately fires the first spike of\n"
+  "its sequence.\n"
+  "\n"
+  "ENDCOMMENT\n"
+  "\n"
+  ;
 #endif

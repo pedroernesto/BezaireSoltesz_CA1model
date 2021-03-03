@@ -1,4 +1,4 @@
-/* Created by Language version: 6.2.0 */
+/* Created by Language version: 7.7.0 */
 /* NOT VECTORIZED */
 #define NRN_VECTORIZED 0
 #include <stdio.h>
@@ -82,6 +82,15 @@ extern void hoc_register_limits(int, HocParmLimits*);
 extern void hoc_register_units(int, HocParmUnits*);
 extern void nrn_promote(Prop*, int, int);
 extern Memb_func* memb_func;
+ 
+#define NMODL_TEXT 1
+#if NMODL_TEXT
+static const char* nmodl_file_text;
+static const char* nmodl_filename;
+extern void hoc_reg_nmodl_text(int, const char*);
+extern void hoc_reg_nmodl_filename(int, const char*);
+#endif
+
  extern Prop* nrn_point_prop_;
  static int _pointtype;
  static void* _hoc_create_pnt(_ho) Object* _ho; { void* create_point_process();
@@ -168,7 +177,7 @@ static void _ode_matsol(_NrnThread*, _Memb_list*, int);
  static void _ode_matsol_instance1(_threadargsproto_);
  /* connect range variables in _p that hoc is supposed to know about */
  static const char *_mechanism[] = {
- "6.2.0",
+ "7.7.0",
 "MyExp2Sid",
  "tau1",
  "tau2",
@@ -233,6 +242,10 @@ extern void _cvode_abstol( Symbol**, double*, int);
 	 _hoc_create_pnt, _hoc_destroy_pnt, _member_func);
  _mechtype = nrn_get_mechtype(_mechanism[1]);
      _nrn_setdata_reg(_mechtype, _setdata);
+ #if NMODL_TEXT
+  hoc_reg_nmodl_text(_mechtype, nmodl_file_text);
+  hoc_reg_nmodl_filename(_mechtype, nmodl_filename);
+#endif
   hoc_register_prop_size(_mechtype, 14, 3);
   hoc_register_dparam_semantics(_mechtype, 0, "area");
   hoc_register_dparam_semantics(_mechtype, 1, "pntproc");
@@ -242,7 +255,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
  pnt_receive[_mechtype] = _net_receive;
  pnt_receive_size[_mechtype] = 1;
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 MyExp2Sid /home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64/MyExp2Sid.mod\n");
+ 	ivoc_help("help ?1 MyExp2Sid /users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/MyExp2Sid.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -270,7 +283,7 @@ static int _ode_spec1(_threadargsproto_);
  static int _ode_matsol1 () {
  DA = DA  / (1. - dt*( ( - 1.0 ) / tau1 )) ;
  DB = DB  / (1. - dt*( ( - 1.0 ) / tau2 )) ;
- return 0;
+  return 0;
 }
  /*END CVODE*/
  static int state () {_reset=0;
@@ -497,3 +510,104 @@ static void _initlists() {
  _slist1[1] = &(B) - _p;  _dlist1[1] = &(DB) - _p;
 _first = 0;
 }
+
+#if NMODL_TEXT
+static const char* nmodl_filename = "/users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/MyExp2Sid.mod";
+static const char* nmodl_file_text = 
+  "COMMENT\n"
+  "Two state kinetic scheme synapse described by rise time tau1,\n"
+  "and decay time constant tau2. The normalized peak condunductance is 1.\n"
+  "Decay time MUST be greater than rise time.\n"
+  "\n"
+  "The solution of A->G->bath with rate constants 1/tau1 and 1/tau2 is\n"
+  " A = a*exp(-t/tau1) and\n"
+  " G = a*tau2/(tau2-tau1)*(-exp(-t/tau1) + exp(-t/tau2))\n"
+  "	where tau1 < tau2\n"
+  "\n"
+  "If tau2-tau1 -> 0 then we have a alphasynapse.\n"
+  "and if tau1 -> 0 then we have just single exponential decay.\n"
+  "\n"
+  "The factor is evaluated in the\n"
+  "initial block such that an event of weight 1 generates a\n"
+  "peak conductance of 1.\n"
+  "\n"
+  "Because the solution is a sum of exponentials, the\n"
+  "coupled equations can be solved as a pair of independent equations\n"
+  "by the more efficient cnexp method.\n"
+  "\n"
+  "ENDCOMMENT\n"
+  "\n"
+  "NEURON {\n"
+  "	POINT_PROCESS MyExp2Sid\n"
+  "	RANGE tau1, tau2, e, i, sid, cid\n"
+  "	NONSPECIFIC_CURRENT i\n"
+  "\n"
+  "	RANGE g\n"
+  "	GLOBAL total\n"
+  "}\n"
+  "\n"
+  "UNITS {\n"
+  "	(nA) = (nanoamp)\n"
+  "	(mV) = (millivolt)\n"
+  "	(uS) = (microsiemens)\n"
+  "}\n"
+  "\n"
+  "PARAMETER {\n"
+  "	tau1=.1 (ms) <1e-9,1e9>\n"
+  "	tau2 = 10 (ms) <1e-9,1e9>\n"
+  "	e=0	(mV)\n"
+  "	sid = -1 (1) : synapse id, from cell template\n"
+  "	cid = -1 (1) : id of cell to which this synapse is attached\n"
+  "}\n"
+  "\n"
+  "ASSIGNED {\n"
+  "	v (mV)\n"
+  "	i (nA)\n"
+  "	g (uS)\n"
+  "	factor\n"
+  "	total (uS)\n"
+  "}\n"
+  "\n"
+  "STATE {\n"
+  "	A (uS)\n"
+  "	B (uS)\n"
+  "}\n"
+  "\n"
+  "INITIAL {\n"
+  "	LOCAL tp\n"
+  "	total = 0\n"
+  "	if (tau1/tau2 > .9999) {\n"
+  "		tau1 = .9999*tau2\n"
+  "	}\n"
+  "	A = 0\n"
+  "	B = 0\n"
+  "	tp = (tau1*tau2)/(tau2 - tau1) * log(tau2/tau1)\n"
+  "	factor = -exp(-tp/tau1) + exp(-tp/tau2)\n"
+  "	factor = 1/factor\n"
+  "}\n"
+  "\n"
+  "BREAKPOINT {\n"
+  "	SOLVE state METHOD cnexp\n"
+  "	g = B - A\n"
+  "	i = g*(v - e)\n"
+  "}\n"
+  "\n"
+  "DERIVATIVE state {\n"
+  "	A' = -A/tau1\n"
+  "	B' = -B/tau2\n"
+  "}\n"
+  "\n"
+  "NET_RECEIVE(weight (uS)) {\n"
+  "	LOCAL srcid, w\n"
+  "	if (weight > 999) {\n"
+  "		srcid = floor(weight/1000) - 1\n"
+  "		w = weight - (srcid+1)*1000\n"
+  "	}else{\n"
+  "		w = weight\n"
+  "	}\n"
+  "	A = A + w*factor\n"
+  "	B = B + w*factor\n"
+  "	total = total+w\n"
+  "}\n"
+  ;
+#endif
