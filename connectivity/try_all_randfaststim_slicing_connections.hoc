@@ -272,10 +272,10 @@ func connectCells () {local r, syn, distance, counter, precellType, postcellType
 					postgid = int(postcellgids.x[0])
 				}
 
-                		// Connect only cells belonging to the same slice
-                		pregid = conns2make.x[r]
+                	// Connect only cells belonging to the same slice
+                	pregid = conns2make.x[r]
 			        pre_slice_index = cellType[precellType].SliceIndList.x[pregid-cellType[precellType].cellStartGid]
-                		post_slice_index = cellType[postcellType].SliceIndList.x[postgid-cellType[postcellType].cellStartGid]
+                	post_slice_index = cellType[postcellType].SliceIndList.x[postgid-cellType[postcellType].cellStartGid]
 			        if (pc.gid_exists(postgid) && (pre_slice_index == post_slice_index)) {
 					cell = pc.gid2cell(postgid)
 
