@@ -141,7 +141,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
 	int _vectorized = 0;
   _initlists();
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 positionfcns /users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/positionfcns.mod\n");
+ 	ivoc_help("help ?1 positionfcns /users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/positionfcns.mod\n");
  }
 static int _reset;
 static char *modelname = "";

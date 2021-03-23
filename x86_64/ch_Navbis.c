@@ -260,7 +260,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
   hoc_register_dparam_semantics(_mechtype, 2, "na_ion");
  	hoc_register_cvode(_mechtype, _ode_count, 0, 0, 0);
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 ch_Navbis /users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/ch_Navbis.mod\n");
+ 	ivoc_help("help ?1 ch_Navbis /users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/ch_Navbis.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -614,7 +614,7 @@ _first = 0;
 }
 
 #if NMODL_TEXT
-static const char* nmodl_filename = "/users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/ch_Navbis.mod";
+static const char* nmodl_filename = "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/ch_Navbis.mod";
 static const char* nmodl_file_text = 
   "TITLE sodium channel (voltage dependent, slightly higher threshold)\n"
   "\n"

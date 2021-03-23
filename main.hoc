@@ -49,7 +49,7 @@ I.  LOAD LIBRARIES
 {load_file("./setupfiles/ranstream.hoc")}	// Contains the template that defines a RandomStream
 											//  class used to produce random numbers
 
-load_file("./setupfiles/circuit_slicing/CellCategoryInfo.hoc")	// Contains the template that defines a
+{load_file("./setupfiles/CellCategoryInfo_Slicing.hoc")}	// Contains the template that defines a
 																//  CellCategoryInfo class used to store
 																// 	celltype-specific parameters
 
@@ -58,7 +58,7 @@ load_file("./setupfiles/circuit_slicing/CellCategoryInfo.hoc")	// Contains the t
 
 {load_file("./setupfiles/defaultvar.hoc")}	// Contains the proc definition for the default_var proc
 
-{load_file("./setupfiles/circuit_slicing/parameters.hoc")}	// Loads in default values for operational and model
+{load_file("./setupfiles/parameters_Slicing.hoc")}	// Loads in default values for operational and model
 															// parameters whose values were not specified ahead of
 															// time, ie by passing them in at the command line or
 															// in a wrapper hoc file
@@ -71,6 +71,7 @@ load_file("./setupfiles/circuit_slicing/CellCategoryInfo.hoc")	// Contains the t
 
 //{load_file("./setupfiles/check_for_files.hoc")}	// Checks that the necessary chosen files exist
 													//  (datasets, connectivity, and stimulation)
+
 
 
 /***********************************************************************************************
@@ -123,7 +124,7 @@ proc calcNetSize_CellDeath() {local i
 }
 calcNetSize_CellDeath()
 */
-{load_file("./setupfiles/update_network_gids.hoc")}
+{load_file("./setupfiles/update_network_gids_Slicing.hoc")}
 update_network_gids()
 
 // Calculate bin sizes at this point, with the current values for numCells
@@ -145,7 +146,7 @@ calcBinSize()
 // Calculate the final network size, after any circuit slicing.
 // Keep a list of previous gids for cells left from the original circuit,
 // to be used later in cells positioning
-{load_file("./setupfiles/circuit_slicing/calcNetSize_Slicing.hoc")}
+{load_file("./setupfiles/calcNetSize_Slicing.hoc")}
 update_network_gids()
 
 
@@ -245,7 +246,7 @@ if (strcmp(UID,"0")==0 && pc.id==0) {	// if a unique ID (UID) was not already
 	}
 	UID = direx
 }//  your pcitr loop when you call the
-//  pcitr iterator
+																			//  pcitr iterator
 
 if (OK2executeSysCmds==1) {
 	{load_file("./setupfiles/save_run_info.hoc")}	// This file will ensure a unique RunName (if
@@ -320,7 +321,7 @@ ranlfplist = new List()		// a list that will contain an entry for each random nu
 							//  and the cell is further away from the electrode point than MaxEDist
 							//  (see npole_lfp.hoc for more detail)
 
-{load_file("./setupfiles/circuit_slicing/create_cells_pos.hoc")}	// Creates each cell on its assigned host
+{load_file("./setupfiles/create_cells_pos_Slicing.hoc")}	// Creates each cell on its assigned host
 																	// and sets its position
 
 strdef cmd
@@ -356,7 +357,7 @@ V.	CONNECT THE MODEL CELLS AND CONNECT THE STIMULATION CELLS TO SOME MODEL CELLS
 
 MakeArtConns=1
 
-sprint(cmd,"./connectivity/%s_connections.hoc", Connectivity)
+{sprint(cmd,"./connectivity/%s_connections.hoc", Connectivity)}
 {load_file(cmd)}			// Loads in a particular algorithm to connect the cells in the network.
 							//  Each algorithm is specified by a different file in the connectivity
 							//  folder, and the file names are all of the format:

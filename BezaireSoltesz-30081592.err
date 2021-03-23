@@ -1,0 +1,5 @@
+sh: hg: command not found
+cp: impossible d'évaluer '../hg_status.out': Aucun fichier ou dossier de ce type
+cp: impossible d'évaluer '../hg_diff.out': Aucun fichier ou dossier de ce type
+ls: impossible d'accéder à 'vercomment.txt': Aucun fichier ou dossier de ce type
+ls: impossible d'accéder à 'version.txt': Aucun fichier ou dossier de ce type

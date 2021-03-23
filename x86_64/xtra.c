@@ -196,7 +196,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
  	hoc_reg_ba(_mechtype, _ba1, 11);
  	hoc_reg_ba(_mechtype, _ba2, 22);
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 xtra /users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/xtra.mod\n");
+ 	ivoc_help("help ?1 xtra /users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/xtra.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -292,7 +292,7 @@ _first = 0;
 }
 
 #if NMODL_TEXT
-static const char* nmodl_filename = "/users/bp000108/BezaireSoltesz_CA1model_last/modeldbca1/xtra.mod";
+static const char* nmodl_filename = "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/xtra.mod";
 static const char* nmodl_file_text = 
   ": $Id: xtra.mod,v 1.3 2009/02/24 00:52:07 ted Exp ted $\n"
   "\n"
