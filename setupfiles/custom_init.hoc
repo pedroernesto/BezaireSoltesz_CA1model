@@ -28,7 +28,7 @@ proc presimulation() { local prelength, maindt, temp, secondordersav
 									//  example of how custom initialization can be mishandled:
 									//  https://www.neuron.yale.edu/phpBB/viewtopic.php?f=8&t=3127
 
-	maindt = dt			// Save the desired dt value to reset it after temporarily
+	maindt = dt						// Save the desired dt value to reset it after temporarily
 									//  changing dt to run a quick presimulation to allow the
 									//  network to reach steady state before we start 'recording'
 

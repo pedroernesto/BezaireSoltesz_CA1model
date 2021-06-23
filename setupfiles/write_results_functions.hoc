@@ -83,15 +83,15 @@ proc SpikeOutParallel() {local i  localobj f
 
 	g=1
 	if (CatFlag==1) {	// If the user is okay with system commands concatenating all processors'
-				//  results file into one results file, then proceed. Parallelize the
-				//  concatenation as much as possible using the following algorithm.
-				//  Ex: if there were 8 processors, with indices 0 - 7, then the
-				//  concatenation happens in the following minimal number of steps:
-				//  1. processor 1 adds its file contents to those for processor 0;
-				//     at the same time as 1 --> 0, these other transfers are also
-				//     occurring: 3 --> 2, 5 --> 4, 7 --> 6.
-				//  2. The next level of concatenation occurs: 2 -->0 and 6 --> 4
-				//  3. The final concatenation occurs: 4 --> 0.
+						//  results file into one results file, then proceed. Parallelize the
+						//  concatenation as much as possible using the following algorithm.
+						//  Ex: if there were 8 processors, with indices 0 - 7, then the
+						//  concatenation happens in the following minimal number of steps:
+						//  1. processor 1 adds its file contents to those for processor 0;
+						//     at the same time as 1 --> 0, these other transfers are also
+						//     occurring: 3 --> 2, 5 --> 4, 7 --> 6.
+						//  2. The next level of concatenation occurs: 2 -->0 and 6 --> 4
+						//  3. The final concatenation occurs: 4 --> 0.
 		pc.barrier()
 		while (pc.nhost>g) {
 			g=g*2
@@ -153,26 +153,26 @@ proc SummaryOut() {local alltime, allct, allspk localobj f
 						//  ideal; 0.7 and higher are usually acceptable.
 		loadbal=avgcomp/maxcomp
 		exchtime= $1 - maxcomp	// Spike exchange time is calculated as the difference
-					//  between the maximum amount of time required to solve
-					//  the simulation (by the slowest processor) and the
-					//  full time spent during the simulation phase (full
-					//  time calculated by starting the timer right before
-					//  calling pc.solve() or equivalent, and stopping the
-					//  timer right after the solve step completes).
+								//  between the maximum amount of time required to solve
+								//  the simulation (by the slowest processor) and the
+								//  full time spent during the simulation phase (full
+								//  time calculated by starting the timer right before
+								//  calling pc.solve() or equivalent, and stopping the
+								//  timer right after the solve step completes).
 	}
 
 	if (pc.id == 0) {	// Write header to file 1 time only
 		alltime = startsw() - loadstart	// Calculate the total amount of time taken to
-						//  execute the job, from the very start of the
-						//  job to this point (assuming SumNumOut is
-						//  run after all the other results-writing
-						//  functions, and is therefore one of the last
-						//  commands to run prior to the quit command).
-						//
-						//  This time can then be used to determine how
-						//  much time was spent writing results (by
-						//  subtracting the time spent in all the other
-						//  steps, which were explicitly tracked).
+										//  execute the job, from the very start of the
+										//  job to this point (assuming SumNumOut is
+										//  run after all the other results-writing
+										//  functions, and is therefore one of the last
+										//  commands to run prior to the quit command).
+										//
+										//  This time can then be used to determine how
+										//  much time was spent writing results (by
+										//  subtracting the time spent in all the other
+										//  steps, which were explicitly tracked).
 
 		sprint(cmd,"./results/%s/sumnumout.txt", RunName)
 		f = new File(cmd)
@@ -252,10 +252,10 @@ proc highIndexOut() {local i, ij, gid localobj cell, f
 	}
 	pc.barrier()					// Wait for all processors to get to this point
 	maxconn = pc.allreduce(perRankmax, 2)	// Find the highest highIndex
-						//  across all processors (second
-						//  argument of 2 specifies to
-						//  find the maximum across all
-						//  processors).
+											//  across all processors (second
+											//  argument of 2 specifies to
+											//  find the maximum across all
+											//  processors).
 
 	// Maximum highIndex for the synapse RandomStream
 	perRankmax=0
@@ -327,18 +327,18 @@ proc printSpikeHistogram() {
 	// Open for appending to file
 	for i=0, pc.nhost-1 {
 		f4.printf("%d\t%d\n", i, spkhist.x[i])	// Print two pieces of information:
-							//  i: the number of spikes sent
-							//  spkhist.x[i]: the number of times this
-							//		number of spikes was sent
-							//
-							// Don't be confused by size of the vector
-							//  equalling the number of processors in
-							//  the job, or using the total number of
-							//  processors in the job to bound the upper
-							//  limit of the for loop. The index i does
-							//  not actually stand for the number of
-							//  processors, but for the number of spikes
-							//  transferred after one time step.
+												//  i: the number of spikes sent
+												//  spkhist.x[i]: the number of times this
+												//		number of spikes was sent
+												//
+												// Don't be confused by size of the vector
+												//  equalling the number of processors in
+												//  the job, or using the total number of
+												//  processors in the job to bound the upper
+												//  limit of the for loop. The index i does
+												//  not actually stand for the number of
+												//  processors, but for the number of spikes
+												//  transferred after one time step.
 	}
 	f4.close()
 }

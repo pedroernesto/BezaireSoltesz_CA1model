@@ -43,12 +43,12 @@ func dipole_lfp() { local avglfp, vlfp, ncells, celltype, pci, gid, i, typei loc
 
    if (ncells > 0) {
        avglfp = pc.allreduce(vlfp, 1)/ncells		// Sum all the LFP contributions across
-																								//  all processors using allreduce with
-																								//  argument 1, so that the sum of the
-																								//  LFP contribution from all pyramidal
-																								//  cells in the network is given, and
-																								//  then divide by the total number of
-																								//  cells for the average.
+													//  all processors using allreduce with
+													//  argument 1, so that the sum of the
+													//  LFP contribution from all pyramidal
+													//  cells in the network is given, and
+													//  then divide by the total number of
+													//  cells for the average.
    }
 
    return avglfp
@@ -79,14 +79,14 @@ func dipole_pos_lfp() { local avgplfp, plfp, ncellsp, celltype, pci, gid, i, typ
 				// OR
 				// Relative to a point
 				if (sqrt((cell.x-$1)*(cell.x-$1) + (cell.y-$2)*(cell.y-$2))<MaxEDist) { 	// Ignoring z location in this example, use
-														//  larger value for MaxEDist if z included
+																							//  larger value for MaxEDist if z included
 				ncellsp += 1	// Update the number of pyramidal cells
 								//  included in the calculation
 				plfp = plfp + cell.apical[cell.NumApical-1].v(0.5) - cell.basal[0].v(0.5)	// For each pyramidal cell
-														//  on this processor that
-														//  is within the desired
-														//  location, sum the LFP
-														//  contribution
+																							//  on this processor that
+																							//  is within the desired
+																							//  location, sum the LFP
+																							//  contribution
 			   }
 		   }
 	   }
@@ -98,12 +98,12 @@ func dipole_pos_lfp() { local avgplfp, plfp, ncellsp, celltype, pci, gid, i, typ
 	sumcell=pc.allreduce(ncellsp, 1)
    if (sumcell > 0) {
        avgplfp = pc.allreduce(plfp, 1)/sumcell		// Sum all the LFP contributions across
-							//  all processors using allreduce with
-							//  argument 1, so that the sum of the
-							//  LFP contribution from all pyramidal
-							//  cells in the network is given, and
-							//  then divide by the number of included
-							//  cells for the average.
+													//  all processors using allreduce with
+													//  argument 1, so that the sum of the
+													//  LFP contribution from all pyramidal
+													//  cells in the network is given, and
+													//  then divide by the number of included
+													//  cells for the average.
    }
 
    return avgplfp
@@ -182,7 +182,7 @@ proc sample_lfp() { local i, avglfp, startgid, endgid, gid, celltype localobj ve
     if (pc.id == 0) {
         vec = new Vector()
 		vec.append(t, avglfp)			// For this time step, create a vector with entries of time
-							//  and average LFP
+										//  and average LFP
 		lfplist.append(vec.c)			// Append the vector for this time step to the list
     }
 
@@ -214,13 +214,13 @@ proc sample_lfp() { local i, avglfp, startgid, endgid, gid, celltype localobj ve
 	//  and add it to the cell's LFP recording list.
     if (name_declared("traceidxlist")) {
         execute("~mytraceidxlist = traceidxlist")	// Because traceidxlist is only available
-							//  at the top level and not within this
-							//  function, execute this code to make
-							//  a copy of the variable available within
-							//  this function
+													//  at the top level and not within this
+													//  function, execute this code to make
+													//  a copy of the variable available within
+													//  this function
 
         dipole_lfp_traceidx(mytraceidxlist,lfptracelist)
     }
     cvode.event(t + lfp_dt, "sample_lfp()")		// Add another event to the event queue, to
-							//  execute sample_lfp again, lfp_dt ms from now
+												//  execute sample_lfp again, lfp_dt ms from now
 }

@@ -31,20 +31,20 @@ throughout the simulation.
 //  necessary to write the results functions.
 proc rrun(){								// Run the network simulation and write out the results
 
-	pnm.want_all_spikes() 						// Record all spikes of all cells on this machine into the
-									//  vectors pnm.spikevec (spiketimes) and pnm.idvec (gids)
+	pnm.want_all_spikes() 					// Record all spikes of all cells on this machine into the
+											//  vectors pnm.spikevec (spiketimes) and pnm.idvec (gids)
 
 	local_minimum_delay = pc.set_maxstep(maxstepval)	// Set every machine's max step size to minimum delay of
-								//  all netcons created on pc using pc.gid_connect, but
-								//  not larger than 10
+														//  all netcons created on pc using pc.gid_connect, but
+														//  not larger than 10
 
 	stdinit()						// Call the init fcn (which is redefined in this code) and
-								//  then make other standard calls
+									//  then make other standard calls
 
-	runstart = startsw()					// Get the start time of the simulation
+	runstart = startsw()				// Get the start time of the simulation
 	pc.psolve(tstop)					// Equivalent to calling cvode.solve(tstop) but for parallel NEURON;
-								//  solve will be broken into steps determined by the result of
-								//  set_maxstep
+										//  solve will be broken into steps determined by the result of
+										//  set_maxstep
 
 	runtime = startsw() - runstart				// Calculate the time taken to run the simulation
 	if (pc.id == 0) {printf("\nTIME HOST 0: %g seconds (ran simulation)\n************\n", runtime)}
@@ -68,13 +68,13 @@ proc rrun(){								// Run the network simulation and write out the results
 	}
 
 	SpikeOutParallel()	// Each processor writes out a file "spikeraster_#.dat" where # is the processor.
-				//  The file contains the spike times (in ms) and spiking cells (by gid) into a
-				//  file called "spikeraster.dat"
+						//  The file contains the spike times (in ms) and spiking cells (by gid) into a
+						//  file called "spikeraster.dat"
 
 	TimeOutSerial()	// Write out a file "runtimes.dat" of run times for each code section
 
 	highIndexOut() 	// Write a file "MaxHighIndex.dat" how much of the random streams this run used, for a statistically independent run,
-			//  start the next run with random seeds that are greater than the maximum number reported in this file
+					//  start the next run with random seeds that are greater than the maximum number reported in this file
 
 	if (ComputeDipoleLFP > 0) {	// Write out the LFP recordings to "lfp.dat" for the average LFP and lfp_gid.dat for each cell that was recorded
 		if (pc.id == 0) {
@@ -158,9 +158,9 @@ proc midbal() {local wt, thisstep
 	wt = startsw()	// Get current time
 	if (t>0) {
 		thisstep = wt - walltime	// Calculate the real time taken by the most
-						//  recent simulation interval.
+									//  recent simulation interval.
 		simleft = tstop - t			// Calculate the remaining simulation time
-							//  to be solved.
+									//  to be solved.
 
 		compleft = JobHours*3600 - (startsw() - loadstart) 	// Calculate the remaining real
 									//  time in which the simulation

@@ -50,8 +50,8 @@ I.  LOAD LIBRARIES
 											//  class used to produce random numbers
 
 {load_file("./setupfiles/CellCategoryInfo_Slicing.hoc")}	// Contains the template that defines a
-																//  CellCategoryInfo class used to store
-																// 	celltype-specific parameters
+															//  CellCategoryInfo class used to store
+															// 	celltype-specific parameters
 
 {load_file("./setupfiles/SynStore.hoc")}	// Contains the template that defines a holder of
 											//  synapse type info
@@ -59,9 +59,9 @@ I.  LOAD LIBRARIES
 {load_file("./setupfiles/defaultvar.hoc")}	// Contains the proc definition for the default_var proc
 
 {load_file("./setupfiles/parameters_Slicing.hoc")}	// Loads in default values for operational and model
-															// parameters whose values were not specified ahead of
-															// time, ie by passing them in at the command line or
-															// in a wrapper hoc file
+													// parameters whose values were not specified ahead of
+													// time, ie by passing them in at the command line or
+													// in a wrapper hoc file
 
 {load_file("./setupfiles/set_other_parameters.hoc")}	// Loads in operational and model parameters
 														//  that we would not want to define ahead of
@@ -272,8 +272,8 @@ objref  memfile, topfile
 
 if (pc.id==0) {
 	{sprint(cmd,"./results/%s/memory.dat", RunName)} 	// Host 0 will make repeated calls to the
-	{memfile = new File(cmd)}				//  mallinfo function defined below and
-	{memfile.wopen()}								//  record the nrn_mallinfo output here
+	{memfile = new File(cmd)}							//  mallinfo function defined below and
+	{memfile.wopen()}									//  record the nrn_mallinfo output here
 
 	{sprint(cmd,"./results/%s/topoutput.dat", RunName)}	// Host 0 will make repeated calls to the
 {topfile = new File(cmd)}								//  mallinfo function defined below and
@@ -322,7 +322,7 @@ ranlfplist = new List()		// a list that will contain an entry for each random nu
 							//  (see npole_lfp.hoc for more detail)
 
 {load_file("./setupfiles/create_cells_pos_Slicing.hoc")}	// Creates each cell on its assigned host
-																	// and sets its position
+															// and sets its position
 
 strdef cmd
 {load_file("./setupfiles/write_positions.hoc")}		// Defines the proc to write the position
@@ -411,8 +411,8 @@ if (PrintVoltage>0) {load_file("./setupfiles/recordvoltageauto.hoc")}	// This fi
 																		//  connectivity information.
 
 if ((PrintConnDetails==0) && (PrintVoltage>0)) {recordedCellConnsParallel()}	// If detailed connections are not being
-																																							//  written out, at least write them out
-																																							//  for cells that are being traced
+																				//  written out, at least write them out
+																				//  for cells that are being traced
 
 {load_file("./setupfiles/dipole_lfp.hoc")}	// Defines the code to calculate the dipole LFP
 {load_file("./setupfiles/npole_lfp.hoc")}	// Defines the code to calculate the n-pole LFP
