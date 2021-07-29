@@ -79,7 +79,7 @@ proc setNoise() {local reli, typei, jgid, idx localobj cell
 
 	for idx=0, numCellTypes-1 {
 		if (cellType[idx].is_art==1) {	// If the cell type is artificial, set the random stream
-																		//  associated with the noise in its spike times
+										//  associated with the noise in its spike times
 
 			// For all the artificial cells of this type, owned by this processor
 			for pcitr(&reli, &typei, &jgid, cellType[idx].cellStartGid, cellType[idx].cellEndGid) {

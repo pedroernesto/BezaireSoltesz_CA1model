@@ -426,19 +426,19 @@ simstart = startsw()
 VI.	INITIALIZE AND RUN NETWORK, OUTPUT RESULT FILES
 ***********************************************************************************************/
 {load_file("./setupfiles/custom_init.hoc")}
-						// Redefines the init proc that initializes the
-						//  simulation so that it includes a "pre-run" of the
-						//  simulation to reach steady state prior to the start
-						//  of the simulation at time t = 0 ms.
-						// This function will be called later, just before the
-						//  simulation starts.
-						//
-						// WARNING: Any time you redefine the init function, you
-						//  risk not completely initializing everything that needs
-						//  to be initialized. Read the Initialization section of
-						//  the NEURON Book and see this NEURON forum thread for an
-						//  example of how custom initialization can be mishandled:
-						//  https://www.neuron.yale.edu/phpBB/viewtopic.php?f=8&t=3127
+								// Redefines the init proc that initializes the
+								//  simulation so that it includes a "pre-run" of the
+								//  simulation to reach steady state prior to the start
+								//  of the simulation at time t = 0 ms.
+								// This function will be called later, just before the
+								//  simulation starts.
+								//
+								// WARNING: Any time you redefine the init function, you
+								//  risk not completely initializing everything that needs
+								//  to be initialized. Read the Initialization section of
+								//  the NEURON Book and see this NEURON forum thread for an
+								//  example of how custom initialization can be mishandled:
+								//  https://www.neuron.yale.edu/phpBB/viewtopic.php?f=8&t=3127
 
 {load_file("./setupfiles/write_results_functions.hoc")}
 								// Defines procedures to write out various

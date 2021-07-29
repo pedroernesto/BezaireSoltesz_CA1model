@@ -28,8 +28,8 @@ objref celltypestring[1], techstring[1], cellType[1]	// Define placeholder objec
 														//  redefine them with the correct size in the proc
 
 double cellnumvar[1], cellLayerflag[1], cellArtflag[1], numCellTypes[1]	// Define placeholder doubles with a size
-																																				//  of one, then redefine them with the
-																																				//  correct size in the proc
+																		//  of one, then redefine them with the
+																		//  correct size in the proc
 objref pnmtmp, pctmp, nil
 proc loadCellCategoryInfo() {local i, startpos			// This function will load celltype info into a CellCategoryInfo
 														//  object (one object per cell type)
