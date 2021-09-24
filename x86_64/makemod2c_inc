@@ -1,281 +1,281 @@
 
 ./ch_CavL.c: ../ch_CavL.mod
-	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
-	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_CavL.mod -o "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/x86_64")
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_CavL.mod -o "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64")
 
 ./ch_CavL.o: ./ch_CavL.c
-	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 
 ./ch_CavN.c: ../ch_CavN.mod
-	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
-	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_CavN.mod -o "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/x86_64")
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_CavN.mod -o "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64")
 
 ./ch_CavN.o: ./ch_CavN.c
-	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 
 ./ch_HCN.c: ../ch_HCN.mod
-	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
-	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_HCN.mod -o "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/x86_64")
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_HCN.mod -o "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64")
 
 ./ch_HCN.o: ./ch_HCN.c
-	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 
 ./ch_HCNolm.c: ../ch_HCNolm.mod
-	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
-	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_HCNolm.mod -o "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/x86_64")
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_HCNolm.mod -o "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64")
 
 ./ch_HCNolm.o: ./ch_HCNolm.c
-	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 
 ./ch_HCNp.c: ../ch_HCNp.mod
-	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
-	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_HCNp.mod -o "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/x86_64")
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_HCNp.mod -o "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64")
 
 ./ch_HCNp.o: ./ch_HCNp.c
-	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 
 ./ch_KCaS.c: ../ch_KCaS.mod
-	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
-	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_KCaS.mod -o "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/x86_64")
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_KCaS.mod -o "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64")
 
 ./ch_KCaS.o: ./ch_KCaS.c
-	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 
 ./ch_Kdrfast.c: ../ch_Kdrfast.mod
-	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
-	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_Kdrfast.mod -o "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/x86_64")
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_Kdrfast.mod -o "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64")
 
 ./ch_Kdrfast.o: ./ch_Kdrfast.c
-	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 
 ./ch_Kdrfastngf.c: ../ch_Kdrfastngf.mod
-	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
-	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_Kdrfastngf.mod -o "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/x86_64")
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_Kdrfastngf.mod -o "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64")
 
 ./ch_Kdrfastngf.o: ./ch_Kdrfastngf.c
-	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 
 ./ch_Kdrp.c: ../ch_Kdrp.mod
-	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
-	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_Kdrp.mod -o "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/x86_64")
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_Kdrp.mod -o "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64")
 
 ./ch_Kdrp.o: ./ch_Kdrp.c
-	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 
 ./ch_Kdrslow.c: ../ch_Kdrslow.mod
-	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
-	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_Kdrslow.mod -o "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/x86_64")
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_Kdrslow.mod -o "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64")
 
 ./ch_Kdrslow.o: ./ch_Kdrslow.c
-	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 
 ./ch_KvAdistp.c: ../ch_KvAdistp.mod
-	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
-	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_KvAdistp.mod -o "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/x86_64")
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_KvAdistp.mod -o "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64")
 
 ./ch_KvAdistp.o: ./ch_KvAdistp.c
-	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 
 ./ch_KvA.c: ../ch_KvA.mod
-	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
-	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_KvA.mod -o "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/x86_64")
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_KvA.mod -o "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64")
 
 ./ch_KvA.o: ./ch_KvA.c
-	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 
 ./ch_KvAngf.c: ../ch_KvAngf.mod
-	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
-	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_KvAngf.mod -o "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/x86_64")
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_KvAngf.mod -o "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64")
 
 ./ch_KvAngf.o: ./ch_KvAngf.c
-	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 
 ./ch_KvAolm.c: ../ch_KvAolm.mod
-	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
-	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_KvAolm.mod -o "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/x86_64")
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_KvAolm.mod -o "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64")
 
 ./ch_KvAolm.o: ./ch_KvAolm.c
-	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 
 ./ch_KvAproxp.c: ../ch_KvAproxp.mod
-	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
-	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_KvAproxp.mod -o "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/x86_64")
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_KvAproxp.mod -o "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64")
 
 ./ch_KvAproxp.o: ./ch_KvAproxp.c
-	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 
 ./ch_KvCaB.c: ../ch_KvCaB.mod
-	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
-	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_KvCaB.mod -o "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/x86_64")
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_KvCaB.mod -o "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64")
 
 ./ch_KvCaB.o: ./ch_KvCaB.c
-	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 
 ./ch_KvGroup.c: ../ch_KvGroup.mod
-	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
-	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_KvGroup.mod -o "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/x86_64")
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_KvGroup.mod -o "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64")
 
 ./ch_KvGroup.o: ./ch_KvGroup.c
-	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 
 ./ch_leak.c: ../ch_leak.mod
-	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
-	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_leak.mod -o "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/x86_64")
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_leak.mod -o "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64")
 
 ./ch_leak.o: ./ch_leak.c
-	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 
 ./ch_Navaxonp.c: ../ch_Navaxonp.mod
-	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
-	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_Navaxonp.mod -o "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/x86_64")
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_Navaxonp.mod -o "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64")
 
 ./ch_Navaxonp.o: ./ch_Navaxonp.c
-	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 
 ./ch_Navbis.c: ../ch_Navbis.mod
-	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
-	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_Navbis.mod -o "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/x86_64")
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_Navbis.mod -o "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64")
 
 ./ch_Navbis.o: ./ch_Navbis.c
-	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 
 ./ch_Navcck.c: ../ch_Navcck.mod
-	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
-	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_Navcck.mod -o "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/x86_64")
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_Navcck.mod -o "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64")
 
 ./ch_Navcck.o: ./ch_Navcck.c
-	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 
 ./ch_Nav.c: ../ch_Nav.mod
-	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
-	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_Nav.mod -o "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/x86_64")
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_Nav.mod -o "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64")
 
 ./ch_Nav.o: ./ch_Nav.c
-	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 
 ./ch_Navngf.c: ../ch_Navngf.mod
-	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
-	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_Navngf.mod -o "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/x86_64")
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_Navngf.mod -o "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64")
 
 ./ch_Navngf.o: ./ch_Navngf.c
-	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 
 ./ch_Navp.c: ../ch_Navp.mod
-	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
-	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_Navp.mod -o "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/x86_64")
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ch_Navp.mod -o "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64")
 
 ./ch_Navp.o: ./ch_Navp.c
-	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 
 ./ExpGABAab.c: ../ExpGABAab.mod
-	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
-	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ExpGABAab.mod -o "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/x86_64")
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ExpGABAab.mod -o "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64")
 
 ./ExpGABAab.o: ./ExpGABAab.c
-	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 
 ./fastconn.c: ../fastconn.mod
-	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
-	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) fastconn.mod -o "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/x86_64")
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) fastconn.mod -o "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64")
 
 ./fastconn.o: ./fastconn.c
-	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 
 ./iconc_Ca.c: ../iconc_Ca.mod
-	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
-	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) iconc_Ca.mod -o "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/x86_64")
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) iconc_Ca.mod -o "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64")
 
 ./iconc_Ca.o: ./iconc_Ca.c
-	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 
 ./MyExp2Sid.c: ../MyExp2Sid.mod
-	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
-	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) MyExp2Sid.mod -o "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/x86_64")
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) MyExp2Sid.mod -o "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64")
 
 ./MyExp2Sid.o: ./MyExp2Sid.c
-	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 
 ./MyExp2Sidnw.c: ../MyExp2Sidnw.mod
-	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
-	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) MyExp2Sidnw.mod -o "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/x86_64")
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) MyExp2Sidnw.mod -o "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64")
 
 ./MyExp2Sidnw.o: ./MyExp2Sidnw.c
-	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 
 ./mynetstim.c: ../mynetstim.mod
-	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
-	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) mynetstim.mod -o "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/x86_64")
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) mynetstim.mod -o "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64")
 
 ./mynetstim.o: ./mynetstim.c
-	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 
 ./positionfcns.c: ../positionfcns.mod
-	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
-	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) positionfcns.mod -o "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/x86_64")
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) positionfcns.mod -o "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64")
 
 ./positionfcns.o: ./positionfcns.c
-	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 
 ./repeatconn.c: ../repeatconn.mod
-	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
-	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) repeatconn.mod -o "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/x86_64")
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) repeatconn.mod -o "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64")
 
 ./repeatconn.o: ./repeatconn.c
-	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 
 ./sgate.c: ../sgate.mod
-	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
-	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) sgate.mod -o "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/x86_64")
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) sgate.mod -o "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64")
 
 ./sgate.o: ./sgate.c
-	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 
 ./SIN.c: ../SIN.mod
-	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
-	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) SIN.mod -o "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/x86_64")
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) SIN.mod -o "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64")
 
 ./SIN.o: ./SIN.c
-	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 
 ./xtra.c: ../xtra.mod
-	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
-	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) xtra.mod -o "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/x86_64")
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) xtra.mod -o "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64")
 
 ./xtra.o: ./xtra.c
-	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 

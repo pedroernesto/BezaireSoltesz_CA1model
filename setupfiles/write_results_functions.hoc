@@ -392,3 +392,25 @@ proc writeLFPTraces() { local i,j,k,celltype,startgid,endgid localobj f, lfpvec,
         }
     }
 }
+
+
+proc printNeuronGidSliceId() {local celltype, startgid, endgid, gid, slice_index  localobj f
+    for celltype=0, numCellTypes-1 {
+    	if (strcmp(cellType[celltype].cellType_string, "pyramidalcell")==0) {	// Find the gid range
+            startgid = cellType[celltype].cellStartGid							//  of the pyramidal cells
+            endgid = cellType[celltype].cellEndGid
+            break
+        }
+    }
+
+	sprint(cmd,"./results/%s/neuron_slice_ids.dat", RunName)
+	f = new File(cmd)
+	if (pc.id == 0) {
+		f.wopen()
+		for gid=startgid, endgid {
+			slice_index = cellType[celltype].SliceIndList.x[gid-cellType[celltype].cellStartGid]
+			f.printf("%d %d\n", gid, slice_index)	// Print the gid of the neuron and the slice it belongs to
+		}
+	}
+	f.close()
+}

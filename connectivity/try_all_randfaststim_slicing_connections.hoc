@@ -207,7 +207,7 @@ func connectCells () {local r, syn, distance, counter, precellType, postcellType
                         pre_posStart = new Vector(1,cellType[precellType].PosGidStart)
                         post_posStart = new Vector(1,cellType[postcellType].PosGidStart)
 
-			conns2make.fastconn(params, pre_posStart, precell_posindeces, post_posStart, postcell_posindeces, postcellgids, highIndices)	
+			conns2make.fastconn(params, pre_posStart, precell_posindeces, post_posStart, postcell_posindeces, postcellgids, highIndices)
 																	// Use the newly installed vector method in the following manner:
 																	//  1. Create a vector that is more than 3x as long as the number
 																	//     of connections you expect to make from this presynaptic
@@ -272,14 +272,14 @@ func connectCells () {local r, syn, distance, counter, precellType, postcellType
 					postgid = int(postcellgids.x[0])
 				}
 
-                		// Connect only cells belonging to the same slice
-                		pregid = conns2make.x[r]
+                	// Connect only cells belonging to the same slice
+                	pregid = conns2make.x[r]
 			        pre_slice_index = cellType[precellType].SliceIndList.x[pregid-cellType[precellType].cellStartGid]
-                		post_slice_index = cellType[postcellType].SliceIndList.x[postgid-cellType[postcellType].cellStartGid]
+                	post_slice_index = cellType[postcellType].SliceIndList.x[postgid-cellType[postcellType].cellStartGid]
 			        if (pc.gid_exists(postgid) && (pre_slice_index == post_slice_index)) {
 					cell = pc.gid2cell(postgid)
-					
-	
+
+
 					numSynTypes = cell.pre_list.o(precellType).count()	// Get total number of potential synapse types for this combination
 																		//  of presynaptic cell type and postsynaptic cell type.
 					if (numSynTypes > 0) {								// If at least one synapse type is defined, then proceed
@@ -362,4 +362,3 @@ func connectCells () {local r, syn, distance, counter, precellType, postcellType
 makeConnections()
 
 objref conns2make // This variable is likely to take up a large amount of memory, so redefine it to clear it at the end of use
-

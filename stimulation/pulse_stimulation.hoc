@@ -9,8 +9,8 @@ proc stimulateCells() { local i, pci, typei, jgid, celltype, stimcelltype, count
 							for pcitr(&pci, &typei, &jgid, cellType[celltype].cellStartGid + int(45/100*cellType[celltype].numCells) - 1, cellType[celltype].cellStartGid + int(54/100*cellType[celltype].numCells) - 1) {
 								if (pc.gid_exists(jgid)) {
 									cell = pc.gid2cell(jgid)
-									nc_appendo(i, cell, stimcelltype, 0, 2e-2, 3)
-									nc_appendo(i, cell, stimcelltype, 1, 2e-2, 3)
+									nc_appendo(i, cell, stimcelltype, 0, 2e-2, 3)  
+									nc_appendo(i, cell, stimcelltype, 1, 2e-2, 3) 
 									cellType[stimcelltype].numCons.x[celltype] +=2
 								}
 							}
@@ -20,11 +20,11 @@ proc stimulateCells() { local i, pci, typei, jgid, celltype, stimcelltype, count
 							for pcitr(&pci, &typei, &jgid, cellType[celltype].cellStartGid + int(45/100*cellType[celltype].numCells) - 1, cellType[celltype].cellStartGid + int(54/100*cellType[celltype].numCells) - 1) {
 								if (pc.gid_exists(jgid)) {
 									cell = pc.gid2cell(jgid)
-									nc_appendo(i, cell, stimcelltype, 0, 1e-2, 3)
-									nc_appendo(i, cell, stimcelltype, 1, 1e-2, 3)
+									nc_appendo(i, cell, stimcelltype, 0, 1e-2, 3) 
+									nc_appendo(i, cell, stimcelltype, 1, 1e-2, 3)  
 									cellType[stimcelltype].numCons.x[celltype] +=2
 								}
-							}
+							}	
 						}
 						if (strcmp(cellType[celltype].cellType_string,"mossycell")==0) {	// Connect to some mossy cells
 							// Make 10 connections to the middle 10% (45th - 54th percentiles) of mossy cells; may make multiple connections on one cell
@@ -44,4 +44,4 @@ proc stimulateCells() { local i, pci, typei, jgid, celltype, stimcelltype, count
 		}
 	}
 }
-stimulateCells()	// Make connections between the perforant path and some cells
+stimulateCells()									// Make connections between the perforant path and some cells

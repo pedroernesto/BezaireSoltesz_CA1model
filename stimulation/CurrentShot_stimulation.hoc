@@ -1,0 +1,58 @@
+/************************************************************
+'ca1' model code repository
+Written by Marianne Bezaire, marianne.bezaire@gmail.com, www.mariannebezaire.com
+In the lab of Ivan Soltesz, www.ivansolteszlab.org
+Published and latest versions of this code are available online at:
+ModelDB:
+Open Source Brain: http://www.opensourcebrain.org/projects/nc_ca1
+
+Main code file: ../main.hoc
+
+This file defines a procedure related to brief pulses (shots) of
+electrical current.
+setCurrentShotAmplitude: this procedure sets the properties of the random number
+   generators that are then associated to the noise functionality of
+   the artificial cells. Each artificial cell has its own, unique
+   random stream that is associated to its noise algorithm. The noise
+   algorithm then draws from that random number stream to determine
+   the interspike intervals that define the spike train pattern of the cell.
+   However, only a subset of artificial cells are kept active;
+   the other cells will be silenced throughout the simulation.
+************************************************************/
+
+proc setCurrentShotAmplitude() {local reli, typei, jgid, idx localobj cell, r
+	// This procedure takes one argument:
+	//  $1 = Percent of artificial neurons to be kept active
+
+	for idx=0, numCellTypes-1 {
+		if (cellType[idx].is_art==1) {	// If the cell type is artificial, set the random stream
+										//  associated with the noise in its spike times
+
+			r = new Random()
+			r.uniform(0,1)
+			// For all the artificial cells of this type, owned by this processor
+			for pcitr(&reli, &typei, &jgid, cellType[idx].cellStartGid, cellType[idx].cellEndGid) {
+				cell = pc.gid2cell(jgid)	// Create a reference to the artificial cell
+
+				if (r.repick() < $1/100) {
+					ranstimlist.object(reli).r.negexp(1) 	// Using a negative exponential distribution to determine
+															//  the interspike interval (ISI) gives Poisson-distributed
+															//  spike times. Always use 1 as the argument; the interval
+															//  for the netstim will set the 'rate' (or average ISI).
+															//
+															// For another example (which defines the randomstream class
+															//  differently, and therefore calls different commands at
+															//  different times) see the following file:
+															// <http://senselab.med.yale.edu/modeldb/showmodel.asp?model=83319&file=\destexhe_benchmarks\NEURON\common\netstim.hoc>
+					cell.noiseFromRandom(ranstimlist.object(reli).r)	// Set this random stream as the random number
+																		//  generator for the noise functionality of
+																		//  the spike generator.
+				} else {
+					cell.start = -1 // This cell will be silent the whole simulation (unless it receives positive input from another cell)
+				}
+			}
+		}
+	}
+}
+
+setCurrentShotAmplitude(PercentArtActive)

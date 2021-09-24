@@ -10,7 +10,7 @@ Main code file: ../main.hoc
 This file: Last updated on April 9, 2015
 
 This file defines three different functions that create
-synapses between cells:
+synapses between cells: 
 
 - For connections where the postsynaptic cell is a real cell:
 #1: When it's convenient to pass in the gid of the postsynaptic
@@ -37,8 +37,8 @@ nclist = new List()
 func nc_append() { localobj cell, nc
 	if (pc.gid_exists($2)) {			// Check if cell exists on this machine.
 		cell = pc.gid2cell($2)			//  If so, then get cell object reference
-										//  from the postsynaptic cell gid that
-										//  was passed in as argument $2
+																//  from the postsynaptic cell gid that
+																//  was passed in as argument $2
 
 		// Then create the connection between the presynaptic cell and the
 		//  synapse object on the postsynaptic cell:

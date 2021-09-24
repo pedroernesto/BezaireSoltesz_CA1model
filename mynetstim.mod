@@ -1,7 +1,7 @@
 : $Id: netstim.mod 2212 2008-09-08 14:32:26Z hines $
 : comments at end
 
-NEURON	{
+NEURON	{ 
   ARTIFICIAL_CELL MyNetStim
   RANGE interval, number, start
   RANGE noise
@@ -56,7 +56,7 @@ INITIAL {
 		}
 		net_send(event, 3)
 	}
-}
+}	
 
 PROCEDURE init_sequence(t(ms)) {
 	if (number > 0) {
@@ -70,7 +70,7 @@ FUNCTION is_art() {
 	is_art=1
 }
 
-PROCEDURE position(a, b, c) {
+PROCEDURE position(a, b, c) { 
 	xpos = a
 	ypos = b
 	zpos = c
@@ -202,3 +202,4 @@ net_send events. A change to the on==1 state immediately fires the first spike o
 its sequence.
 
 ENDCOMMENT
+

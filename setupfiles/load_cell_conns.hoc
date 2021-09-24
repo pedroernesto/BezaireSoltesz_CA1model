@@ -1,5 +1,5 @@
 /************************************************************
-'ca1' model code repository
+'ca1' model code repository 
 Written by Marianne Bezaire, marianne.bezaire@gmail.com, www.mariannebezaire.com
 In the lab of Ivan Soltesz, www.ivansolteszlab.org
 Latest versions of this code are available online at:
@@ -58,13 +58,13 @@ proc conn_cells() {local num, wgt, syn
 	// load file
 	f2 = new File()
 	sprint(cmdstr, path2ConnData, ConnData)	// Open the ConnData dataset specified by the user (a
-	f2.ropen(cmdstr)						//  3-digit number), which gives the number of
-											//  connection types in the model, followed by one
-											//  line for each connection type, which gives
-											//  information about the presynaptic and postsynaptic
-											//  cell types, and the properties of the connection
-											//  (weight, convergence or number of incoming connections,
-											//  and number of synapses, as explained in detail above)
+	f2.ropen(cmdstr)												//  3-digit number), which gives the number of
+																					//  connection types in the model, followed by one
+																					//  line for each connection type, which gives
+																					//  information about the presynaptic and postsynaptic
+																					//  cell types, and the properties of the connection
+																					//  (weight, convergence or number of incoming connections,
+																					//  and number of synapses, as explained in detail above)
 
 	numConnTypes = f2.scanvar			// Scan the first line, which contains a number giving the # of connection types
 
