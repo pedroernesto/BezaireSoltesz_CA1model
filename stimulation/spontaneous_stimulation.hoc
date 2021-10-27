@@ -40,7 +40,7 @@ proc connectStims() { local wgt, reli, typei, jgid, postcelltype, precelltype lo
 			for postcelltype=0, numCellTypes-1 {	// For each potential postsynaptic cell type
 				if (cellType[postcelltype].is_art==0) {	// If the cell is a real cell type
 					wgt = cellType[precelltype].wgtConns.x[postcelltype]	// Check the weight specified for this connection
-					if (wgt > 0) {																				//  and if stronger than 0, make the connections
+					if (wgt > 0) {											//  and if stronger than 0, make the connections
 
 						// For each cell of type postsynaptic cell type owned by this processor
 						for pcitr(&reli, &typei, &jgid, cellType[postcelltype].cellStartGid, cellType[postcelltype].cellEndGid) {
@@ -64,8 +64,8 @@ proc connectStims() { local wgt, reli, typei, jgid, postcelltype, precelltype lo
 }
 
 if (MakeArtConns==0) {		// Only make connections from artificial cells if they
-	connectStims()					//  have not been connected at another time (ie, in the
-}													//  connectivity algorithm)
+	connectStims()			//  have not been connected at another time (ie, in the
+}							//  connectivity algorithm)
 
 proc setNoise() {local reli, typei, jgid, idx localobj cell
 	for idx=0, numCellTypes-1 {
@@ -76,17 +76,17 @@ proc setNoise() {local reli, typei, jgid, idx localobj cell
 			for pcitr(&reli, &typei, &jgid, cellType[idx].cellStartGid, cellType[idx].cellEndGid) {
 				cell = pc.gid2cell(jgid)	// Create a reference to the artificial cell
 				ranstimlist.object(reli).r.negexp(1) 	// Using a negative exponential distribution to determine
-																							//  the interspike interval (ISI) gives Poisson-distributed
-																							//  spike times. Always use 1 as the argument; the interval
-																							//  for the netstim will set the 'rate' (or average ISI).
-																							//
-																							// For another example (which defines the randomstream class
-																							//  differently, and therefore calls different commands at
-																							//  different times) see the following file:
-																							// <http://senselab.med.yale.edu/modeldb/showmodel.asp?model=83319&file=\destexhe_benchmarks\NEURON\common\netstim.hoc>
+														//  the interspike interval (ISI) gives Poisson-distributed
+														//  spike times. Always use 1 as the argument; the interval
+														//  for the netstim will set the 'rate' (or average ISI).
+														//
+														// For another example (which defines the randomstream class
+														//  differently, and therefore calls different commands at
+														//  different times) see the following file:
+														// <http://senselab.med.yale.edu/modeldb/showmodel.asp?model=83319&file=\destexhe_benchmarks\NEURON\common\netstim.hoc>
 				cell.noiseFromRandom(ranstimlist.object(reli).r)	// Set this random stream as the random number
-			}																										//  generator for the noise functionality of
-		}																											//  the spike generator.
+			}														//  generator for the noise functionality of
+		}															//  the spike generator.
 	}
 }
 setNoise()

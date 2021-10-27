@@ -149,7 +149,6 @@ calcBinSize()
 {load_file("./setupfiles/calcNetSize_Slicing.hoc")}
 update_network_gids()
 
-
 /***********************************************************************************************
 III. SET UP PARALLEL CAPABILITY AND MEMORY USAGE RECORDER, AND WRITE OUT RUN RECEIPT
 ***********************************************************************************************/
@@ -446,6 +445,11 @@ VI.	INITIALIZE AND RUN NETWORK, OUTPUT RESULT FILES
 								//  the procedures yet. They will be called
 								//  later on.
 
+if (PrintNeuronSliceIds==1) {
+	printNeuronGidSliceId()
+	printArtGidSliceId()
+}
+
 {load_file("./setupfiles/simulation_optimization.hoc")}
 								// Sets various simulation conditions to
 								//  make the simulation more efficient. Note
@@ -469,10 +473,6 @@ if (get_spike_hist==1) {
 					//  histogram to get a sense of the new spike exchange structure so you can
 					//  again find the most efficient setting for the spike compression
 	setupSpikeHistogram()
-}
-
-if (PrintNeuronSliceIds==1) {
-	printNeuronGidSliceId()
 }
 
 {load_file("./setupfiles/sim_execution_functions.hoc")}

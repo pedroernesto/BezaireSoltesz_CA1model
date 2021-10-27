@@ -40,4 +40,3 @@ proc calcNetSize_Slicing() {local i, targetCircuit_length, pos_index localobj Gi
 	}
 }
 calcNetSize_Slicing(SliceThickness, Slices)
-

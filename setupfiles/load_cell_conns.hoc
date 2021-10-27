@@ -1,5 +1,5 @@
 /************************************************************
-'ca1' model code repository 
+'ca1' model code repository
 Written by Marianne Bezaire, marianne.bezaire@gmail.com, www.mariannebezaire.com
 In the lab of Ivan Soltesz, www.ivansolteszlab.org
 Latest versions of this code are available online at:
@@ -32,39 +32,39 @@ proc conn_cells() {local num, wgt, syn
 		// Create placeholder vectors to store the incoming connections properties
 		//  for each cell type's connections onto this cell type. The properties include:
 		cellType[i].numConns = new Vector(numCellTypes)	// Number of connections from all
-																										//  cells of one type onto a single
-																										//  instance of the post-synaptic
-																										//  cell type (aka, the convergence)
+														//  cells of one type onto a single
+														//  instance of the post-synaptic
+														//  cell type (aka, the convergence)
 
 		cellType[i].numSyns = new Vector(numCellTypes)	// Number of synapses to make for
-																										//  each connection that is made from
-																										//  a single presynaptic cell of a
-																										//  particular type to a single post-
-																										//  synaptic cell of a particular type
-																										//  (since, when a cell connects to
-																										//  another cell, it often forms
-																										//  multiple connections)
+														//  each connection that is made from
+														//  a single presynaptic cell of a
+														//  particular type to a single post-
+														//  synaptic cell of a particular type
+														//  (since, when a cell connects to
+														//  another cell, it often forms
+														//  multiple connections)
 
 		cellType[i].wgtConns = new Vector(numCellTypes)	// The weight of each synapse to be
-																										//  formed between these two cell
-																										//  types, in terms of the maximum
-																										//  conductance (amplitude) of the
-																										//  synapse (synapse mechanisms in
-																										//  this model always specify their
-																										//  synaptic conductances in units
-																										//  of uS, micro-Seimens).
+														//  formed between these two cell
+														//  types, in terms of the maximum
+														//  conductance (amplitude) of the
+														//  synapse (synapse mechanisms in
+														//  this model always specify their
+														//  synaptic conductances in units
+														//  of uS, micro-Seimens).
 	}
 
 	// load file
 	f2 = new File()
 	sprint(cmdstr, path2ConnData, ConnData)	// Open the ConnData dataset specified by the user (a
-	f2.ropen(cmdstr)												//  3-digit number), which gives the number of
-																					//  connection types in the model, followed by one
-																					//  line for each connection type, which gives
-																					//  information about the presynaptic and postsynaptic
-																					//  cell types, and the properties of the connection
-																					//  (weight, convergence or number of incoming connections,
-																					//  and number of synapses, as explained in detail above)
+	f2.ropen(cmdstr)						//  3-digit number), which gives the number of
+											//  connection types in the model, followed by one
+											//  line for each connection type, which gives
+											//  information about the presynaptic and postsynaptic
+											//  cell types, and the properties of the connection
+											//  (weight, convergence or number of incoming connections,
+											//  and number of synapses, as explained in detail above)
 
 	numConnTypes = f2.scanvar			// Scan the first line, which contains a number giving the # of connection types
 

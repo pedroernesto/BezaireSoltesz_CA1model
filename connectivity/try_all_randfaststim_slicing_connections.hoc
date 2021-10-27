@@ -204,8 +204,8 @@ func connectCells () {local r, syn, distance, counter, precellType, postcellType
 			params.x[25]= 1+RandomSeedsConn // newhighindex
 			params.x[26]= connlength
 
-                        pre_posStart = new Vector(1,cellType[precellType].PosGidStart)
-                        post_posStart = new Vector(1,cellType[postcellType].PosGidStart)
+            pre_posStart = new Vector(1,cellType[precellType].PosGidStart)
+            post_posStart = new Vector(1,cellType[postcellType].PosGidStart)
 
 			conns2make.fastconn(params, pre_posStart, precell_posindeces, post_posStart, postcell_posindeces, postcellgids, highIndices)
 																	// Use the newly installed vector method in the following manner:
@@ -272,83 +272,83 @@ func connectCells () {local r, syn, distance, counter, precellType, postcellType
 					postgid = int(postcellgids.x[0])
 				}
 
-                	// Connect only cells belonging to the same slice
-                	pregid = conns2make.x[r]
-			        pre_slice_index = cellType[precellType].SliceIndList.x[pregid-cellType[precellType].cellStartGid]
-                	post_slice_index = cellType[postcellType].SliceIndList.x[postgid-cellType[postcellType].cellStartGid]
-			        if (pc.gid_exists(postgid) && (pre_slice_index == post_slice_index)) {
-					cell = pc.gid2cell(postgid)
+            	// Connect only cells belonging to the same slice
+            	pregid = conns2make.x[r]
+		        pre_slice_index = cellType[precellType].SliceIndList.x[pregid-cellType[precellType].cellStartGid]
+            	post_slice_index = cellType[postcellType].SliceIndList.x[postgid-cellType[postcellType].cellStartGid]
+		        if (pc.gid_exists(postgid) && (pre_slice_index == post_slice_index)) {
+				cell = pc.gid2cell(postgid)
 
 
-					numSynTypes = cell.pre_list.o(precellType).count()	// Get total number of potential synapse types for this combination
-																		//  of presynaptic cell type and postsynaptic cell type.
-					if (numSynTypes > 0) {								// If at least one synapse type is defined, then proceed
+				numSynTypes = cell.pre_list.o(precellType).count()	// Get total number of potential synapse types for this combination
+																	//  of presynaptic cell type and postsynaptic cell type.
+				if (numSynTypes > 0) {								// If at least one synapse type is defined, then proceed
 
-						ransynlist.object(cell.randi).r.discunif(0,numSynTypes-1)	// Create a uniform random INTEGER distribution that will
-																					//  allow the specification of a synapse type from all the
-																					//  available synapse types available for that presynaptic
-																					//  cell type (range = 0 to # synapse types-1)
-						if (RandomSynWgt>1) {
-							if (RandomSynWgt==2) {
-								ranwgtlist.object(cell.randi).r.lognormal(synWeight, synWeight*synVar)	// Create a log normal distribution that will
-																									//  allow the specification of a synapse weight, where the
-																									//  distribution has the specified mean and variance:
-																									//  "r.lognormal(mean, variance)", using synWeight (the specified,
-																									//  average weight of the synapse) and synVar (the parameter set
-																									//  to define the variance of the distribution).
-							} else {
-								ranwgtlist.object(cell.randi).r.uniform(synWeight*(1-synVar), synWeight*(1+synVar))
-																									// Create a uniform distribution that will
-																									//  allow the specification of a synapse weight, where the
-																									//  distribution is uniformly picked from the open interval
-																									//  synWeight*(1-synVar) to synWeight*(1+synVar), where
-																									//  synWeight is the average synapse weight and synVar is
-																									//  a parameter set by the user to specify the range
-							}
-						} else {
-							ranwgtlist.object(cell.randi).r.normal(synWeight, synWeight*synVar)	// Create a normal distribution that will
+					ransynlist.object(cell.randi).r.discunif(0,numSynTypes-1)	// Create a uniform random INTEGER distribution that will
+																				//  allow the specification of a synapse type from all the
+																				//  available synapse types available for that presynaptic
+																				//  cell type (range = 0 to # synapse types-1)
+					if (RandomSynWgt>1) {
+						if (RandomSynWgt==2) {
+							ranwgtlist.object(cell.randi).r.lognormal(synWeight, synWeight*synVar)	// Create a log normal distribution that will
 																								//  allow the specification of a synapse weight, where the
 																								//  distribution has the specified mean and variance:
-																								//  "r.normal(mean, variance)", using synWeight (the specified,
+																								//  "r.lognormal(mean, variance)", using synWeight (the specified,
 																								//  average weight of the synapse) and synVar (the parameter set
 																								//  to define the variance of the distribution).
+						} else {
+							ranwgtlist.object(cell.randi).r.uniform(synWeight*(1-synVar), synWeight*(1+synVar))
+																								// Create a uniform distribution that will
+																								//  allow the specification of a synapse weight, where the
+																								//  distribution is uniformly picked from the open interval
+																								//  synWeight*(1-synVar) to synWeight*(1+synVar), where
+																								//  synWeight is the average synapse weight and synVar is
+																								//  a parameter set by the user to specify the range
+						}
+					} else {
+						ranwgtlist.object(cell.randi).r.normal(synWeight, synWeight*synVar)	// Create a normal distribution that will
+																							//  allow the specification of a synapse weight, where the
+																							//  distribution has the specified mean and variance:
+																							//  "r.normal(mean, variance)", using synWeight (the specified,
+																							//  average weight of the synapse) and synVar (the parameter set
+																							//  to define the variance of the distribution).
+					}
+
+					for s=1,numSyns {	// Randomly pick from the available synapses
+										//  enough times to make the desired number
+										//  of synapses per connection.
+
+						randSynNumber = ransynlist.object(cell.randi).repick	// Randomly pick a synapse type from the available synapse types
+						if (AxConVel<=0) { // AxConVel is the axonal conduction velocity in um/ms
+							conDelay =  3 	// Axonal conduction delay + synapse delay (time between when the presynaptic cell spikes
+											//  and the synapse on the postsynaptic cell is activated)
+						} else { // Don't use the z dimension when computing distances for now - we'll save that for another time
+							pos_index = precell_posindeces.x[pregid-cellType[precellType].cellStartGid]
+							xpos=get_x_pos(pos_index,cellType[precellType].PosGidStart,cellType[precellType].dentateXBins,cellType[precellType].dentateYBins*cellType[precellType].dentateZBins,cellType[precellType].dentateXBinSize)
+		  					ypos=get_y_pos(pos_index,cellType[precellType].PosGidStart,cellType[precellType].dentateYBins,cellType[precellType].dentateZBins,cellType[precellType].dentateYBinSize)
+							conDelay = int(10*sqrt((xpos - cell.x)*(xpos - cell.x) + (ypos - cell.y)*(ypos - cell.y))/AxConVel)/10 + 0.5 // use 0.5 for the synaptic cleft delay; this also ensures the delay will never be set to 0, which would error the program
+							if (conDelay<dt || conDelay%dt>0 || conDelay/dt>=255) {
+								print "BAD CONDELAY: host ", pc.id, " precell: ", conns2make.x[r], ", postcell: ", conns2make.x[r+connlength], ", conDelay = ", conDelay
+								conDelay =  3
+							}
 						}
 
-						for s=1,numSyns {	// Randomly pick from the available synapses
-											//  enough times to make the desired number
-											//  of synapses per connection.
+						// Connect the presynaptic cell to the chosen synapse on the postsynaptic cell.
+						//  Note that the synapse weight parameter is also being used to pass the
+						//  presynaptic cell gid to the synapse mechanism. Within the synapse mechanism,
+						//  the presynaptic cell gid will be subtracted from the synapse weight, and the
+						//  two parameters will be stored separately within the mechanism.
+						if (RandomSynWgt>0) {
+							thiswgt = ranwgtlist.object(cell.randi).repick
 
-							randSynNumber = ransynlist.object(cell.randi).repick	// Randomly pick a synapse type from the available synapse types
-							if (AxConVel<=0) { // AxConVel is the axonal conduction velocity in um/ms
-								conDelay =  3 	// Axonal conduction delay + synapse delay (time between when the presynaptic cell spikes
-												//  and the synapse on the postsynaptic cell is activated)
-							} else { // Don't use the z dimension when computing distances for now - we'll save that for another time
-								pos_index = precell_posindeces.x[pregid-cellType[precellType].cellStartGid]
-								xpos=get_x_pos(pos_index,cellType[precellType].PosGidStart,cellType[precellType].dentateXBins,cellType[precellType].dentateYBins*cellType[precellType].dentateZBins,cellType[precellType].dentateXBinSize)
-			  					ypos=get_y_pos(pos_index,cellType[precellType].PosGidStart,cellType[precellType].dentateYBins,cellType[precellType].dentateZBins,cellType[precellType].dentateYBinSize)
-								conDelay = int(10*sqrt((xpos - cell.x)*(xpos - cell.x) + (ypos - cell.y)*(ypos - cell.y))/AxConVel)/10 + 0.5 // use 0.5 for the synaptic cleft delay; this also ensures the delay will never be set to 0, which would error the program
-								if (conDelay<dt || conDelay%dt>0 || conDelay/dt>=255) {
-									print "BAD CONDELAY: host ", pc.id, " precell: ", conns2make.x[r], ", postcell: ", conns2make.x[r+connlength], ", conDelay = ", conDelay
-									conDelay =  3
-								}
-							}
+							if (thiswgt<0.0) {thiswgt=0.0}
 
-							// Connect the presynaptic cell to the chosen synapse on the postsynaptic cell.
-							//  Note that the synapse weight parameter is also being used to pass the
-							//  presynaptic cell gid to the synapse mechanism. Within the synapse mechanism,
-							//  the presynaptic cell gid will be subtracted from the synapse weight, and the
-							//  two parameters will be stored separately within the mechanism.
-							if (RandomSynWgt>0) {
-								thiswgt = ranwgtlist.object(cell.randi).repick
-
-								if (thiswgt<0.0) {thiswgt=0.0}
-
-								nc_append(conns2make.x[r], postgid, precellType, randSynNumber, thiswgt + (conns2make.x[r]+1)*1000, conDelay)
-							} else {
-								nc_append(conns2make.x[r], postgid, precellType, randSynNumber, synWeight + (conns2make.x[r]+1)*1000, conDelay)
-							}
+							nc_append(conns2make.x[r], postgid, precellType, randSynNumber, thiswgt + (conns2make.x[r]+1)*1000, conDelay)
+						} else {
+							nc_append(conns2make.x[r], postgid, precellType, randSynNumber, synWeight + (conns2make.x[r]+1)*1000, conDelay)
 						}
-						counter +=1	// After all of the synapses are formed for a single connection, increment the connection counter by 1
+					}
+					counter +=1	// After all of the synapses are formed for a single connection, increment the connection counter by 1
 					}
 				} else {	// Something is very wrong if the postsynaptic gid does not exist on this machine, print message to terminal
 					// print $s3, "s to ", $s4, "s:", " can't make gid ", postgid, " which is (r = ", r, " +  connlength = ", connlength, ") = ", r+connlength, " from x[r] = ", conns2make.x[r], " total conns = ", int(conns2make.x[0]/1)

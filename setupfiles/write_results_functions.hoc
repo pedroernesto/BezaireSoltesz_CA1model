@@ -393,12 +393,10 @@ proc writeLFPTraces() { local i,j,k,celltype,startgid,endgid localobj f, lfpvec,
     }
 }
 
-
-proc printNeuronGidSliceId() {local celltype, startgid, endgid, gid, slice_index  localobj f
+// Print a list with all the gid of Pyramidal cells and the slice each cell belongs to
+proc printNeuronGidSliceId() {local celltype, gid, slice_index  localobj f
     for celltype=0, numCellTypes-1 {
-    	if (strcmp(cellType[celltype].cellType_string, "pyramidalcell")==0) {	// Find the gid range
-            startgid = cellType[celltype].cellStartGid							//  of the pyramidal cells
-            endgid = cellType[celltype].cellEndGid
+    	if (strcmp(cellType[celltype].cellType_string, "pyramidalcell")==0) {	// Find the gid range of the pyramidal cells
             break
         }
     }
@@ -407,10 +405,42 @@ proc printNeuronGidSliceId() {local celltype, startgid, endgid, gid, slice_index
 	f = new File(cmd)
 	if (pc.id == 0) {
 		f.wopen()
-		for gid=startgid, endgid {
+		for gid=cellType[celltype].cellStartGid, cellType[celltype].cellEndGid {
 			slice_index = cellType[celltype].SliceIndList.x[gid-cellType[celltype].cellStartGid]
 			f.printf("%d %d\n", gid, slice_index)	// Print the gid of the neuron and the slice it belongs to
 		}
 	}
 	f.close()
+}
+
+// Print a list with all the gid of CA3 cells, the slice each cell belongs to, and its stimulus onset attribute (start)
+proc printArtGidSliceId() {local celltype, reli, typei, gid, slice_index  localobj f
+	pc.barrier()									// Wait for all processors to get to this point
+	sprint(cmd,"./results/%s/neuronArt_slice_ids.dat", RunName)
+	f = new File(cmd)
+	if (pc.id == 0) { 								// Write header to file 1 time only
+		f.wopen()
+		f.close()
+	}
+
+    for celltype=0, numCellTypes-1 {
+    	if (strcmp(cellType[celltype].cellType_string, "ca3cell")==0) {	// Find the gid range of the ca3cell cells
+            break
+        }
+    }
+
+	for rank = 0, pc.nhost-1 {				// For each processor, allow processor to append to file the intended data of its cells
+		if (rank == pc.id) {				// Ensure that each processor runs once
+			f.aopen() 						// Open for appending to file
+			for pcitr(&reli, &typei, &gid, cellType[celltype].cellStartGid, cellType[celltype].cellEndGid) {
+				if (pc.gid_exists(gid)) {
+					slice_index = cellType[celltype].SliceIndList.x[gid-cellType[celltype].cellStartGid]
+					cell = pc.gid2cell(gid)	// Create a reference to the artificial cell
+					f.printf("%d %d %d %d\n", gid, slice_index, cell.start, rank)	// Print the gid of the neuron and the slice it belongs to
+				}
+			}
+			f.close()
+		}
+		pc.barrier()		// Make sure each processor waits its turn.
+	}
 }

@@ -34,8 +34,8 @@ http://www.neuron.yale.edu/neuron/static/docs/help/neuron/general/classes/random
 
 begintemplate RandomStream
 	public r, repick, start, lowIndex, seq	// Define variables and funcs that are
-																					//  accessible from outside the class
-																					//  object
+											//  accessible from outside the class
+											//  object
 
 	objref r						// Define a new object
 
