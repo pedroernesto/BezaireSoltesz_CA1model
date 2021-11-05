@@ -63,3 +63,4 @@ default_var("SliceThickness",450)       // Thickness of a single horizontal (x-d
 default_var("Slices",10)                // Desired number of contiguous (but disconnected) slices
 default_var("PrintNeuronSliceIds", 1)   // Flag to print the gid of the neuron and the slice it belongs to
 default_var("PercentArtActive", 100)    // Percent of artificial cells to be kept active
+default_var("RandomSeedsCell", 0)		// Seed used by stimulation streams to vary the stimulating artifical cells in each run

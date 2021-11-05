@@ -446,7 +446,17 @@ VI.	INITIALIZE AND RUN NETWORK, OUTPUT RESULT FILES
 								//  later on.
 
 if (PrintNeuronSliceIds==1) {
-	printNeuronGidSliceId()
+	printNeuronGidSliceId("axoaxoniccell")
+	printNeuronGidSliceId("bistratifiedcell")
+	printNeuronGidSliceId("cckcell")
+	printNeuronGidSliceId("ivycell")
+	printNeuronGidSliceId("ngfcell")
+	printNeuronGidSliceId("olmcell")
+	printNeuronGidSliceId("pyramidalcell")
+	printNeuronGidSliceId("pvbasketcell")
+	printNeuronGidSliceId("scacell")
+	printNeuronGidSliceId("ca3cell")
+
 	printArtGidSliceId()
 }
 

@@ -33,7 +33,7 @@ proc setCurrentShotAmplitude() {local reli, typei, jgid, idx, slice, numslices l
     }
 	numslices = int(targetCircuit_length/$1)
 
-	r = new Random()
+	r = new Random(RandomSeedsCell)
 	r.uniform(0,1)
 	for slice = 0, numslices-1 {
 		for idx=0, numCellTypes-1 {
@@ -68,4 +68,6 @@ proc setCurrentShotAmplitude() {local reli, typei, jgid, idx, slice, numslices l
 	}
 }
 
-setCurrentShotAmplitude(SliceThickness, Slices, PercentArtActive)
+if (MakeArtConns==1) { 													// It is assumed that connections from artificial cells
+	setCurrentShotAmplitude(SliceThickness, Slices, PercentArtActive) 	// have been made at another time (ie, in the connectivity algorithm)
+}

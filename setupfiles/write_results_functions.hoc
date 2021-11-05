@@ -395,13 +395,15 @@ proc writeLFPTraces() { local i,j,k,celltype,startgid,endgid localobj f, lfpvec,
 
 // Print a list with all the gid of Pyramidal cells and the slice each cell belongs to
 proc printNeuronGidSliceId() {local celltype, gid, slice_index  localobj f
+	// This procedure takes three arguments:
+	// $s1: Friendly name of the cell type
     for celltype=0, numCellTypes-1 {
-    	if (strcmp(cellType[celltype].cellType_string, "pyramidalcell")==0) {	// Find the gid range of the pyramidal cells
+    	if (strcmp(cellType[celltype].cellType_string, $s1)==0) {	// Find the gid range of the pyramidal cells
             break
         }
     }
 
-	sprint(cmd,"./results/%s/neuron_slice_ids.dat", RunName)
+	sprint(cmd,"./results/%s/neuron_%s_slice_ids.dat", RunName, $s1)
 	f = new File(cmd)
 	if (pc.id == 0) {
 		f.wopen()
