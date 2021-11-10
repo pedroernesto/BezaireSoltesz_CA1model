@@ -90,7 +90,7 @@ proc rrun(){								// Run the network simulation and write out the results
 
 	if (PrintVoltage>0) {voltageout()}			// Write out any voltages that were recorded during simulation
 	if (PrintConnDetails==1) {allCellConnsParallel()}	// Write the file of all cell connections (pre and post gids, synapse type,
-								//  host on which cell exists), "connections.dat"
+														//  host on which cell exists), "connections.dat"
 
 	if ((PrintConnDetails==0) && (PrintVoltage==1)) {recordedCellConnsParallel()}	// If detailed connections are not being written out, at least write them out for cells that are being traced
 

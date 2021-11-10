@@ -10,9 +10,9 @@
 
 Duration=20
 RANDOM=$(date +%s)
-for j in $(seq 12 12)
+for j in $(seq 1 10)
   do
-    for i in $(seq 7 9)
+    for i in $(seq 0 9)
       do
         PercentArtCells=${j}.${i}
         result_dir="run_Sasaki_Scale_100_CurrentShotStim_0${j}_${i}_SimDuration_${Duration}_Procs_8"

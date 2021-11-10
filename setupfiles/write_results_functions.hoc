@@ -127,23 +127,23 @@ proc SpikeOutParallel() {local i  localobj f
 //  Only one processor writes everything to the file.
 proc SummaryOut() {local alltime, allct, allspk localobj f
 	allct = pc.allreduce(nclist.count,1)	// Add the total number of synapses
-						//  created on each processor to get
-						//  the total across the whole network.
+											//  created on each processor to get
+											//  the total across the whole network.
 
 	allspk = pc.allreduce(pnm.idvec.size,1)	// Add the total number of spikes
-						//  registered on each processor to get
-						//  the total number of spikes generated
-						//  during the whole simulation.
+											//  registered on each processor to get
+											//  the total number of spikes generated
+											//  during the whole simulation.
 
 	comptime = pc.step_time					// Get each processor's simulation
-								//  computation time.
+											//  computation time.
 
 	avgcomp = pc.allreduce(comptime, 1)/pc.nhost	// Get the average amount of time
-							//  required by a processor to
-							//  solve the simulation.
+													//  required by a processor to
+													//  solve the simulation.
 	maxcomp = pc.allreduce(comptime, 2)	// Get the maximum amount of time
-						//  required by any processor to
-						//  solve the simulation.
+										//  required by any processor to
+										//  solve the simulation.
 
 	loadbal=1			// Placeholder, ideal load balance value = 1 (fraction, range from 0 - 1)
 	exchtime=0			// Placeholder, ideal spike exchange time  = 0 (ms)
@@ -362,7 +362,7 @@ proc writeLFPTraces() { local i,j,k,celltype,startgid,endgid localobj f, lfpvec,
     if (name_declared("traceidxlist")) {
         for celltype=0, numCellTypes-1 {
 	    if (strcmp(cellType[celltype].cellType_string, "pyramidalcell")==0) {	// Find the gid range
-                startgid = cellType[celltype].cellStartGid				//  of the pyramidal cells
+                startgid = cellType[celltype].cellStartGid						//  of the pyramidal cells
                 endgid = cellType[celltype].cellEndGid
                 break
             }
@@ -395,8 +395,9 @@ proc writeLFPTraces() { local i,j,k,celltype,startgid,endgid localobj f, lfpvec,
 
 // Print a list with all the gid of Pyramidal cells and the slice each cell belongs to
 proc printNeuronGidSliceId() {local celltype, gid, slice_index  localobj f
-	// This procedure takes three arguments:
+	// This procedure takes one argument:
 	// $s1: Friendly name of the cell type
+
     for celltype=0, numCellTypes-1 {
     	if (strcmp(cellType[celltype].cellType_string, $s1)==0) {	// Find the gid range of the pyramidal cells
             break

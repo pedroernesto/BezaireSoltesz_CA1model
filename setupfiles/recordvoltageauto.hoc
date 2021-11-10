@@ -52,12 +52,12 @@ for i=0,numCellTypes-1 {
 		} else {
 			numpercent = int(cellType[i].numCells/(100/FracTraces))+1	// Calculate how many cells of this type
 			if (numpercent>NumTraces) {									//  should be traced. If the number is
-				numpercent = NumTraces										//  larger than the maximum number of
-			}																						//  traces allowed, set it to the max.
+				numpercent = NumTraces									//  larger than the maximum number of
+			}															//  traces allowed, set it to the max.
 		}
 		if (numpercent>cellType[i].numCells) {				// If the number is higher than the total
-			numpercent = cellType[i].numCells						//  number of cells of that type, then
-		}																							//  set it to the number of cells.
+			numpercent = cellType[i].numCells				//  number of cells of that type, then
+		}													//  set it to the number of cells.
 		tracevector.x[i] = numpercent
 		numtrace = numtrace + numpercent
 	}
@@ -73,8 +73,8 @@ objref cell
 for i=0,numCellTypes-1 {
 	if (cellType[i].is_art==0) {					// For each cell type,
 		for k = 0, tracevector.x[i]-1 {				//  for the desired number of traces,
-																					//  create and set up the vector for
-																					//  recording the membrane potential.
+													//  create and set up the vector for
+													//  recording the membrane potential.
 
 			tracenamelist[tr] = new String()		// For every recorded cell, track the cell type
 			tracenamelist[tr].s = cellType[i].cellType_string
@@ -90,13 +90,13 @@ for i=0,numCellTypes-1 {
 			//traceidxlist.x[tr]=cellType[i].cellStartGid + k  // Record from first x cells
 
 			if (pc.gid_exists(traceidxlist.x[tr])) {	// If cell exists on this machine,
-																								//  create and set up recording vector.
+														//  create and set up recording vector.
 				sprint(cmdstr, "%s%g = new Vector(%g)", tracenamelist[tr].s, tracepclist.x[tr], (tstop-tstart)/dt)	// Create vector
 				{execute(cmdstr)}
 				cell = pc.gid2cell(traceidxlist.x[tr])
 				sprint(cmdstr, "%s%g.record(&cell.soma.v(0.5))", tracenamelist[tr].s, tracepclist.x[tr])	// Record cell's somatic
 				{execute(cmdstr)}																																					//  membrane potential
-			}																																														//  into vector.
+			}																																												//  into vector.
 			tr=tr+1
 		}
 	}
@@ -107,14 +107,14 @@ objref f
 proc voltageout() {local tr, rank, gid, srcid localobj tgt
 	for tr = 0, numtrace-1 {						// Write out voltage traces for all traced cells.
 		if (pc.gid_exists(traceidxlist.x[tr])) {	// If cell exists on this machine,
-																							//  generate a results file for it.
+													//  generate a results file for it.
 			sprint(outfile, "results/%s/trace_%s%g.dat", RunName, tracenamelist[tr].s, traceidxlist.x[tr])
 			f = new File(outfile)
 			f.wopen()
 			f.printf("t\tv\n")
 			for i=0, (tstop-tstart)/dt-1 {			// Write out the somatic membrane potential
-																					//  at each time step of the simulation, as
-																					//  it was recorded into the vector.
+													//  at each time step of the simulation, as
+													//  it was recorded into the vector.
 				sprint(cmdstr, "f.printf(\"%%g\\t%%g\\n\", i*dt, %s%g.x[i])", tracenamelist[tr].s, tracepclist.x[tr], i)
 				execute(cmdstr)
 			}
