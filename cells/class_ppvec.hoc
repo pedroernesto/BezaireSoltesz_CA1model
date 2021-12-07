@@ -13,7 +13,7 @@ begintemplate ppvec
 				pp = new MyNetStim(.5)
 				pp.interval = 1
 				pp.number = 1
-				pp.start = 2
+				pp.start = -1	// By default, this cell will be silent the whole simulation (unless it receives positive input from another cell) 
 				pp.gid = $1
 				pp.randi = $2
 				}

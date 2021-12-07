@@ -109,7 +109,7 @@ begintemplate CellCategoryInfo	// Define a template that describes
 							//  we will keep the functionality for now.
 
 		ctype = new StringFunctions()	// Create a new StringFunctions object
-																	//  for parsing the name of the celltype
+										//  for parsing the name of the celltype
 	}
 
 	proc setSynList(){			// From a file, read in the constants
@@ -179,7 +179,7 @@ begintemplate CellCategoryInfo	// Define a template that describes
 															//  spaced along the Z dimension.
 
 		if (dentateZBins==0) {dentateZBins=1}	// Make sure the Z dimension is at least one
-																					//  cell wide.
+												//  cell wide.
 
 		dentateYBins=int(($2/$3)*(numCells*($3)^2/($2*$1))^(1/3))	// Given the relative
 																	//  length for Y compared
@@ -189,7 +189,7 @@ begintemplate CellCategoryInfo	// Define a template that describes
 																	//  the Y dimension.
 
 		if (dentateYBins==0) {dentateYBins=1}	// Make sure the Y dimension is at least one
-																					//  cell wide.
+												//  cell wide.
 
 		dentateXBins=int(($1/$3)*(numCells*($3)^2/($2*$1))^(1/3))	// Given the relative
 																	//  length for X compared

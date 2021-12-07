@@ -8,14 +8,19 @@
 # or simply by using the source alias (.):
 # . run_CurrentShotStims.sh
 
+# Before launching a new parallel simulation, it may be useful
+# to find the PIDs of 'nrniv' processes  still active and kill them:
+# pids=$(echo $(/bin/ps r -o pid,cmd|grep "nrniv"| grep -v "grep"|awk '{print $1}'))
+# kill -9 $pids
+
 Duration=20
 RANDOM=$(date +%s)
-for j in $(seq 1 10)
+for j in $(seq 30 30)
   do
-    for i in $(seq 0 9)
+    for i in $(seq 1 9)
       do
         PercentArtCells=${j}.${i}
-        result_dir="run_Sasaki_Scale_100_CurrentShotStim_0${j}_${i}_SimDuration_${Duration}_Procs_8"
+        result_dir="run_Sasaki_Scale_100_CurrentShotStim_0${j}_${i}_SimDuration_${Duration}_Procs_8_test"
         mpiexec -n 8 x86_64/special -nobanner -nogui -mpi -c "strdef RunName" -c RunName="\"${result_dir}\"" \
                                                           -c "Scale=100" -c "SimDuration=${Duration}" \
                                                           -c "PercentArtActive=${PercentArtCells}" \

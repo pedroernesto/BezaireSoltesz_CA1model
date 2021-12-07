@@ -125,7 +125,9 @@ proc calcNetSize_CellDeath() {local i
 calcNetSize_CellDeath()
 */
 {load_file("./setupfiles/update_network_gids_Slicing.hoc")}
-update_network_gids()
+if (PercentCellDeath != 0) {
+	update_network_gids()
+}
 
 // Calculate bin sizes at this point, with the current values for numCells
 // to not affect the expected cells density in the circuit after any slicing

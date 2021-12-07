@@ -205,7 +205,7 @@ proc TimeOutSerial() {local i, rank, gid, srcid localobj tgt, f, cell
 
 	for rank = 0, pc.nhost-1 {				// For each processor, allow processor to append
 		if (rank == pc.id) {				//  its runtimes to file. Ensure that each
-					 			//  processor runs once.
+					 						//  processor runs once.
 
 			f.aopen() 				// Open for appending to file.
 			f.printf("%g\t%g\t%g\t%g\t%g\n", pc.id, loadtime, createtime, connecttime, runtime)
