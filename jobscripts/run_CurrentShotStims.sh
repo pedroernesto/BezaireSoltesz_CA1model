@@ -14,11 +14,11 @@
 # kill -9 $pids
 
 Duration=20
-RANDOM=$(date +%s)
-for j in $(seq 30 30)
+for j in $(seq 10 20)
   do
-    for i in $(seq 1 9)
+    for i in $(seq 0 0)
       do
+        RANDOM=$(date +%s)
         PercentArtCells=${j}.${i}
         result_dir="run_Sasaki_Scale_100_CurrentShotStim_0${j}_${i}_SimDuration_${Duration}_Procs_8_test"
         mpiexec -n 8 x86_64/special -nobanner -nogui -mpi -c "strdef RunName" -c RunName="\"${result_dir}\"" \
