@@ -47,18 +47,17 @@ proc setCurrentShotAmplitude() {local targetCircuit_length, NumSlices, reli, typ
     while ( SliceArtCellsActCount.sum() < NumSlices*SliceArtCellsActMax) {	// Ensure that all slices are equally activated
         rgid = r.repick()
         slice_idx = cellType[idx].SliceIndList.x[rgid-cellType[idx].cellStartGid]
-		if ( rgid < cellType[idx].cellStartGid || rgid > cellType[idx].cellEndGid ) {
-			print slice_idx, rgid, " ---> ", cellType[idx].cellStartGid, cellType[idx].cellEndGid
-		}
-
-        if (SliceArtCellsActCount.x[slice_idx] < SliceArtCellsActMax) {		// Check out that in this slice activation is still lower than SliceArtCellsActMax
+        if (SliceArtCellsActCount.x[slice_idx] < SliceArtCellsActMax) {		// Check that in this slice activation is
+																			// still lower than SliceArtCellsActMax
             for rank = 0, pc.nhost-1 {
                 if (rank == pc.id) {				// Ensure that each processor runs once
                     // For all the artificial cells of this type, owned by this processor
                     for pcitr(&reli, &typei, &jgid, cellType[idx].cellStartGid, cellType[idx].cellEndGid) {
                         cell = pc.gid2cell(jgid)	// Create a reference to the artificial cell
-                        if (pc.gid_exists(jgid) && (jgid==rgid)) {
+                        if (pc.gid_exists(jgid) && jgid==rgid && cell.start==-1) {  // Ensure that the picked cell is not already activated
                             cell.start = OnSetStim      // Onset time in ms, for stimulation from artificial cells
+                            SliceArtCellsActCount.x[slice_idx] += 1
+
                             ranstimlist.object(reli).r.negexp(1) 	// Using a negative exponential distribution to determine
                                                                     //  the interspike interval (ISI) gives Poisson-distributed
                                                                     //  spike times. Always use 1 as the argument; the interval
@@ -71,13 +70,7 @@ proc setCurrentShotAmplitude() {local targetCircuit_length, NumSlices, reli, typ
                             cell.noiseFromRandom(ranstimlist.object(reli).r)	// Set this random stream as the random number
                                                                                 //  generator for the noise functionality of
                                                                                 //  the spike generator
-                            SliceArtCellsActCount.x[slice_idx] += 1
-
-							// print "Host: ", pc.id, "Slice: ", slice_idx, " ----> ", SliceArtCellsActCount.x[slice_idx], SliceArtCellsActMax, SliceArtCellsActCount.sum(), NumSlices*SliceArtCellsActMax
-							print "Host: ",  pc.id, " ----> ", rgid, slice_idx
-							SliceArtCellsActCount.printf()
-                        } else {
-                            cell.start = -1 // This cell will be silent the whole simulation (unless it receives positive input from another cell)
+							// SliceArtCellsActCount.printf()
                         }
                     }
                 }
