@@ -52,18 +52,19 @@ extern double hoc_Exp(double);
 #define number _p[1]
 #define start _p[2]
 #define noise _p[3]
-#define sid _p[4]
-#define cid _p[5]
-#define xpos _p[6]
-#define ypos _p[7]
-#define zpos _p[8]
-#define gid _p[9]
-#define randi _p[10]
-#define event _p[11]
-#define on _p[12]
-#define ispike _p[13]
-#define v _p[14]
-#define _tsav _p[15]
+#define dur _p[4]
+#define sid _p[5]
+#define cid _p[6]
+#define xpos _p[7]
+#define ypos _p[8]
+#define zpos _p[9]
+#define gid _p[10]
+#define randi _p[11]
+#define event _p[12]
+#define on _p[13]
+#define ispike _p[14]
+#define v _p[15]
+#define _tsav _p[16]
 #define _nd_area  *_ppvar[0]._pval
 #define donotuse	*_ppvar[2]._pval
 #define _p_donotuse	_ppvar[2]._pval
@@ -159,6 +160,7 @@ extern void hoc_reg_nmodl_filename(int, const char*);
  /* declare global and static user variables */
  /* some parameters have upper and lower limits */
  static HocParmLimits _hoc_parm_limits[] = {
+ "dur", 1e-09, 1e+09,
  "interval", 1e-09, 1e+09,
  "noise", 0, 1,
  "number", 0, 1e+09,
@@ -167,6 +169,7 @@ extern void hoc_reg_nmodl_filename(int, const char*);
  static HocParmUnits _hoc_parm_units[] = {
  "interval", "ms",
  "start", "ms",
+ "dur", "ms",
  "sid", "1",
  "cid", "1",
  0,0
@@ -193,6 +196,7 @@ static void nrn_state(_NrnThread*, _Memb_list*, int);
  "number",
  "start",
  "noise",
+ "dur",
  "sid",
  "cid",
  "xpos",
@@ -216,12 +220,13 @@ static void nrn_alloc(Prop* _prop) {
 	_p = nrn_point_prop_->param;
 	_ppvar = nrn_point_prop_->dparam;
  }else{
- 	_p = nrn_prop_data_alloc(_mechtype, 16, _prop);
+ 	_p = nrn_prop_data_alloc(_mechtype, 17, _prop);
  	/*initialize range parameters*/
  	interval = 10;
  	number = 10;
  	start = 50;
  	noise = 0;
+ 	dur = 1;
  	sid = -1;
  	cid = -1;
  	xpos = 0;
@@ -231,7 +236,7 @@ static void nrn_alloc(Prop* _prop) {
  	randi = 0;
   }
  	_prop->param = _p;
- 	_prop->param_size = 16;
+ 	_prop->param_size = 17;
   if (!nrn_point_prop_) {
  	_ppvar = nrn_prop_datum_alloc(_mechtype, 4, _prop);
   }
@@ -262,7 +267,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
   hoc_reg_nmodl_text(_mechtype, nmodl_file_text);
   hoc_reg_nmodl_filename(_mechtype, nmodl_filename);
 #endif
-  hoc_register_prop_size(_mechtype, 16, 4);
+  hoc_register_prop_size(_mechtype, 17, 4);
   hoc_register_dparam_semantics(_mechtype, 0, "area");
   hoc_register_dparam_semantics(_mechtype, 1, "pntproc");
   hoc_register_dparam_semantics(_mechtype, 2, "pointer");
@@ -272,7 +277,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
  pnt_receive[_mechtype] = _net_receive;
  pnt_receive_size[_mechtype] = 1;
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 MyNetStim /users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/mynetstim.mod\n");
+ 	ivoc_help("help ?1 MyNetStim /home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/mynetstim.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -495,7 +500,7 @@ static void _net_receive (_pnt, _args, _lflag) Point_process* _pnt; double* _arg
        artcell_net_send ( _tqitem, _args, _pnt, t +  0.0 , 1.0 ) ;
        }
      }
-   if ( _lflag  == 1.0  && on  == 1.0 ) {
+   if ( _lflag  == 1.0  && on  == 1.0  && t < start + dur ) {
      ispike = ispike + 1.0 ;
      net_event ( _pnt, t ) ;
      next_invl ( _threadargs_ ) ;
@@ -579,14 +584,14 @@ _first = 0;
 #endif
 
 #if NMODL_TEXT
-static const char* nmodl_filename = "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/mynetstim.mod";
+static const char* nmodl_filename = "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/mynetstim.mod";
 static const char* nmodl_file_text = 
   ": $Id: netstim.mod 2212 2008-09-08 14:32:26Z hines $\n"
   ": comments at end\n"
   "\n"
-  "NEURON	{ \n"
+  "NEURON	{\n"
   "  ARTIFICIAL_CELL MyNetStim\n"
-  "  RANGE interval, number, start\n"
+  "  RANGE interval, number, start, dur\n"
   "  RANGE noise\n"
   "  RANGE sid, cid\n"
   "  RANGE xpos, ypos, zpos, gid, randi\n"
@@ -599,6 +604,7 @@ static const char* nmodl_file_text =
   "	number	= 10 <0,1e9>	: number of spikes (independent of noise)\n"
   "	start		= 50 (ms)	: start of first spike\n"
   "	noise		= 0 <0,1>	: amount of randomness (0.0 - 1.0)\n"
+  "  dur     = 1 (ms) <1e-9,1e9>: time duration of stimulation (msec)\n"
   "	sid = -1 (1) : synapse id, from cell template\n"
   "	cid = -1 (1) : id of cell to which this synapse is attached\n"
   "	xpos = 0\n"
@@ -639,7 +645,7 @@ static const char* nmodl_file_text =
   "		}\n"
   "		net_send(event, 3)\n"
   "	}\n"
-  "}	\n"
+  "}\n"
   "\n"
   "PROCEDURE init_sequence(t(ms)) {\n"
   "	if (number > 0) {\n"
@@ -653,7 +659,7 @@ static const char* nmodl_file_text =
   "	is_art=1\n"
   "}\n"
   "\n"
-  "PROCEDURE position(a, b, c) { \n"
+  "PROCEDURE position(a, b, c) {\n"
   "	xpos = a\n"
   "	ypos = b\n"
   "	zpos = c\n"
@@ -741,7 +747,7 @@ static const char* nmodl_file_text =
   "			net_send(0, 1)\n"
   "		}\n"
   "	}\n"
-  "	if (flag == 1 && on == 1) {\n"
+  "	if (flag == 1 && on == 1 && t < start+dur ) {\n"
   "		ispike = ispike + 1\n"
   "		net_event(t)\n"
   "		next_invl()\n"
@@ -785,6 +791,5 @@ static const char* nmodl_file_text =
   "its sequence.\n"
   "\n"
   "ENDCOMMENT\n"
-  "\n"
   ;
 #endif
