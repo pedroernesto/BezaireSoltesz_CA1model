@@ -459,7 +459,7 @@ if (PrintNeuronSliceIds==1) {
 	printNeuronGidSliceId("scacell")
 	printNeuronGidSliceId("ca3cell")
 
-	printArtGidSliceId()
+	// printArtGidSliceId()
 }
 
 {load_file("./setupfiles/simulation_optimization.hoc")}

@@ -9,14 +9,14 @@ begintemplate ppvec
 		randi = $2
 		actemp(gid,randi)
 	}
-		proc actemp() {
-				pp = new MyNetStim(.5)
-				pp.interval = 1
-				pp.number = 1
-				pp.start = -1	// By default, this cell will be silent the whole simulation (unless it receives positive input from another cell) 
-				pp.gid = $1
-				pp.randi = $2
-				}
+	proc actemp() {
+			pp = new MyNetStim(.5)
+			pp.interval = 1
+			pp.number = 1
+			pp.start = -1	// By default, this cell will be silent the whole simulation (unless it receives positive input from another cell)
+			pp.gid = $1
+			pp.randi = $2
+	}
 
 	func is_art() {return 1}
 

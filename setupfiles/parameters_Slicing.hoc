@@ -4,7 +4,7 @@
 
 default_var("RunName","none")		// Name of simulation run
 default_var("UID","0")		// Unique ID for this simulation run
-default_var("Stimulation","CurrentShot")		// Filename of the stimulation protocol used to stimulate the network
+default_var("Stimulation","CurrentShot_ca3cells_SpikeTrain")		// Filename of the stimulation protocol used to stimulate the network
 default_var("Connectivity","try_all_randfaststim_slicing")	// Filename of the connection protocol used to connect the cells of the network
 default_var("Scale",1000)		// Network scale (1:Scale)
 default_var("SimDuration",300)		// Duration of time simulated, in milliseconds
@@ -26,7 +26,6 @@ default_var("TemporalResolution",0.1)		// Temporal resolution of the simulation 
 default_var("FracTraces",100)		// The percent of cells to record intracellularly, for each cell type
 default_var("NumTraces",40)		// The maximum number of cells to record intracellularly, for each cell type
 default_var("NumTracesPyr",3000)	// The maximum number of pyramidal cells to record intracellularly
-default_var("DegreeStim",10)		// Degree of stimulation; meaning depends on Stimulation type
 default_var("Onint",125)		// Duration of burst (in ms) when burst stimulation is used
 default_var("Offint",0)		// Duration of rest interval between bursts (in ms) when burst stimulation is used
 default_var("PercentCellDeath",0)		// Percent of cells that are killed (removed), for cell types flagged for cell death
@@ -62,6 +61,7 @@ default_var("LFPCellTypes","pyramidalcell")		// semicolon separated list of cell
 default_var("SliceThickness",450)       // Thickness of a single horizontal (x-direction) slice in microns
 default_var("Slices",10)                // Desired number of contiguous (but disconnected) slices
 default_var("PrintNeuronSliceIds", 1)   // Flag to print the gid of the neuron and the slice it belongs to
-default_var("PercentArtActive", 100)    // Percent of artificial cells to be kept active
+default_var("PercentArtActive", 5)    // Percent of artificial cells to be kept active
 default_var("RandomSeedsCell", 0)		// Seed used by stimulation streams to vary the stimulating artifical cells in each run
-default_var("OnSetStim", 2)             // Onset time in ms, for stimulation from artificial cells
+default_var("OnSetStim", 1.0)           // Onset time in ms, for stimulation from artificial cells
+default_var("DegreeStim", 10)		    // Degree of stimulation; meaning depends on Stimulation type

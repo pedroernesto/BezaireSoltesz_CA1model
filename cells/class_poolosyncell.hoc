@@ -43,18 +43,18 @@ proc init() {
 	size_sections2()	// set the size dimensions of each section
 	size_sections3()	// set the size dimensions of each section
 	define_shape()
-	
+
 	// subcellular mechanisms: channels, pumps, transporters
 	mechinit()			// local fcn: set values for max conductances and reversal potentials of ion channels and other ephys parameters that are subject to fitting
 	insert_mechs()		// local fcn: insert ion channels and actually set values determined in the mechinit fcn
-	
+
 	set_nseg()		// set the number of segments in each section
 					// if this is driven by an error-minimization rule,
 					// make sure to do it after setting the morphology
 					// and inserting the mechanisms, as it depends on those
 	get_root()
 	rotate_shape()
-	
+
 	pre_list = new List() // define a list for the presynaptic connections
 	define_synapses($3)	// local fcn: define all possible synaptic connections received by this cell
 }
@@ -309,15 +309,15 @@ proc append_sections() { local i
 	axon[1] axon_list.append()
 	axon[0] all.append()
 	axon[0] axon_list.append()
-	
+
 	for i=0,NumSoma-1 soma[i] { all.append()
-								soma_list.append()}	
+								soma_list.append()}
 	for i=0,NumBasal-1 basal[i] { all.append()
-								basal_list.append()			
-								dendrite_list.append()}			
+								basal_list.append()
+								dendrite_list.append()}
 	for i=0,NumApical-1 apical[i] { all.append()
-								apical_list.append()	
-								dendrite_list.append()}	
+								apical_list.append()
+								dendrite_list.append()}
 
 
 
@@ -564,7 +564,7 @@ proc size_sections3() {
 	basal[56]  {nseg=5 diam= .4  L= 100.9536  }
 	basal[57]  {nseg=2 diam= .4  L= 32.70675  }
 	basal[58]  {nseg=8 diam= .4  L= 165.4767  }
-	basal[59]  {nseg=8 diam= .4  L= 161.9148  }	
+	basal[59]  {nseg=8 diam= .4  L= 161.9148  }
 }
 
 
@@ -587,7 +587,7 @@ proc mechinit() {
 	NumBasal=60
 	NumAxon=2
 
-	Rm = 28000 // 5555 // 
+	Rm = 28000 // 5555 //
 	RmDend = Rm/2
 	RmSoma = Rm
 	RmAx = Rm
@@ -597,10 +597,10 @@ proc mechinit() {
 	CmAx  = Cm
 	CmDend = Cm*2
 
-	celsius = 34.0  
+	celsius = 34.0
 
-	RaAll= 150 
-	RaSoma=150 
+	RaAll= 150
+	RaSoma=150
 	RaAx = 50
 
 
@@ -616,10 +616,10 @@ proc mechinit() {
 	gKvAprox = 0.008 // proximal KvA conductance in mho/cm2
 	gHCN     = 0.0006 // hcurrent conductance in mho/cm2 --> 6 pS/um2
 }
-	
+
 proc insert_mechs() {
 	access soma[5]
-	distance() // calculates the distance between location 0 of the currently accessed section (as the origin) to a second point (but with this usage, it just sets the origin point) 
+	distance() // calculates the distance between location 0 of the currently accessed section (as the origin) to a second point (but with this usage, it just sets the origin point)
 
 	axon[1] {
 		insert ch_Navaxonp gmax_ch_Navaxonp=gNavaxon
@@ -630,15 +630,15 @@ proc insert_mechs() {
 
 	axon[0] {
 		insert ch_Navaxonp  gmax_ch_Navaxonp=gNavaxon
-		insert ch_Kdrp  gmax_ch_Kdrp=gKdr 
+		insert ch_Kdrp  gmax_ch_Kdrp=gKdr
 		insert pas e_pas=eleakval g_pas = 1/RmAx Ra=RaAx cm=CmAx
 		insert ch_KvAproxp gmax_ch_KvAproxp = gKvAprox*0.2
 	}
 
-	for i=0,NumSoma-1 soma[i] {   
+	for i=0,NumSoma-1 soma[i] {
 		insert ch_HCNp gmax_ch_HCNp=gHCN
 		vhalfl_ch_HCNp=-82
-		insert ch_Navp  gmax_ch_Navp=gNav     
+		insert ch_Navp  gmax_ch_Navp=gNav
 		ar2_ch_Navp=1
 		insert ch_Kdrp gmax_ch_Kdrp=gKdr
 		insert ch_KvAproxp gmax_ch_KvAproxp = gKvAprox
@@ -646,9 +646,9 @@ proc insert_mechs() {
 	}
 
 	for i=0,NumBasal-1 basal[i] {
-		insert ch_Navp    gmax_ch_Navp=gNav   
+		insert ch_Navp    gmax_ch_Navp=gNav
 		ar2_ch_Navp=1
-		insert ch_Kdrp gmax_ch_Kdrp=gKdr 
+		insert ch_Kdrp gmax_ch_Kdrp=gKdr
 		insert ch_KvAproxp gmax_ch_KvAproxp = gKvAprox
 		insert pas e_pas=eleakval g_pas = 1/RmDend Ra=RaAll cm=CmDend
 	}
@@ -657,10 +657,10 @@ proc insert_mechs() {
 		insert pas e_pas=eleakval g_pas = 1/RmDend Ra=RaAll  cm=CmDend
 		if (diam>0.5 && distance(0.5)<500) {
 			insert ch_HCNp gmax_ch_HCNp = gHCN
-			insert ch_Navp 
+			insert ch_Navp
 			ar2_ch_Navp=0.8
 			gmax_ch_Navp=gNav
-			insert ch_Kdrp 
+			insert ch_Kdrp
 			gmax_ch_Kdrp=gKdr
 			insert ch_KvAproxp
 			insert ch_KvAdistp
@@ -703,7 +703,7 @@ proc position(){ local i
 			pt3dchange(i, $1-x+x3d(i), $2-y+y3d(i), $3-z+z3d(i), diam3d(i))
 		}
 	}
-	x = $1  y = $2  z = $3	
+	x = $1  y = $2  z = $3
 }
 
 proc get_root() {local i localobj sref
@@ -738,8 +738,8 @@ proc define_synapses() {
 		templist = new List ()
 		for r=0, cellType[ind].SynList[celltype].count()-1 {
 			execute(cellType[ind].SynList[celltype].object(r).NewSynStr, this) // sets newSecRef
-						
-			forsec newSecRef {		
+
+			forsec newSecRef {
 				for (x,0) {
 					execute(cellType[ind].SynList[celltype].object(r).CondStr, this)
 					 if (y==1) {
@@ -770,4 +770,5 @@ proc define_synapses() {
 		findme = 1
 	}
 }
+
 endtemplate poolosyncell

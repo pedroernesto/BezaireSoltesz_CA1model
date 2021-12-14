@@ -1,9 +1,9 @@
 : $Id: netstim.mod 2212 2008-09-08 14:32:26Z hines $
 : comments at end
 
-NEURON	{ 
+NEURON	{
   ARTIFICIAL_CELL MyNetStim
-  RANGE interval, number, start
+  RANGE interval, number, start, dur
   RANGE noise
   RANGE sid, cid
   RANGE xpos, ypos, zpos, gid, randi
@@ -16,6 +16,7 @@ PARAMETER {
 	number	= 10 <0,1e9>	: number of spikes (independent of noise)
 	start		= 50 (ms)	: start of first spike
 	noise		= 0 <0,1>	: amount of randomness (0.0 - 1.0)
+  dur     = 1 (ms) <1e-9,1e9>: time duration of stimulation (msec)
 	sid = -1 (1) : synapse id, from cell template
 	cid = -1 (1) : id of cell to which this synapse is attached
 	xpos = 0
@@ -56,7 +57,7 @@ INITIAL {
 		}
 		net_send(event, 3)
 	}
-}	
+}
 
 PROCEDURE init_sequence(t(ms)) {
 	if (number > 0) {
@@ -70,7 +71,7 @@ FUNCTION is_art() {
 	is_art=1
 }
 
-PROCEDURE position(a, b, c) { 
+PROCEDURE position(a, b, c) {
 	xpos = a
 	ypos = b
 	zpos = c
@@ -158,7 +159,7 @@ NET_RECEIVE (w) {
 			net_send(0, 1)
 		}
 	}
-	if (flag == 1 && on == 1) {
+	if (flag == 1 && on == 1 && t < start+dur ) {
 		ispike = ispike + 1
 		net_event(t)
 		next_invl()
@@ -202,4 +203,3 @@ net_send events. A change to the on==1 state immediately fires the first spike o
 its sequence.
 
 ENDCOMMENT
-
