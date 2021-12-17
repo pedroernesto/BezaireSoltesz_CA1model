@@ -446,7 +446,7 @@ objref CurrentShot
 proc insert_electrode() {
 	soma {
 		CurrentShot = new IClamp(0.5)       // Place a stimulating electrode on the cell
-		CurrentShot.amp = $1				// Ammplitude of the current pulse, in nA
+		CurrentShot.amp = $1				// Amplitude of the current pulse, in nA
 		CurrentShot.dur = $2             	// Duration of the pulse, in ms
 		CurrentShot.del = $3         		// Onset of the stimulus, in ms
 	}

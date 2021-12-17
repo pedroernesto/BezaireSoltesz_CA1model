@@ -14,23 +14,24 @@
 # kill -9 $pids
 
 Duration=20  # Biological time to be simulated, in ms
-Scale=170
-StimType="IClampPosition"
+Scale=110
+# StimType="IClampPosition"
 # StimStype="SpikesTrainSingleSpike"
 # StimStype="SpikesTrainVaryingFreq"
+StimType="SpikesTrainVaryingFreqPosition"
 Stimulation="CurrentShot_ca3cells_${StimType}"
-for j in $(seq 60 -10 15)
+for j in $(seq 25 1 115)
   do
-    for i in $(seq 0 0)
+    for i in $(seq 1 9)
       do
         RANDOM=$(date +%s)
         # PercentArtCells=${j}.${i}
         DegreeStim=${j}.${i}
-        result_dir="run_Sasaki_Scale_${Scale}_CurrentShot_${StimType}_0${j}_${i}_SimDuration_${Duration}_Procs_8"
+        result_dir="Scale_${Scale}_${StimType}_0${j}_${i}_SimDuration_${Duration}"
         mpiexec -n 8 x86_64/special -nobanner -nogui -mpi -c "strdef RunName" -c RunName="\"${result_dir}\"" \
                                                           -c "strdef Stimulation" -c Stimulation="\"${Stimulation}\"" \
                                                           -c "Scale=${Scale}" -c "SimDuration=${Duration}" -c "ComputeNpoleLFP=0" \
-                                                          -c "DegreeStim=${DegreeStim}" -c "TemporalResolution=0.025" \
+                                                          -c "DegreeStim=${DegreeStim}" -c "TemporalResolution=0.1" \
                                                           -c "RandomSeedsCell=${RANDOM}" -c "JobHours=25" main.hoc
                                                           # -c "PercentArtActive=${PercentArtCells}" \
 
