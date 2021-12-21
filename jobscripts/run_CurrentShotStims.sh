@@ -16,11 +16,11 @@
 Duration=20  # Biological time to be simulated, in ms
 Scale=110
 # StimType="IClampPosition"
-# StimStype="SpikesTrainSingleSpike"
-# StimStype="SpikesTrainVaryingFreq"
+# StimType="SpikesTrainSingleSpike"
+# StimType="SpikesTrainVaryingFreq"
 StimType="SpikesTrainVaryingFreqPosition"
 Stimulation="CurrentShot_ca3cells_${StimType}"
-for j in $(seq 25 1 115)
+for j in $(seq 53 1 115)
   do
     for i in $(seq 1 9)
       do
