@@ -22,7 +22,7 @@ StimType="SpikesTrainVaryingFreqPosition"
 Stimulation="CurrentShot_ca3cells_${StimType}"
 for j in $(seq 53 1 115)
   do
-    for i in $(seq 1 9)
+    for i in $(seq 0 0)
       do
         RANDOM=$(date +%s)
         # PercentArtCells=${j}.${i}
