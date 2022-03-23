@@ -213,4 +213,4 @@ Tau2a - for mixed GABA_AB synapses only (for all others this is blank), the deca
 ea - for mixed GABA_AB synapses only (for all others this is blank), the reversal potential of the GABA_A conductance of the synapse (mV)
 Tau1b - for mixed GABA_AB synapses only (for all others this is blank), the 10-90% rise time of the GABA_B conductance of the synapse (ms)
 Tau2b - for mixed GABA_AB synapses only (for all others this is blank), the decay time constant of the GABA_A conductance of the synapse (ms)
-eb - for mixed GABA_AB synapses only (for all others this is blank), the reversal potential of the GABA_A conductance of the synapse (mV)
+eb - for mixed GABA_AB synapses only (for all others this is blank), the reversal potential of the GABA_A conductance of the synapse (mV)https://www.thegeekstuff.com/2009/03/4-ways-to-identify-who-is-logged-in-on-your-linux-system/https://forum.fens.org/registration/#1575455611926-f9a43086-8959

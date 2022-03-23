@@ -37,11 +37,11 @@ not be innervated and therefore will not be used during the
 simulation, while other objects may be innervated multiple times.
 ************************************************************/
 begintemplate SynStore			// Define a template that stores
-														//  information about synapse
-														//  types and locations for a
-														//  given combination of pre-
-														//  synaptic and postsynaptic
-														//  cell types.
+								//  information about synapse
+								//  types and locations for a
+								//  given combination of pre-
+								//  synaptic and postsynaptic
+								//  cell types.
 
 	// Public variables, accessible from outside template
 	public init, SecRefStr,CheckCond1,CheckCond2
@@ -53,27 +53,27 @@ begintemplate SynStore			// Define a template that stores
 	strdef CheckCond1,CheckCond2, SynType, Scaling
 
 	proc init(){			// Define a proc to set the parameters
-										//  upon creation of SynStore object
+							//  upon creation of SynStore object
 
 		SecRefStr = $s1		// String that gives the same of the
-											//  section list containing all sections
-											//  that can possible have this synapse
-											//  type
+							//  section list containing all sections
+							//  that can possible have this synapse
+							//  type
 
 		SynType = $s2		// Synapse mechanism (corresponding to a
-										//  a synapse definition in a mod file)
+							//  a synapse definition in a mod file)
 
 		CheckCond1 = $s3	// A condition that a point in a section
-											//  must satisfy for a synapse to be
-											//  created at that point. Usually is
-											//  a minimum distance that the point
-											//  must be away from the soma
+							//  must satisfy for a synapse to be
+							//  created at that point. Usually is
+							//  a minimum distance that the point
+							//  must be away from the soma
 
 		CheckCond2 = $s4	// A 2nd condition that a point in a
-											//  section must satisfy for a synapse
-											//  to be created at that point. Usually
-											//  is a maximum distance that the point
-											//  must be away from the soma
+							//  section must satisfy for a synapse
+							//  to be created at that point. Usually
+							//  is a maximum distance that the point
+							//  must be away from the soma
 
 		if (strcmp(SynType,"ExpGABAab")==0) {	// A GABA_A,B synapse
 			GABAabFlag=1
@@ -95,9 +95,9 @@ begintemplate SynStore			// Define a template that stores
 			efirst = $7				// Reversal potential of synapse
 
 			if (strcmp(SynType,"MyExp2Sidnw")==0) {	// If using a mechanism
-																							//  that allows weight
-																							//  to scale with
-																							//  distance
+													//  that allows weight
+													//  to scale with
+													//  distance
 
 				sprint(Scaling,"syn.nw = %s", $s8)	// Scaling equation
 			}
@@ -109,19 +109,19 @@ begintemplate SynStore			// Define a template that stores
 		//  contents of the SynStores associated with that postsynaptic cell
 
 		sprint(NewSynStr,"newSecRef = %s", SecRefStr)	// Command to define reference
-																									//  to section list where
-																									//  synapses of this type can
-																									//  be made
+														//  to section list where
+														//  synapses of this type can
+														//  be made
 
 		sprint(SynStr,"syn = new %s(x)", SynType) 	// Command to define the synapse
-																								//  mechanism to use (ex: ExpGABAab,
-																								//  MyExp2Sidnw, MyExp2Sid
+													//  mechanism to use (ex: ExpGABAab,
+													//  MyExp2Sidnw, MyExp2Sid
 
 		sprint(CondStr,"y=(5e-6+%s && 5e-6+%s)", CheckCond1, CheckCond2)	// Command to
-																																			//  define conditions
-																																			//  to check for points
-																																			//  along section where
-																																			//  synapses are to be made
+																			//  define conditions
+																			//  to check for points
+																			//  along section where
+																			//  synapses are to be made
 
 	}
 

@@ -8,38 +8,70 @@
 # or simply by using the source alias (.):
 # . run_CurrentShotStims.sh
 
+# Remotely:
+# nohup bash -c "source ./jobscripts/run_CurrentShotStims.sh" > sim.log &
+
 # Before launching a new parallel simulation, it may be useful
 # to find the PIDs of 'nrniv' processes  still active and kill them:
 # pids=$(echo $(/bin/ps r -o pid,cmd|grep "nrniv"| grep -v "grep"|awk '{print $1}'))
 # kill -9 $pids
+#
+# A better option:
+# killall -TERM mpiexec
 
 Duration=20  # Biological time to be simulated, in ms
 Scale=110
 # StimType="IClampPosition"
-# StimType="SpikesTrainSingleSpike"
+StimType="SpikesTrainSingleSpike"
 # StimType="SpikesTrainVaryingFreq"
-StimType="SpikesTrainVaryingFreqPosition"
+# StimType="SpikesTrainVaryingFreqPosition"
+# StimType="Spikes4TrainVaryingFreqPosition"
+
+SUB='Freq'
+if [[ "$StimType" == *"$SUB"* ]]
+then
+    sed -i 's/ppvec/ppspont/g' datasets/cellnumbers_115.dat
+    cat datasets/cellnumbers_115.dat
+else
+    sed -i 's/ppspont/ppvec/g' datasets/cellnumbers_115.dat
+    cat datasets/cellnumbers_115.dat
+fi
+
 Stimulation="CurrentShot_ca3cells_${StimType}"
-for j in $(seq 53 1 115)
+for j in $(seq 1 1 25)
   do
-    for i in $(seq 0 0)
+    for i in $(seq 3 2 7)
       do
+      	if [[ j -lt 10 ]]
+      	then
+          result_dir="Scale_${Scale}_${StimType}_000${j}_${i}_SimDuration_${Duration}"
+        elif [[ j -ge 10 && j -lt 100 ]]
+      	then
+          result_dir="Scale_${Scale}_${StimType}_00${j}_${i}_SimDuration_${Duration}"
+        else
+          result_dir="Scale_${Scale}_${StimType}_0${j}_${i}_SimDuration_${Duration}"
+      	fi
+
         RANDOM=$(date +%s)
-        # PercentArtCells=${j}.${i}
-        DegreeStim=${j}.${i}
-        result_dir="Scale_${Scale}_${StimType}_0${j}_${i}_SimDuration_${Duration}"
-        mpiexec -n 8 x86_64/special -nobanner -nogui -mpi -c "strdef RunName" -c RunName="\"${result_dir}\"" \
-                                                          -c "strdef Stimulation" -c Stimulation="\"${Stimulation}\"" \
-                                                          -c "Scale=${Scale}" -c "SimDuration=${Duration}" -c "ComputeNpoleLFP=0" \
-                                                          -c "DegreeStim=${DegreeStim}" -c "TemporalResolution=0.1" \
-                                                          -c "RandomSeedsCell=${RANDOM}" -c "JobHours=25" main.hoc
-                                                          # -c "PercentArtActive=${PercentArtCells}" \
+      	if [[ "$StimType" == *"$SUB"* ]]
+        then
+  	       DegreeStim=${j}.${i}
+  	        cmd_str="-c DegreeStim=${DegreeStim} -c TemporalResolution=0.1 "
+        else
+  	       PercentArtCells=${j}.${i}
+  	        cmd_str="-c PercentArtActive=${PercentArtCells} "
+        fi
+        # mpiexec --use-hwthread-cpus --map-by ppr:32:node:pe=1 ./x86_64/special ......
+        mpiexec  -n 32 ./x86_64/special -nobanner -nogui -mpi -c "strdef RunName" -c RunName="\"${result_dir}\"" \
+								-c "strdef Stimulation" -c Stimulation="\"${Stimulation}\"" \
+								-c "Scale=${Scale}" -c "SimDuration=${Duration}" -c "ComputeNpoleLFP=0" \
+								${cmd_str} -c "RandomSeedsCell=${RANDOM}" -c "JobHours=25" main.hoc
 
         # Concatenate all spikeraster data
         cd ./results/${result_dir}
         # echo ${PWD}
-        cat spikeraster_{0..7}.dat | sort > spikeraster.dat
-        # rm spikeraster.dat
+        cat spikeraster_*.dat | sort > spikeraster.dat
+        rm spikeraster_*.dat subconns_*.dat trace_*.dat
         cd ../..
 
       done
