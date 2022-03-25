@@ -21,6 +21,6 @@ begintemplate ppstim
 
 	func is_art() {return 1}
 
-	proc connect_pre() {acell $o2 = new NetCon(pp, $o1)}
+	proc connect_pre() {$o2 = new NetCon(pp, $o1)}
 
 endtemplate ppstim
