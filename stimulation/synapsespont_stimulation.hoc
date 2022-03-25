@@ -1,0 +1,56 @@
+// Connect a NetStim Poisson input to each synapse created, to ensure
+// a baseline activity as in a slice immersed in a chemical bath
+
+stimulateSynapses() { local i, pci, typei, jgid, celltype, stimcelltype, localobj ns, synapse
+
+    gid = ncell
+	pc.barrier() // Wait for all processors to get to this point
+	for rank = 0, pc.nhost-1 {				// For each processor, allow processor to stimulate its hosted synapses
+		if (rank == pc.id) {				// Ensure that each processor runs once
+			for i=0, nclist.count -1 {		// For each synapse in the list of all synapses
+
+				synapse = nclist.o(i).syn		   // Get a reference to the synapse object on the target cell
+
+                // Connect point-processes to synpase objects
+                ns = new ppstim()           // Create a point-processes stimulation object
+                setNetStim(gid, ns)
+
+                // Using NetCon, as the NetStim 'cell' and target synapse are owned by the same (current) host process
+                NetCon(ns, synapse, 1.0, 0.0) // 0 ms delay
+
+                // Using gid_connect, however the NetStim 'cell' and target synapse are owned by the same (current) host process
+                //srcid = gid    	// Get the gid of the point-processes stimulation object
+                //nc_appendstim(srcid, synapse, 1.0, 0.0) // 0 ms delay
+
+                gid += 1
+			}
+		}
+		pc.barrier()	// All the other processors wait for
+	}					//  the connecting one to finish, so that they each take turns.
+
+}
+stimulateSynapses()   // Make connections between point-processes and synpase objects
+
+setNetStim() { local gid localobj acell, rs
+    gid = $1
+    acell = $o1
+
+    rs = new RandomStream(1+RandomSeedsStim, gid + 5*ncell)) 	// Create a new random number generator for each cell, used by
+																//  netstims for setting spont stim.
+    rs.negexp(1) 	// Using a negative exponential distribution to determine
+                    //  the interspike interval (ISI) gives Poisson-distributed
+                    //  spike times. Always use 1 as the argument; the interval
+                    //  for the netstim will set the 'rate' (or average ISI).
+	acell.noiseFromRandom(rs)	// Set this random stream as the random number
+								//  generator for the noise functionality of
+								//  the spike generator.
+
+	// cells.append(cellType[cellind].CellList[ij])	// Append each cell to cells list
+	// cellType[cellind].numThisHost = ij+1 // set number of cells of this type on this host (but add 1 b/c ij is zero based)
+	// cells2make.x[gid]=gid
+
+	acell.connect_pre(nil, nc)	// Create an empty connection for use by the spike detector
+	// pc.acell(gid, nc)			// Associate the cell with its gid and its spike generation location
+
+	nc = nil 	// Then clear the reference to the netcon object, which should destroy the netcon (because all refs would have been removed)
+}

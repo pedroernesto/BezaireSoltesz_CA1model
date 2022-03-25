@@ -18,7 +18,8 @@ begintemplate ppspont
 			pp.start = -1
 			pp.gid = $1
 			pp.randi = $2
-		}
+	}
+	
 	proc setnoiseFromRandom() {
 		pp.noiseFromRandom($o1)
 	}

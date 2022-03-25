@@ -1,20 +1,26 @@
 begintemplate ppstim
 
-	public pp, connect_pre, is_art, acell
-	create acell
+	public pp, connect_pre, is_art, noiseFromRandom, setnoiseFromRandom
 	objref pp
 
 	proc init() {
 		actemp()
 	}
 	proc actemp() {
-		acell pp = new MyNetStim(.5)
-		pp.interval = 100
+		pp = new MyNetStim(.5)
+		pp.interval = 1e9
 		pp.number = 1
-		pp.start = 5
+		pp.start = 0
+		pp.noise = 1
+		pp.dur = 1e9
+	}
+
+	proc setnoiseFromRandom() {
+		pp.noiseFromRandom($o1)
 	}
 
 	func is_art() {return 1}
+
 	proc connect_pre() {acell $o2 = new NetCon(pp, $o1)}
 
 endtemplate ppstim

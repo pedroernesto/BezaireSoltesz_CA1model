@@ -348,13 +348,6 @@ func connectCells () {local r, syn, distance, counter, precellType, postcellType
 							nc_append(conns2make.x[r], postgid, precellType, randSynNumber, synWeight + (conns2make.x[r]+1)*1000, conDelay)
 						}
 
-						// Connect a NetStim Poisson input to each synapse created, to ensure
-						// a baseline activity as in a slice immersed in a chemical bath
-						/*
-						for j=0, cell.pre_list.o(precellType).o(randSynNumber).count-1 {	// Iterate through each synapse in the list
-							nc_appendstim( nslist.o(j), cell.pre_list.o(precellType).o(randSynNumber).o(j) )
-						}
-						*/
 					}
 					counter +=1	// After all of the synapses are formed for a single connection, increment the connection counter by 1
 					}

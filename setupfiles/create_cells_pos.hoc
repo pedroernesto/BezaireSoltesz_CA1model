@@ -54,16 +54,16 @@ proc createCells(){ local i, ij, si, pci, cellind, runresult, gid	// Create cell
 				//  think about all the confounding factors).
 
 				ransynlist.append(new RandomStream(1+RandomSeedsConn, gid + 1*ncell)) 	// Create a new random number generator for each cell, 														//	with a unique stream. This will be used to determine
-																																								//	what type of synapse is used in connections
+																						//	what type of synapse is used in connections
 
 				ranwgtlist.append(new RandomStream(1+RandomSeedsConn, gid + 4*ncell)) 	// Create a new random number generator for each cell, used to
-																																								//  set variable synapse weights
+																						//  set variable synapse weights
 
 				ranstimlist.append(new RandomStream(1+RandomSeedsStim, gid + 2*ncell)) 	// Create a new random number generator for each cell, used by
-																																								//  netstims for setting spont stim.
+																						//  netstims for setting spont stim.
 
 				raninitlist.append(new RandomStream(1+RandomSeedsStim, gid + 3*ncell)) 	// Create a new random number generator for each cell, used to
-																																								//  set variable initial voltage
+																						//  set variable initial voltage
 
 				ranlfplist.append(new RandomStream(1+RandomSeedsStim, gid + 4*ncell)) 	// Create a new random number generator for each cell, used to
 		                                                                                //  determine whether cell provides a small contribution to the
