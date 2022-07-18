@@ -35,7 +35,8 @@ proc setCurrentShotAmplitude() {local idx, reli, typei, jgid, slice_idx, p_exp l
 
 		p_exp = 1.0/$3*exp(-sqrt((cell.x-$1)*(cell.x-$1) + (cell.y-$2)*(cell.y-$2))/$3)
         if ( slice_idx==$4 &&  r.repick() < p_exp ) {
-            // Use class_cutsuridiscell.hoc (or other real neuron model) as NEURON template for ca3cells
+            // Use class_cutsuridiscell.hoc (or other real neuron model) as NEURON template for ca3cells,
+			// at cellnumbers_xxx.dat file
             // DegreeStim must be given in [nA). Note that V is in [mV] and R in [MegaOhm].
             // So, I = V/R gives 10^(-3) V / 10^(6) Ohm ~ 10^(-9) A = 1 nA
             // DegreeStim should be given in [nA], but note that is in the range 60uA-270uA in Sasaki's experiment

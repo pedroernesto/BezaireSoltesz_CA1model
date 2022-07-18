@@ -46,7 +46,7 @@ proc setCurrentShotAmplitude() {local idx, reli, typei, jgid, slice_idx, p_exp l
 			cell.interval = 78.0/(1 + (DegreeStim-1)*p_exp)
 			// print sqrt((cell.xpos-$1)*(cell.xpos-$1) + (cell.ypos-$2)*(cell.ypos-$2))/$3, " ---> ", cell.interval
             cell.start = OnSetStim      // Onset time in ms, for stimulation from artificial cells
-            // Use class_ppspont.hoc as NEURON template for ca3cells
+            // Use class_ppspont.hoc as NEURON template for ca3cells, at cellnumbers_xxx.dat file
             cell.dur = 2.0             // Time duration in ms, for stimulation from artificial cells
             ranstimlist.object(reli).r.negexp(1) 	// Using a negative exponential distribution to determine
                                                     //  the interspike interval (ISI) gives Poisson-distributed

@@ -55,7 +55,7 @@ proc setCurrentShotAmplitude() {local targetCircuit_length, NumSlices, reli, typ
                     for pcitr(&reli, &typei, &jgid, cellType[idx].cellStartGid, cellType[idx].cellEndGid) {
                         cell = pc.gid2cell(jgid)	// Create a reference to the artificial cell
                         if (pc.gid_exists(jgid) && jgid==rgid && cell.start==-1) {  // Ensure that the picked cell is not already activated
-                            // Use class_ppvec.hoc as NEURON template for ca3cells
+                            // Use class_ppvec.hoc as NEURON template for ca3cells, at cellnumbers_xxx.dat file
                             cell.start = OnSetStim      // Onset time in ms, for stimulation from artificial cells
                             ranstimlist.object(reli).r.negexp(1) 	// Using a negative exponential distribution to determine
                                                                     //  the interspike interval (ISI) gives Poisson-distributed
