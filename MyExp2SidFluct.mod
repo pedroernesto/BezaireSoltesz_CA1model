@@ -95,8 +95,8 @@ BREAKPOINT {
 }
 
 PROCEDURE noisy_dyn() { : use grand()
-  A =  A * exp_A + amp_A * normrand(0,1)
-  B =  B * exp_B + amp_B * normrand(0,1)
+  A =  A * exp_A + amp_A * grand()
+  B =  B * exp_B + amp_B * grand()
 }
 
 PROCEDURE new_seed(seed) {		: procedure to set the seed
