@@ -1,6 +1,6 @@
 89
 bistratifiedcell ca3cell MyExp2Sid dendrite_list distance(x)>50 distance(x)<200  2.000000 6.300000 0.000000
-bistratifiedcell bistratifiedcell MyExp2Sid dendrite_list distance(x)>50 distance(x)<200  0.287000 2.670000 -60.000000      
+bistratifiedcell bistratifiedcell MyExp2Sid dendrite_list distance(x)>50 distance(x)<200  0.287000 2.670000 -60.000000
 bistratifiedcell cckcell MyExp2Sid dendrite_list distance(x)>-1 distance(x)<50  0.432000 4.490000 -60.000000
 bistratifiedcell cckcell MyExp2Sid soma_list distance(x)>-1 distance(x)<1000  0.432000 4.490000 -60.000000
 bistratifiedcell ivycell MyExp2Sid dendrite_list distance(x)>50 distance(x)<200  2.900000 3.100000 -60.000000

@@ -1,27 +1,83 @@
-// Connect a NetStim Poisson input to each synapse created, to ensure
+// Connect a NetStim Poisson input to each synapse from ca3cell type cells, to ensure
 // a baseline activity as in a slice immersed in a chemical bath
 
-proc stimulateSynapses() { local gid, i, rank localobj synapse, ns
+// objref nconlist[nclist.count]
+// print "nconlist.count = ", nconlist.len()
+// nconlist = new List()
+
+// load_file("./cells/class_ppstim.hoc")
+
+proc stimulateSynapses() { local gid, i, rank, reli, typei, jgid, idx localobj synapse, ns, nil, cell, rs
+
+	for idx=0, numCellTypes-1 {
+    	if (strcmp(cellType[idx].cellType_string, "ca3cell")==0) {	// Find the gid range of the ca3cell cells
+            break
+        }
+    }
 
     gid = ncell
 	pc.barrier() // Wait for all processors to get to this point
 	for rank = 0, pc.nhost-1 {				// For each processor, allow processor to stimulate its hosted synapses
 		if (rank == pc.id) {				// Ensure that each processor runs once
+            for pcitr(&reli, &typei, &jgid, cellType[idx].cellStartGid, cellType[idx].cellEndGid) {
+                ns = pc.gid2cell(jgid)	// Create a reference to the artificial cell
+                if (pc.gid_exists(jgid) && ns.start==-1) {  // Ensure that the picked cell is not already activated
+                    ns.start = 0      // Onset time in ms, for stimulation from artificial cells
+                    // Use class_ppspont.hoc as NEURON template for ca3cells, at cellnumbers_xxx.dat file
+                    ns.dur = 1e9             // Time duration in ms, for stimulation from artificial cells
+
+                    ranstimlist.object(reli).r.negexp(1) 	// Using a negative exponential distribution to determine
+                                                            //  the interspike interval (ISI) gives Poisson-distributed
+                                                            //  spike times. Always use 1 as the argument; the interval
+                                                            //  for the netstim will set the 'rate' (or average ISI).
+                                                            //
+                                                            // For another example (which defines the randomstream class
+                                                            //  differently, and therefore calls different commands at
+                                                            //  different times) see the following file:
+                                                            // <http://senselab.med.yale.edu/modeldb/showmodel.asp?model=83319&file=\destexhe_benchmarks\NEURON\common\netstim.hoc>
+                    ns.noiseFromRandom(ranstimlist.object(reli).r)	// Set this random stream as the random number
+                                                                        //  generator for the noise functionality of
+                                                                        //  the spike generator
+                    break
+                }
+            }
+
 			for i=0, nclist.count -1 {		// For each synapse in the list of all synapses
 
 				synapse = nclist.o(i).syn		   // Get a reference to the synapse object on the target cell
 
                 // Connect point-processes to synpase objects
 
-                ns = new ppstim()           // Create a point-processes stimulation object
-                setNetStim(gid,ns)
-
+                // ns = new ppstim()           // Create a point-processes stimulation object
+                // ns = new NetStim()
                 // Using NetCon instead of gid_connect, as the NetStim 'cell' and target synapse are owned by the same (current) host process
-                ns.connect_pre(synapse)
+                // ns.connect_pre(synapse, nc)
+
+                /*
+                nconlist[i] = new NetCon(ns, synapse)
+                nconlist[i].weight = 1
+                nconlist[i].delay = 0
+                nconlist[i].threshold = 0
+                */
+                // cell = pc.gid2cell(synapse.cid)
+                // cell.soma[0] nc = new NetCon(ns,nil)
+                nc = new NetCon(ns,synapse)
+                // nc = pc.gid_connect(gid, pc.gid2cell(synapse.cid))
+                nc.weight = 1
+                nc.delay = 0
+                nc.threshold = 10
+
+                // setNetStim(gid,ns)
+                ns.start = 0
+                ns.number = 1e9
+                ns.noise = 1
+                ns.interval = 1
+				print "ns.event = " , ns.pp.event
+                // print "OK....", ns, ns.start, ns.number, ns.interval, ns.noise, synapse, nc.threshold
 
                 // Using gid_connect, however the NetStim 'cell' and target synapse are owned by the same (current) host process
-                //srcid = gid    	// Get the gid of the point-processes stimulation object
-                //nc_appendstim(srcid, synapse, 1.0, 0.0) // 0 ms delay
+                // srcid = gid    	// Get the gid of the point-processes stimulation object
+                // nc_appendstim(srcid, synapse, 1.0, 0.0) // 0 ms delay
 
                 gid += 1
 			}
@@ -31,13 +87,16 @@ proc stimulateSynapses() { local gid, i, rank localobj synapse, ns
 
 }
 
-func setNetStim() { local gid localobj ns, rs
+proc setNetStim() { local gid localobj ns, rs, nil, nc
 
     gid = $1
-    ns = $o1
+    ns = $o2
 
-    rs = new RandomStream(1+RandomSeedsStim, gid + 5*ncell) 	// Create a new random number generator for each cell, used by
-																//  netstims for setting spont stim.
+    rs = new Random()
+    rs.Random123(1, 2, 3)
+
+    // rs = new RandomStream(1+RandomSeedsStim, gid + 1*ncell) 	// Create a new random number generator for each cell, used by
+															    // netstims for setting spont stim.
     rs.negexp(1) 	// Using a negative exponential distribution to determine
                     //  the interspike interval (ISI) gives Poisson-distributed
                     //  spike times. Always use 1 as the argument; the interval
@@ -50,11 +109,11 @@ func setNetStim() { local gid localobj ns, rs
 	// cellType[cellind].numThisHost = ij+1 // set number of cells of this type on this host (but add 1 b/c ij is zero based)
 	// cells2make.x[gid]=gid
 
-	ns.connect_pre(nil, nc)	// Create an empty connection for use by the spike detector
+	// ns.connect_pre(nil, nc)	// Create an empty connection for use by the spike detector
 	// pc.acell(gid, nc)			// Associate the cell with its gid and its spike generation location
 
-    nc = nil 	// Then clear the reference to the netcon object, which should destroy the netcon (because all refs would have been removed)
+    // nc = nil 	// Then clear the reference to the netcon object, which should destroy the netcon (because all refs would have been removed)
 
 }
 
-stimulateSynapses()    // Make connections between point-processes and synpase objects
+stimulateSynapses()    // Make connections between point-processes and synapse objects

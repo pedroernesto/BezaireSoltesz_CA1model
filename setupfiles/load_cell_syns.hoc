@@ -72,7 +72,8 @@ proc syn_cells() {localobj mySynStore
 			f2c.scanstr(Scaling)				//  factor, load that factor here
 		}
 
-		if (strcmp(SynType,"ExpGABAab")==0) {				// For GABA_A,B synapses, which have extra
+		if (strcmp(SynType,"ExpGABAab")==0 || strcmp(SynType,"ExpGABAabFluct")==0) {
+															// For GABA_A,B synapses, which have extra
 			tau1a = f2c.scanvar								//  components for their GABA_B portion (time
 			tau2a = f2c.scanvar								//  constants and reversal potentials), load
 			ea = f2c.scanvar								//  both the A and B components
@@ -89,7 +90,7 @@ proc syn_cells() {localobj mySynStore
 		sprint(cmdstr1, "%s_idx", post_type)
 		if ((name_declared(cmdstr) > 0) && (name_declared(cmdstr1) > 0)) {	// Create the synapse object that
 																																				//  consolidates all this info
-			if (strcmp(SynType,"ExpGABAab")==0) {
+			if (strcmp(SynType,"ExpGABAab")==0 || strcmp(SynType,"ExpGABAabFluct")==0) {
 				mySynStore = new SynStore(SecRefStr,SynType,CheckCond1,CheckCond2,tau1a,tau2a,ea,tau1b,tau2b,eb)
 			} else {
 				if (strcmp(SynType,"MyExp2Sidnw")==0) {

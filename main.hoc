@@ -102,7 +102,6 @@ proc loadCellTemplates(){local i		// Proc to load the template that defines (eac
 	}
 }
 loadCellTemplates()
-load_file("./cells/class_ppstim.hoc")
 
 // The content of the following code was already executed, as part of the the Cell templates loading (done above)
 /*
@@ -374,12 +373,16 @@ MakeArtConns=1
 
 zzz = mallinfo(zzz, "After connecting cells")	// Record the memory usage after creating the connections
 
+{sprint(cmd,"./stimulation/%s_stimulation.hoc", "synapsespont_noise")}
+//{load_file(cmd)}
+
 {sprint(cmd,"./stimulation/%s_stimulation.hoc", Stimulation)}
 {load_file(cmd)}			// Loads in a particular algorithm to stimulate the network. The algorithm
 							//  will always specify the spike properties (or actual spike trains) of the
 							//  artificial cells in the model, and for some cases will also specify the
 							//  connectivity from the artificial (stimulating) cells to the real cells of
 							//  the model.
+
 
 zzz = mallinfo(zzz, "After defining stimulation")	// Record the memory usage after defining stimulation
 

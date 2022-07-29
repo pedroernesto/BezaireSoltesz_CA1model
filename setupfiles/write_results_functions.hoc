@@ -417,6 +417,7 @@ proc printNeuronGidSliceId() {local celltype, gid, slice_index  localobj f
 }
 
 // Print a list with all the gid of CA3 cells, the slice each cell belongs to, and its stimulus onset attribute (start)
+/*
 proc printArtGidSliceId() {local celltype, reli, typei, gid, slice_index  localobj f
 	pc.barrier()									// Wait for all processors to get to this point
 	sprint(cmd,"./results/%s/neuronArt_slice_ids.dat", RunName)
@@ -447,3 +448,4 @@ proc printArtGidSliceId() {local celltype, reli, typei, gid, slice_index  localo
 		pc.barrier()		// Make sure each processor waits its turn.
 	}
 }
+*/

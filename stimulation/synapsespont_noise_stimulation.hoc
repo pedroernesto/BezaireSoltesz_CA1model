@@ -1,0 +1,24 @@
+
+proc stimulateSynapses() { local gid, i, rank localobj synapse, cell, rs
+
+	pc.barrier() // Wait for all processors to get to this point
+	for rank = 0, pc.nhost-1 {				// For each processor, allow processor to stimulate its hosted synapses
+		if (rank == pc.id) {				// Ensure that each processor runs once
+
+			for i=0, nclist.count -1 {				// For each synapse in the list of all synapses
+				synapse = nclist.o(i).syn		   // Get a reference to the synapse object on the target cell
+
+				// cell = pc.gid2cell(synapse.cid)    // Postsynaptic cell the current synapse is attached to
+
+				rs = new RandomStream(1+RandomSeedsConn, synapse.sid + 1*nclist.count)
+				rs.r.uniform(0,1)
+				synapse.noiseFromRandom(rs.r)
+			}
+
+		}
+		pc.barrier()	// All the other processors wait for
+					    //  the connecting one to finish, so that they each take turns.
+	}
+}
+
+stimulateSynapses()

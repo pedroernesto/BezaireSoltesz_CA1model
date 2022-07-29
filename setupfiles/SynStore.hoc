@@ -75,7 +75,7 @@ begintemplate SynStore			// Define a template that stores
 							//  is a maximum distance that the point
 							//  must be away from the soma
 
-		if (strcmp(SynType,"ExpGABAab")==0) {	// A GABA_A,B synapse
+		if (strcmp(SynType,"ExpGABAab")==0 || strcmp(SynType,"ExpGABAabFluct")==0) {	// A GABA_A,B synapse
 			GABAabFlag=1
 
 			// GABA A component

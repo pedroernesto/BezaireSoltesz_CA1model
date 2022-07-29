@@ -1,5 +1,5 @@
 : $Id: netstim.mod 2212 2008-09-08 14:32:26Z hines $
-: comments at end
+: comments at end 
 
 NEURON	{
   ARTIFICIAL_CELL MyNetStim

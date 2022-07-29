@@ -20,7 +20,7 @@
 # killall -TERM mpiexec
 
 Duration=20  # Biological time to be simulated, in ms
-Scale=110
+Scale=500
 # StimType="IClampPosition"
 StimType="SpikesTrainSingleSpike"
 # StimType="SpikesTrainVaryingFreq"
@@ -37,10 +37,11 @@ else
     cat datasets/cellnumbers_115.dat
 fi
 
+# Stimulation="synapsespont"
 Stimulation="CurrentShot_ca3cells_${StimType}"
-for j in $(seq 1 1 25)
+for j in $(seq 25 1 25)
   do
-    for i in $(seq 3 2 7)
+    for i in $(seq 3 2 3)
       do
       	if [[ j -lt 10 ]]
       	then
@@ -56,13 +57,13 @@ for j in $(seq 1 1 25)
       	if [[ "$StimType" == *"$SUB"* ]]
         then
   	       DegreeStim=${j}.${i}
-  	        cmd_str="-c DegreeStim=${DegreeStim} -c TemporalResolution=0.1 "
+  	       cmd_str="-c DegreeStim=${DegreeStim} -c TemporalResolution=0.1 "
         else
   	       PercentArtCells=${j}.${i}
-  	        cmd_str="-c PercentArtActive=${PercentArtCells} "
+  	       cmd_str="-c PercentArtActive=${PercentArtCells} "
         fi
         # mpiexec --use-hwthread-cpus --map-by ppr:32:node:pe=1 ./x86_64/special ......
-        mpiexec  -n 32 ./x86_64/special -nobanner -nogui -mpi -c "strdef RunName" -c RunName="\"${result_dir}\"" \
+        mpiexec  -n 8 ./x86_64/special -nobanner -nogui -mpi -c "strdef RunName" -c RunName="\"${result_dir}\"" \
 								-c "strdef Stimulation" -c Stimulation="\"${Stimulation}\"" \
 								-c "Scale=${Scale}" -c "SimDuration=${Duration}" -c "ComputeNpoleLFP=0" \
 								${cmd_str} -c "RandomSeedsCell=${RANDOM}" -c "JobHours=25" main.hoc
