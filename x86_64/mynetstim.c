@@ -587,7 +587,7 @@ _first = 0;
 static const char* nmodl_filename = "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/mynetstim.mod";
 static const char* nmodl_file_text = 
   ": $Id: netstim.mod 2212 2008-09-08 14:32:26Z hines $\n"
-  ": comments at end\n"
+  ": comments at end \n"
   "\n"
   "NEURON	{\n"
   "  ARTIFICIAL_CELL MyNetStim\n"

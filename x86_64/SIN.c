@@ -215,7 +215,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
   hoc_register_dparam_semantics(_mechtype, 0, "area");
   hoc_register_dparam_semantics(_mechtype, 1, "pntproc");
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 sinstim /users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/SIN.mod\n");
+ 	ivoc_help("help ?1 sinstim /home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/SIN.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -353,7 +353,7 @@ _first = 0;
 #endif
 
 #if NMODL_TEXT
-static const char* nmodl_filename = "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/SIN.mod";
+static const char* nmodl_filename = "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/SIN.mod";
 static const char* nmodl_file_text = 
   "INDEPENDENT {t FROM 0 TO 1 WITH 1 (ms)}\n"
   "\n"

@@ -215,7 +215,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
   hoc_register_dparam_semantics(_mechtype, 3, "ca_ion");
  	hoc_register_cvode(_mechtype, _ode_count, 0, 0, 0);
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 ch_KCaS /users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/ch_KCaS.mod\n");
+ 	ivoc_help("help ?1 ch_KCaS /home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/ch_KCaS.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -419,7 +419,7 @@ _first = 0;
 }
 
 #if NMODL_TEXT
-static const char* nmodl_filename = "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/ch_KCaS.mod";
+static const char* nmodl_filename = "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/ch_KCaS.mod";
 static const char* nmodl_file_text = 
   "TITLE calcium-activated potassium channel (non-voltage-dependent)\n"
   "\n"

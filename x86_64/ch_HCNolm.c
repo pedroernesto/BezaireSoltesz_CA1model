@@ -229,7 +229,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
  	hoc_register_cvode(_mechtype, _ode_count, _ode_map, _ode_spec, _ode_matsol);
  	hoc_register_tolerance(_mechtype, _hoc_state_tol, &_atollist);
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 ch_HCNolm /users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/ch_HCNolm.mod\n");
+ 	ivoc_help("help ?1 ch_HCNolm /home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/ch_HCNolm.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -577,7 +577,7 @@ _first = 0;
 }
 
 #if NMODL_TEXT
-static const char* nmodl_filename = "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/ch_HCNolm.mod";
+static const char* nmodl_filename = "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/ch_HCNolm.mod";
 static const char* nmodl_file_text = 
   "TITLE Hyperpolarization-activated, CN-gated channel (voltage dependent, for O-LM cells)\n"
   "\n"

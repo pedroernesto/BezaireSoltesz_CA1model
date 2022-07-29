@@ -170,7 +170,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
 #endif
   hoc_register_prop_size(_mechtype, 6, 0);
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 ch_leak /users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/ch_leak.mod\n");
+ 	ivoc_help("help ?1 ch_leak /home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/ch_leak.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -292,7 +292,7 @@ _first = 0;
 }
 
 #if NMODL_TEXT
-static const char* nmodl_filename = "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/ch_leak.mod";
+static const char* nmodl_filename = "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/ch_leak.mod";
 static const char* nmodl_file_text = 
   "TITLE leak conductance (voltage independent)\n"
   "\n"

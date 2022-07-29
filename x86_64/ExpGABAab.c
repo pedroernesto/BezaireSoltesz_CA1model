@@ -287,7 +287,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
  pnt_receive[_mechtype] = _net_receive;
  pnt_receive_size[_mechtype] = 1;
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
- 	ivoc_help("help ?1 ExpGABAab /users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/ExpGABAab.mod\n");
+ 	ivoc_help("help ?1 ExpGABAab /home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/ExpGABAab.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
  hoc_register_units(_mechtype, _hoc_parm_units);
  }
@@ -583,7 +583,7 @@ _first = 0;
 }
 
 #if NMODL_TEXT
-static const char* nmodl_filename = "/users/bp000108/BezaireSoltesz_CA1model_Slicing/modeldbca1/ExpGABAab.mod";
+static const char* nmodl_filename = "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/ExpGABAab.mod";
 static const char* nmodl_file_text = 
   "COMMENT\n"
   "Two state kinetic scheme synapse described by rise time tau1,\n"

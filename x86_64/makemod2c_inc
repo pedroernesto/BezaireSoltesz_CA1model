@@ -191,6 +191,14 @@
 	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 
+./ExpGABAabFluct.c: ../ExpGABAabFluct.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ExpGABAabFluct.mod -o "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64")
+
+./ExpGABAabFluct.o: ./ExpGABAabFluct.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
+	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
+
 ./ExpGABAab.c: ../ExpGABAab.mod
 	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
 	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) ExpGABAab.mod -o "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64")
@@ -207,11 +215,27 @@
 	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 
+./GFluct_ThreadSafe.c: ../GFluct_ThreadSafe.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) GFluct_ThreadSafe.mod -o "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64")
+
+./GFluct_ThreadSafe.o: ./GFluct_ThreadSafe.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
+	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
+
 ./iconc_Ca.c: ../iconc_Ca.mod
 	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
 	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) iconc_Ca.mod -o "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64")
 
 ./iconc_Ca.o: ./iconc_Ca.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
+	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
+
+./MyExp2SidFluct.c: ../MyExp2SidFluct.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\n"
+	(cd ".."; MODLUNIT=$(NRNUNITS) $(NOCMODL) MyExp2SidFluct.mod -o "/home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/x86_64")
+
+./MyExp2SidFluct.o: ./MyExp2SidFluct.c
 	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\n"
 	$(COMPILE) -I".." $(INCLUDES) -fPIC -c $< -o $@
 
