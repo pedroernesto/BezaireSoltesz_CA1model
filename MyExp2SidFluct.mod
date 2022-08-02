@@ -17,8 +17,6 @@ peak conductance of 1.
 
 ENDCOMMENT
 
-INDEPENDENT {t FROM 0 TO 100 WITH 1 (ms)}
-
 NEURON {
 	POINT_PROCESS MyExp2SidFluct
 	RANGE tau1, tau2, e, i, sid, cid
@@ -28,7 +26,6 @@ NEURON {
 	GLOBAL total
 
   RANGE std_A, std_B
-
   THREADSAFE : true only if every instance has its own distinct Random
   POINTER donotuse
 }
@@ -62,9 +59,9 @@ ASSIGNED {
 	exp_B
 	amp_A	(umho)
 	amp_B	(umho)
-	A (uS)
-	B (uS)
 
+  A (uS)
+	B (uS)
   donotuse
 }
 
@@ -80,31 +77,38 @@ INITIAL {
 	factor = -exp(-tp/tau1) + exp(-tp/tau2)
 	factor = 1/factor
 
-  exp_A = exp(-dt/tau1)
-  amp_A = std_A * sqrt( 1-exp(-2*dt/tau1) )
-
-  exp_B = exp(-dt/tau2)
-  amp_B = std_B * sqrt( 1-exp(-2*dt/tau2) )
+  if(tau1!=0) {
+    exp_A = exp(-dt/tau1)
+    amp_A = std_A * sqrt( 1-exp(-2*dt/tau1) )
+  }
+  if(tau2!=0) {
+    exp_B = exp(-dt/tau2)
+    amp_B = std_B * sqrt( 1-exp(-2*dt/tau2) )
+  }
 }
 
-BREAKPOINT {
-  : SOLVE noisy_dyn
+BEFORE BREAKPOINT { : use grand()
+  if(tau1!=0) {
+    A =  A * exp_A + amp_A * grand()
+  }
+  if(tau2!=0) {
+    B =  B * exp_B + amp_B * grand()
+  }
+}
+
+AFTER SOLVE {
+  if(tau1==0) {
+	   A = std_A * grand()
+	}
+  if(tau2==0) {
+	   B = std_B * grand()
+	}
+
 	g = B - A
   if (g < 0) { g = 0 }
 	i = g*(v - e)
 }
 
-PROCEDURE noisy_dyn() { : use grand()
-  A =  A * exp_A + amp_A * grand()
-  B =  B * exp_B + amp_B * grand()
-}
-
-PROCEDURE new_seed(seed) {		: procedure to set the seed
-	set_seed(seed)
-	VERBATIM
-	  printf("Setting random generator with seed = %g\n", _lseed);
-	ENDVERBATIM
-}
 
 VERBATIM
 double nrn_random_pick(void* r);
@@ -117,7 +121,7 @@ VERBATIM
         /*
          : Supports separate independent but reproducible streams for
          : each instance. However, the corresponding hoc Random
-         : distribution MUST be set to Random.uniform(0,1)
+         : distribution MUST be set to Random.normal(0,1)
          */
         _lgrand = nrn_random_pick(_p_donotuse);
     }else{
@@ -134,6 +138,13 @@ ENDVERBATIM
 VERBATIM
     }
 ENDVERBATIM
+}
+
+PROCEDURE new_seed(seed) {		: procedure to set the seed
+	set_seed(seed)
+	VERBATIM
+	  printf("Setting random generator with seed = %g\n", _lseed);
+	ENDVERBATIM
 }
 
 PROCEDURE noiseFromRandom() {

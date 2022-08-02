@@ -21,8 +21,6 @@ by the more efficient cnexp method.
 
 ENDCOMMENT
 
-INDEPENDENT {t FROM 0 TO 100 WITH 1 (ms)}
-
 NEURON {
 	POINT_PROCESS ExpGABAabFluct
 	RANGE tau1a, tau2a, tau1b, tau2b, ea, eb, i, sid, cid
@@ -108,39 +106,61 @@ INITIAL {
 	factorb = -exp(-tpb/tau1b) + exp(-tpb/tau2b)
 	factorb = 1/factorb
 
-  exp_Aa = exp(-dt/tau1a)
-  amp_Aa = std_Aa * sqrt( 1-exp(-2*dt/tau1a) )
-  exp_Ba = exp(-dt/tau2a)
-  amp_Ba = std_Ba * sqrt( 1-exp(-2*dt/tau2a) )
-
-  exp_Ab = exp(-dt/tau1b)
-  amp_Ab = std_Ab * sqrt( 1-exp(-2*dt/tau1b) )
-  exp_Bb = exp(-dt/tau2b)
-  amp_Bb = std_Bb * sqrt( 1-exp(-2*dt/tau2b) )
+  if(tau1a!=0) {
+    exp_Aa = exp(-dt/tau1a)
+    amp_Aa = std_Aa * sqrt( 1-exp(-2*dt/tau1a) )
+  }
+  if(tau2a!=0) {
+    exp_Ba = exp(-dt/tau2a)
+    amp_Ba = std_Ba * sqrt( 1-exp(-2*dt/tau2a) )
+  }
+  if(tau1b!=0) {
+    exp_Ab = exp(-dt/tau1b)
+    amp_Ab = std_Ab * sqrt( 1-exp(-2*dt/tau1b) )
+  }
+  if(tau2b!=0) {
+    exp_Bb = exp(-dt/tau2b)
+    amp_Bb = std_Bb * sqrt( 1-exp(-2*dt/tau2b) )
+  }
 }
 
-BREAKPOINT {
-  : SOLVE noisy_dyn
-	ga = Ba - Aa
+BEFORE BREAKPOINT { : use grand()
+  if(tau1a!=0) {
+    Aa =  Aa * exp_Aa + amp_Aa * grand()
+  }
+  if(tau2a!=0) {
+    Ba =  Ba * exp_Ba + amp_Ba * grand()
+  }
+  if(tau1b!=0) {
+    Ab =  Ab * exp_Ab + amp_Ab * grand()
+  }
+  if(tau2b!=0) {
+    Bb =  Bb * exp_Bb + amp_Bb * grand()
+  }
+}
+
+AFTER SOLVE {
+  if(tau1a==0) {
+    Aa =  std_Aa * grand()
+  }
+  if(tau2a==0) {
+    Ba =  std_Ba * grand()
+  }
+  ga = Ba - Aa
   if (ga < 0) { ga = 0 }
+
+  if(tau1b==0) {
+    Ab =  std_Ab * grand()
+  }
+  if(tau2b==0) {
+    Bb =  std_Bb * grand()
+  }
 	gb = Bb - Ab
   if (gb < 0) { gb = 0 }
+
 	i = ga*(v - ea) + gb*(v - eb)
 }
 
-PROCEDURE noisy_dyn() { : use grand()
-  Aa =  Aa * exp_Aa + amp_Aa * grand()
-  Ba =  Ba * exp_Ba + amp_Ba * grand()
-  Ab =  Ab * exp_Ab + amp_Ab * grand()
-  Bb =  Bb * exp_Bb + amp_Bb * grand()
-}
-
-PROCEDURE new_seed(seed) {		: procedure to set the seed
-	set_seed(seed)
-	VERBATIM
-	  printf("Setting random generator with seed = %g\n", _lseed);
-	ENDVERBATIM
-}
 
 VERBATIM
 double nrn_random_pick(void* r);
@@ -153,7 +173,7 @@ VERBATIM
         /*
          : Supports separate independent but reproducible streams for
          : each instance. However, the corresponding hoc Random
-         : distribution MUST be set to Random.uniform(0,1)
+         : distribution MUST be set to Random.normal(0,1)
          */
         _lgrand = nrn_random_pick(_p_donotuse);
     }else{
@@ -170,6 +190,13 @@ ENDVERBATIM
 VERBATIM
     }
 ENDVERBATIM
+}
+
+PROCEDURE new_seed(seed) {		: procedure to set the seed
+	set_seed(seed)
+	VERBATIM
+	  printf("Setting random generator with seed = %g\n", _lseed);
+	ENDVERBATIM
 }
 
 PROCEDURE noiseFromRandom() {

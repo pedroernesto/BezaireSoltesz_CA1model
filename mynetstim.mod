@@ -1,5 +1,5 @@
 : $Id: netstim.mod 2212 2008-09-08 14:32:26Z hines $
-: comments at end 
+: comments at end
 
 NEURON	{
   ARTIFICIAL_CELL MyNetStim
@@ -87,6 +87,7 @@ FUNCTION invl(mean (ms)) (ms) {
 		invl = (1. - noise)*mean + noise*mean*erand()
 	}
 }
+
 VERBATIM
 double nrn_random_pick(void* r);
 void* nrn_random_arg(int argpos);

@@ -81,6 +81,7 @@ DERIVATIVE state {
 	B' = -B/tau2
 }
 
+
 NET_RECEIVE(weight (uS)) {
 	LOCAL srcid, w
 	if (weight > 999) {

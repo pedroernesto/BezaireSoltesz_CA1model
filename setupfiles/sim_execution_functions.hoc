@@ -42,6 +42,8 @@ proc rrun(){								// Run the network simulation and write out the results
 									//  then make other standard calls
 
 	runstart = startsw()				// Get the start time of the simulation
+
+
 	pc.psolve(tstop)					// Equivalent to calling cvode.solve(tstop) but for parallel NEURON;
 										//  solve will be broken into steps determined by the result of
 										//  set_maxstep

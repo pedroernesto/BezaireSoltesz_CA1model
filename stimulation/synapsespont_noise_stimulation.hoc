@@ -6,15 +6,20 @@ proc stimulateSynapses() { local gid, i, rank localobj synapse, cell, rs
 		if (rank == pc.id) {				// Ensure that each processor runs once
 
 			for i=0, nclist.count -1 {				// For each synapse in the list of all synapses
-				synapse = nclist.o(i).syn		   // Get a reference to the synapse object on the target cell
+				synapse = nclist.o(i).syn()		   // Get a reference to the synapse object on the target cell
 
 				// cell = pc.gid2cell(synapse.cid)    // Postsynaptic cell the current synapse is attached to
 
-				rs = new RandomStream(1+RandomSeedsConn, synapse.sid + 1*nclist.count)
-				rs.r.uniform(0,1)
-				synapse.noiseFromRandom(rs.r)
-			}
 
+				// rs = new RandomStream(1+RandomSeedsConn, synapse.sid + 1*nclist.count)
+				// rs.r.normal(0,1)
+				print pc.id, "synapse.tau2 = ", synapse.tau2
+				//synapse.noiseFromRandom(rs.r)
+
+				// rs = new Random()
+				// rs.normal(0,1)
+				// synapse.noiseFromRandom(rs)
+			}
 		}
 		pc.barrier()	// All the other processors wait for
 					    //  the connecting one to finish, so that they each take turns.
