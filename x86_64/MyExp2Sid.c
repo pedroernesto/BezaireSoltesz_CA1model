@@ -597,6 +597,7 @@ static const char* nmodl_file_text =
   "	B' = -B/tau2\n"
   "}\n"
   "\n"
+  "\n"
   "NET_RECEIVE(weight (uS)) {\n"
   "	LOCAL srcid, w\n"
   "	if (weight > 999) {\n"

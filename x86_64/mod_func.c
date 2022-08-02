@@ -40,6 +40,7 @@ extern void _positionfcns_reg(void);
 extern void _repeatconn_reg(void);
 extern void _sgate_reg(void);
 extern void _SIN_reg(void);
+extern void _test_reg(void);
 extern void _xtra_reg(void);
 
 void modl_reg(){
@@ -83,6 +84,7 @@ void modl_reg(){
     fprintf(stderr," \"repeatconn.mod\"");
     fprintf(stderr," \"sgate.mod\"");
     fprintf(stderr," \"SIN.mod\"");
+    fprintf(stderr," \"test.mod\"");
     fprintf(stderr," \"xtra.mod\"");
     fprintf(stderr, "\n");
   }
@@ -123,5 +125,6 @@ void modl_reg(){
   _repeatconn_reg();
   _sgate_reg();
   _SIN_reg();
+  _test_reg();
   _xtra_reg();
 }

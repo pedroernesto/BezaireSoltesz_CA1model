@@ -31,7 +31,6 @@ extern double hoc_Exp(double);
 #define _net_receive _net_receive__MyExp2SidFluct 
 #define noiseFromRandom noiseFromRandom__MyExp2SidFluct 
 #define new_seed new_seed__MyExp2SidFluct 
-#define noisy_dyn noisy_dyn__MyExp2SidFluct 
  
 #define _threadargscomma_ _p, _ppvar, _thread, _nt,
 #define _threadargsprotocomma_ double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* _nt,
@@ -63,8 +62,7 @@ extern double hoc_Exp(double);
 #define A _p[14]
 #define B _p[15]
 #define v _p[16]
-#define _g _p[17]
-#define _tsav _p[18]
+#define _tsav _p[17]
 #define _nd_area  *_ppvar[0]._pval
 #define donotuse	*_ppvar[2]._pval
 #define _p_donotuse	_ppvar[2]._pval
@@ -89,7 +87,6 @@ extern "C" {
  static double _hoc_grand();
  static double _hoc_noiseFromRandom();
  static double _hoc_new_seed();
- static double _hoc_noisy_dyn();
  static int _mechtype;
 extern void _nrn_cacheloop_reg(int, int);
 extern void hoc_register_prop_size(int, int, int);
@@ -140,7 +137,6 @@ extern void hoc_reg_nmodl_filename(int, const char*);
  "grand", _hoc_grand,
  "noiseFromRandom", _hoc_noiseFromRandom,
  "new_seed", _hoc_new_seed,
- "noisy_dyn", _hoc_noisy_dyn,
  0, 0
 };
 #define grand grand_MyExp2SidFluct
@@ -179,11 +175,10 @@ static double _thread1data[1];
  0,0,0
 };
  static double _sav_indep;
+ static void _ba1() , _ba2() ;
  static void nrn_alloc(Prop*);
 static void  nrn_init(_NrnThread*, _Memb_list*, int);
 static void nrn_state(_NrnThread*, _Memb_list*, int);
- static void nrn_cur(_NrnThread*, _Memb_list*, int);
-static void  nrn_jacob(_NrnThread*, _Memb_list*, int);
  static void _hoc_destroy_pnt(_vptr) void* _vptr; {
    destroy_point_process(_vptr);
 }
@@ -216,7 +211,7 @@ static void nrn_alloc(Prop* _prop) {
 	_p = nrn_point_prop_->param;
 	_ppvar = nrn_point_prop_->dparam;
  }else{
- 	_p = nrn_prop_data_alloc(_mechtype, 19, _prop);
+ 	_p = nrn_prop_data_alloc(_mechtype, 18, _prop);
  	/*initialize range parameters*/
  	tau1 = 0.1;
  	tau2 = 10;
@@ -227,7 +222,7 @@ static void nrn_alloc(Prop* _prop) {
  	std_B = 0.003;
   }
  	_prop->param = _p;
- 	_prop->param_size = 19;
+ 	_prop->param_size = 18;
   if (!nrn_point_prop_) {
  	_ppvar = nrn_prop_datum_alloc(_mechtype, 3, _prop);
   }
@@ -249,7 +244,7 @@ extern void _cvode_abstol( Symbol**, double*, int);
 	int _vectorized = 1;
   _initlists();
  	_pointtype = point_register_mech(_mechanism,
-	 nrn_alloc,nrn_cur, nrn_jacob, nrn_state, nrn_init,
+	 nrn_alloc,(void*)0, (void*)0, (void*)0, nrn_init,
 	 hoc_nrnpointerindex, 2,
 	 _hoc_create_pnt, _hoc_destroy_pnt, _member_func);
   _extcall_thread = (Datum*)ecalloc(1, sizeof(Datum));
@@ -263,12 +258,14 @@ extern void _cvode_abstol( Symbol**, double*, int);
   hoc_reg_nmodl_text(_mechtype, nmodl_file_text);
   hoc_reg_nmodl_filename(_mechtype, nmodl_filename);
 #endif
-  hoc_register_prop_size(_mechtype, 19, 3);
+  hoc_register_prop_size(_mechtype, 18, 3);
   hoc_register_dparam_semantics(_mechtype, 0, "area");
   hoc_register_dparam_semantics(_mechtype, 1, "pntproc");
   hoc_register_dparam_semantics(_mechtype, 2, "pointer");
  pnt_receive[_mechtype] = _net_receive;
  pnt_receive_size[_mechtype] = 1;
+ 	hoc_reg_ba(_mechtype, _ba1, 11);
+ 	hoc_reg_ba(_mechtype, _ba2, 22);
  	hoc_register_var(hoc_scdoub, hoc_vdoub, hoc_intfunc);
  	ivoc_help("help ?1 MyExp2SidFluct /home/pedroernesto/Documents/Project/Code/Models_Validation/Models_to_test/Hippocampus/BezaireSoltesz_CA1model/modeldbca1/MyExp2SidFluct.mod\n");
  hoc_register_limits(_mechtype, _hoc_parm_limits);
@@ -283,43 +280,33 @@ static int _match_recurse=1;
 static void _modl_cleanup(){ _match_recurse=1;}
 static int noiseFromRandom(_threadargsproto_);
 static int new_seed(_threadargsprotocomma_ double);
-static int noisy_dyn(_threadargsproto_);
- 
-static int  noisy_dyn ( _threadargsproto_ ) {
-   A = A * exp_A + amp_A * normrand ( 0.0 , 1.0 ) ;
-   B = B * exp_B + amp_B * normrand ( 0.0 , 1.0 ) ;
-    return 0; }
- 
-static double _hoc_noisy_dyn(void* _vptr) {
- double _r;
-   double* _p; Datum* _ppvar; Datum* _thread; _NrnThread* _nt;
-   _p = ((Point_process*)_vptr)->_prop->param;
-  _ppvar = ((Point_process*)_vptr)->_prop->dparam;
-  _thread = _extcall_thread;
-  _nt = (_NrnThread*)((Point_process*)_vptr)->_vnt;
- _r = 1.;
- noisy_dyn ( _p, _ppvar, _thread, _nt );
- return(_r);
-}
- 
-static int  new_seed ( _threadargsprotocomma_ double _lseed ) {
-   set_seed ( _lseed ) ;
-   
-/*VERBATIM*/
-	  printf("Setting random generator with seed = %g\n", _lseed);
-  return 0; }
- 
-static double _hoc_new_seed(void* _vptr) {
- double _r;
-   double* _p; Datum* _ppvar; Datum* _thread; _NrnThread* _nt;
-   _p = ((Point_process*)_vptr)->_prop->param;
-  _ppvar = ((Point_process*)_vptr)->_prop->dparam;
-  _thread = _extcall_thread;
-  _nt = (_NrnThread*)((Point_process*)_vptr)->_vnt;
- _r = 1.;
- new_seed ( _p, _ppvar, _thread, _nt, *getarg(1) );
- return(_r);
-}
+ /* BEFORE BREAKPOINT */
+ static void _ba1(Node*_nd, double* _pp, Datum* _ppd, Datum* _thread, _NrnThread* _nt)  {
+   double* _p; Datum* _ppvar; _p = _pp; _ppvar = _ppd;
+  v = NODEV(_nd);
+ if ( tau1  != 0.0 ) {
+     A = A * exp_A + amp_A * grand ( _threadargs_ ) ;
+     }
+   if ( tau2  != 0.0 ) {
+     B = B * exp_B + amp_B * grand ( _threadargs_ ) ;
+     }
+   }
+ /* AFTER SOLVE */
+ static void _ba2(Node*_nd, double* _pp, Datum* _ppd, Datum* _thread, _NrnThread* _nt)  {
+   double* _p; Datum* _ppvar; _p = _pp; _ppvar = _ppd;
+  v = NODEV(_nd);
+ if ( tau1  == 0.0 ) {
+     A = std_A * grand ( _threadargs_ ) ;
+     }
+   if ( tau2  == 0.0 ) {
+     B = std_B * grand ( _threadargs_ ) ;
+     }
+   g = B - A ;
+   if ( g < 0.0 ) {
+     g = 0.0 ;
+     }
+   i = g * ( v - e ) ;
+   }
  
 /*VERBATIM*/
 double nrn_random_pick(void* r);
@@ -333,7 +320,7 @@ double grand ( _threadargsproto_ ) {
         /*
          : Supports separate independent but reproducible streams for
          : each instance. However, the corresponding hoc Random
-         : distribution MUST be set to Random.uniform(0,1)
+         : distribution MUST be set to Random.normal(0,1)
          */
         _lgrand = nrn_random_pick(_p_donotuse);
     }else{
@@ -357,6 +344,25 @@ static double _hoc_grand(void* _vptr) {
   _thread = _extcall_thread;
   _nt = (_NrnThread*)((Point_process*)_vptr)->_vnt;
  _r =  grand ( _p, _ppvar, _thread, _nt );
+ return(_r);
+}
+ 
+static int  new_seed ( _threadargsprotocomma_ double _lseed ) {
+   set_seed ( _lseed ) ;
+   
+/*VERBATIM*/
+	  printf("Setting random generator with seed = %g\n", _lseed);
+  return 0; }
+ 
+static double _hoc_new_seed(void* _vptr) {
+ double _r;
+   double* _p; Datum* _ppvar; Datum* _thread; _NrnThread* _nt;
+   _p = ((Point_process*)_vptr)->_prop->param;
+  _ppvar = ((Point_process*)_vptr)->_prop->dparam;
+  _thread = _extcall_thread;
+  _nt = (_NrnThread*)((Point_process*)_vptr)->_vnt;
+ _r = 1.;
+ new_seed ( _p, _ppvar, _thread, _nt, *getarg(1) );
  return(_r);
 }
  
@@ -431,10 +437,14 @@ static void initmodel(double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* _nt
    _ltp = ( tau1 * tau2 ) / ( tau2 - tau1 ) * log ( tau2 / tau1 ) ;
    factor = - exp ( - _ltp / tau1 ) + exp ( - _ltp / tau2 ) ;
    factor = 1.0 / factor ;
-   exp_A = exp ( - dt / tau1 ) ;
-   amp_A = std_A * sqrt ( 1.0 - exp ( - 2.0 * dt / tau1 ) ) ;
-   exp_B = exp ( - dt / tau2 ) ;
-   amp_B = std_B * sqrt ( 1.0 - exp ( - 2.0 * dt / tau2 ) ) ;
+   if ( tau1  != 0.0 ) {
+     exp_A = exp ( - dt / tau1 ) ;
+     amp_A = std_A * sqrt ( 1.0 - exp ( - 2.0 * dt / tau1 ) ) ;
+     }
+   if ( tau2  != 0.0 ) {
+     exp_B = exp ( - dt / tau2 ) ;
+     amp_B = std_B * sqrt ( 1.0 - exp ( - 2.0 * dt / tau2 ) ) ;
+     }
    }
 
 }
@@ -465,78 +475,9 @@ for (_iml = 0; _iml < _cntml; ++_iml) {
 }
 }
 
-static double _nrn_current(double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* _nt, double _v){double _current=0.;v=_v;{ {
-   g = B - A ;
-   if ( g < 0.0 ) {
-     g = 0.0 ;
-     }
-   i = g * ( v - e ) ;
-   }
- _current += i;
+static double _nrn_current(double* _p, Datum* _ppvar, Datum* _thread, _NrnThread* _nt, double _v){double _current=0.;v=_v;{ _current += i;
 
 } return _current;
-}
-
-static void nrn_cur(_NrnThread* _nt, _Memb_list* _ml, int _type) {
-double* _p; Datum* _ppvar; Datum* _thread;
-Node *_nd; int* _ni; double _rhs, _v; int _iml, _cntml;
-#if CACHEVEC
-    _ni = _ml->_nodeindices;
-#endif
-_cntml = _ml->_nodecount;
-_thread = _ml->_thread;
-for (_iml = 0; _iml < _cntml; ++_iml) {
- _p = _ml->_data[_iml]; _ppvar = _ml->_pdata[_iml];
-#if CACHEVEC
-  if (use_cachevec) {
-    _v = VEC_V(_ni[_iml]);
-  }else
-#endif
-  {
-    _nd = _ml->_nodelist[_iml];
-    _v = NODEV(_nd);
-  }
- _g = _nrn_current(_p, _ppvar, _thread, _nt, _v + .001);
- 	{ _rhs = _nrn_current(_p, _ppvar, _thread, _nt, _v);
- 	}
- _g = (_g - _rhs)/.001;
- _g *=  1.e2/(_nd_area);
- _rhs *= 1.e2/(_nd_area);
-#if CACHEVEC
-  if (use_cachevec) {
-	VEC_RHS(_ni[_iml]) -= _rhs;
-  }else
-#endif
-  {
-	NODERHS(_nd) -= _rhs;
-  }
- 
-}
- 
-}
-
-static void nrn_jacob(_NrnThread* _nt, _Memb_list* _ml, int _type) {
-double* _p; Datum* _ppvar; Datum* _thread;
-Node *_nd; int* _ni; int _iml, _cntml;
-#if CACHEVEC
-    _ni = _ml->_nodeindices;
-#endif
-_cntml = _ml->_nodecount;
-_thread = _ml->_thread;
-for (_iml = 0; _iml < _cntml; ++_iml) {
- _p = _ml->_data[_iml];
-#if CACHEVEC
-  if (use_cachevec) {
-	VEC_D(_ni[_iml]) += _g;
-  }else
-#endif
-  {
-     _nd = _ml->_nodelist[_iml];
-	NODED(_nd) += _g;
-  }
- 
-}
- 
 }
 
 static void nrn_state(_NrnThread* _nt, _Memb_list* _ml, int _type) {
@@ -578,8 +519,6 @@ static const char* nmodl_file_text =
   "\n"
   "ENDCOMMENT\n"
   "\n"
-  "INDEPENDENT {t FROM 0 TO 100 WITH 1 (ms)}\n"
-  "\n"
   "NEURON {\n"
   "	POINT_PROCESS MyExp2SidFluct\n"
   "	RANGE tau1, tau2, e, i, sid, cid\n"
@@ -589,7 +528,6 @@ static const char* nmodl_file_text =
   "	GLOBAL total\n"
   "\n"
   "  RANGE std_A, std_B\n"
-  "\n"
   "  THREADSAFE : true only if every instance has its own distinct Random\n"
   "  POINTER donotuse\n"
   "}\n"
@@ -623,9 +561,9 @@ static const char* nmodl_file_text =
   "	exp_B\n"
   "	amp_A	(umho)\n"
   "	amp_B	(umho)\n"
-  "	A (uS)\n"
-  "	B (uS)\n"
   "\n"
+  "  A (uS)\n"
+  "	B (uS)\n"
   "  donotuse\n"
   "}\n"
   "\n"
@@ -641,31 +579,38 @@ static const char* nmodl_file_text =
   "	factor = -exp(-tp/tau1) + exp(-tp/tau2)\n"
   "	factor = 1/factor\n"
   "\n"
-  "  exp_A = exp(-dt/tau1)\n"
-  "  amp_A = std_A * sqrt( 1-exp(-2*dt/tau1) )\n"
-  "\n"
-  "  exp_B = exp(-dt/tau2)\n"
-  "  amp_B = std_B * sqrt( 1-exp(-2*dt/tau2) )\n"
+  "  if(tau1!=0) {\n"
+  "    exp_A = exp(-dt/tau1)\n"
+  "    amp_A = std_A * sqrt( 1-exp(-2*dt/tau1) )\n"
+  "  }\n"
+  "  if(tau2!=0) {\n"
+  "    exp_B = exp(-dt/tau2)\n"
+  "    amp_B = std_B * sqrt( 1-exp(-2*dt/tau2) )\n"
+  "  }\n"
   "}\n"
   "\n"
-  "BREAKPOINT {\n"
-  "  : SOLVE noisy_dyn\n"
+  "BEFORE BREAKPOINT { : use grand()\n"
+  "  if(tau1!=0) {\n"
+  "    A =  A * exp_A + amp_A * grand()\n"
+  "  }\n"
+  "  if(tau2!=0) {\n"
+  "    B =  B * exp_B + amp_B * grand()\n"
+  "  }\n"
+  "}\n"
+  "\n"
+  "AFTER SOLVE {\n"
+  "  if(tau1==0) {\n"
+  "	   A = std_A * grand()\n"
+  "	}\n"
+  "  if(tau2==0) {\n"
+  "	   B = std_B * grand()\n"
+  "	}\n"
+  "\n"
   "	g = B - A\n"
   "  if (g < 0) { g = 0 }\n"
   "	i = g*(v - e)\n"
   "}\n"
   "\n"
-  "PROCEDURE noisy_dyn() { : use grand()\n"
-  "  A =  A * exp_A + amp_A * normrand(0,1)\n"
-  "  B =  B * exp_B + amp_B * normrand(0,1)\n"
-  "}\n"
-  "\n"
-  "PROCEDURE new_seed(seed) {		: procedure to set the seed\n"
-  "	set_seed(seed)\n"
-  "	VERBATIM\n"
-  "	  printf(\"Setting random generator with seed = %g\\n\", _lseed);\n"
-  "	ENDVERBATIM\n"
-  "}\n"
   "\n"
   "VERBATIM\n"
   "double nrn_random_pick(void* r);\n"
@@ -678,7 +623,7 @@ static const char* nmodl_file_text =
   "        /*\n"
   "         : Supports separate independent but reproducible streams for\n"
   "         : each instance. However, the corresponding hoc Random\n"
-  "         : distribution MUST be set to Random.uniform(0,1)\n"
+  "         : distribution MUST be set to Random.normal(0,1)\n"
   "         */\n"
   "        _lgrand = nrn_random_pick(_p_donotuse);\n"
   "    }else{\n"
@@ -695,6 +640,13 @@ static const char* nmodl_file_text =
   "VERBATIM\n"
   "    }\n"
   "ENDVERBATIM\n"
+  "}\n"
+  "\n"
+  "PROCEDURE new_seed(seed) {		: procedure to set the seed\n"
+  "	set_seed(seed)\n"
+  "	VERBATIM\n"
+  "	  printf(\"Setting random generator with seed = %g\\n\", _lseed);\n"
+  "	ENDVERBATIM\n"
   "}\n"
   "\n"
   "PROCEDURE noiseFromRandom() {\n"
