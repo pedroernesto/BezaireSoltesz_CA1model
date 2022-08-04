@@ -18,22 +18,23 @@ peak conductance of 1.
 ENDCOMMENT
 
 NEURON {
-	POINT_PROCESS MyExp2SidFluct
-	RANGE tau1, tau2, e, i, sid, cid
-	NONSPECIFIC_CURRENT i
+  POINT_PROCESS MyExp2SidFluct
+  RANGE tau1, tau2, e, i, sid, cid
+  NONSPECIFIC_CURRENT i
 
-	RANGE g
-	GLOBAL total
+  RANGE g
+  GLOBAL total
 
-  RANGE std_A, std_B
-  THREADSAFE : true only if every instance has its own distinct Random
-  POINTER donotuse
+  RANGE std_A, std_B, exp_A, exp_B, amp_A, amp_B
+
+  : THREADSAFE : only true if every instance has its own distinct Random
+  POINTER donotuse2
 }
 
 UNITS {
-	(nA) = (nanoamp)
-	(mV) = (millivolt)
-	(uS) = (microsiemens)
+  (nA) = (nanoamp)
+  (mV) = (millivolt)
+  (uS) = (microsiemens)
 }
 
 PARAMETER {
@@ -44,8 +45,8 @@ PARAMETER {
 	sid = -1 (1) : synapse id, from cell template
 	cid = -1 (1) : id of cell to which this synapse is attached
 
-  std_A	= 0.0030 (umho)	: standard dev of A
-	std_B	= 0.0030 (umho)	: standard dev of B
+  std_A	= 0.0030 (uS)	: standard dev of A
+	std_B	= 0.0030 (uS)	: standard dev of B
 }
 
 ASSIGNED {
@@ -57,12 +58,12 @@ ASSIGNED {
 
 	exp_A
 	exp_B
-	amp_A	(umho)
-	amp_B	(umho)
+	amp_A	(uS)
+	amp_B	(uS)
 
   A (uS)
 	B (uS)
-  donotuse
+  donotuse2
 }
 
 INITIAL {
@@ -76,92 +77,34 @@ INITIAL {
 	tp = (tau1*tau2)/(tau2 - tau1) * log(tau2/tau1)
 	factor = -exp(-tp/tau1) + exp(-tp/tau2)
 	factor = 1/factor
-
-  if(tau1!=0) {
-    exp_A = exp(-dt/tau1)
-    amp_A = std_A * sqrt( 1-exp(-2*dt/tau1) )
-  }
-  if(tau2!=0) {
-    exp_B = exp(-dt/tau2)
-    amp_B = std_B * sqrt( 1-exp(-2*dt/tau2) )
-  }
 }
 
 BEFORE BREAKPOINT { : use grand()
   if(tau1!=0) {
-    A =  A * exp_A + amp_A * grand()
+    exp_A = exp(-dt/tau1)
+    amp_A = std_A * sqrt( 1-exp(-2*dt/tau1) )
+    A =  A * exp_A + amp_A * normrand(0,1) : grand()
+  }else{
+    A = std_A * normrand(0,1) : grand()
   }
+
   if(tau2!=0) {
-    B =  B * exp_B + amp_B * grand()
+    exp_B = exp(-dt/tau2)
+    amp_B = std_B * sqrt( 1-exp(-2*dt/tau2) )
+    B = B * exp_B + amp_B * normrand(0,1) : grand()
+  }else{
+    B = std_B * normrand(0,1) : grand()
   }
 }
 
 AFTER SOLVE {
-  if(tau1==0) {
-	   A = std_A * grand()
-	}
-  if(tau2==0) {
-	   B = std_B * grand()
-	}
-
-	g = B - A
+  g = B - A
   if (g < 0) { g = 0 }
 	i = g*(v - e)
 }
 
-
-VERBATIM
-double nrn_random_pick(void* r);
-void* nrn_random_arg(int argpos);
-ENDVERBATIM
-
-FUNCTION grand() {
-VERBATIM
-    if (_p_donotuse) {
-        /*
-         : Supports separate independent but reproducible streams for
-         : each instance. However, the corresponding hoc Random
-         : distribution MUST be set to Random.normal(0,1)
-         */
-        _lgrand = nrn_random_pick(_p_donotuse);
-    }else{
-        /* only can be used in main thread */
-        if (_nt != nrn_threads) {
-          hoc_execerror("multithread random in InUnif"," only via hoc Random");
-        }
-ENDVERBATIM
-        : the old standby. Cannot use if reproducible parallel sim
-        : independent of nhost or which host this instance is on
-        : is desired, since each instance on this cpu draws from
-        : the same stream
-        grand = normrand(0,1)
-VERBATIM
-    }
-ENDVERBATIM
-}
-
-PROCEDURE new_seed(seed) {		: procedure to set the seed
-	set_seed(seed)
-	VERBATIM
-	  printf("Setting random generator with seed = %g\n", _lseed);
-	ENDVERBATIM
-}
-
-PROCEDURE noiseFromRandom() {
-VERBATIM
- {
-    void** pv = (void**)(&_p_donotuse);
-    if (ifarg(1)) {
-        *pv = nrn_random_arg(1);
-    }else{
-        *pv = (void*)0;
-    }
- }
-ENDVERBATIM
-}
-
 NET_RECEIVE(weight (uS)) {
-	LOCAL srcid, w
+  LOCAL srcid, w
 	if (weight > 999) {
 		srcid = floor(weight/1000) - 1
 		w = weight - (srcid+1)*1000
@@ -169,6 +112,54 @@ NET_RECEIVE(weight (uS)) {
 		w = weight
 	}
 	A = A + w*factor
-	B = B + w*factor
-	total = total+w
+  B = B + w*factor
+  total = total+w
 }
+
+PROCEDURE print_vars() {
+  VERBATIM
+    printf("MyExp2SidFluct %f, %f, %1.20f", A, B, g);
+  ENDVERBATIM
+}
+
+FUNCTION name() {
+  VERBATIM
+    return 2;
+  ENDVERBATIM
+}
+
+COMMENT
+VERBATIM
+double nrn_random_pick(void* r);
+void* nrn_random_arg(int argpos);
+ENDVERBATIM
+
+FUNCTION grand() {
+  VERBATIM
+  if (_p_donotuse2) {
+      /*
+       : Supports separate independent but reproducible streams for
+       : each instance. However, the corresponding hoc Random
+       : distribution MUST be set to Random.normal(0,1)
+       */
+      _lgrand = nrn_random_pick(_p_donotuse2);
+  }else{
+      /* only can be used in main thread */
+      if (_nt != nrn_threads) {
+        hoc_execerror("Random object ref not set correctly for donotuse2"," only via hoc Random");
+      }
+  }
+  ENDVERBATIM
+}
+
+PROCEDURE noiseFromRandom() {
+  VERBATIM
+  void** pv = (void**)(&_p_donotuse2);
+  if (ifarg(1)) {
+      *pv = nrn_random_arg(1);
+  }else{
+      *pv = (void*)0;
+  }
+  ENDVERBATIM
+}
+ENDCOMMENT

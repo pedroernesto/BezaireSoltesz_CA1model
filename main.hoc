@@ -322,7 +322,6 @@ ranlfplist = new List()		// a list that will contain an entry for each random nu
 
 {load_file("./setupfiles/create_cells_pos_Slicing.hoc")}	// Creates each cell on its assigned host
 															// and sets its position
-
 strdef cmd
 {load_file("./setupfiles/write_positions.hoc")}		// Defines the proc to write the position
 													//  of each cell to file
@@ -496,6 +495,7 @@ if (get_spike_hist==1) {
 								//  there is limited time on the supercomputer
 
 zzz = mallinfo(zzz, "Before running simulation")	// Get memory usage before running simulation
+
 
 {rrun()}						// Run the network simulation using a custom run procedure and write out results
 

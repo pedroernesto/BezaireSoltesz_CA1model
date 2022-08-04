@@ -15,10 +15,6 @@ The factor is evaluated in the
 initial block such that an event of weight 1 generates a
 peak conductance of 1.
 
-Because the solution is a sum of exponentials, the
-coupled equations can be solved as a pair of independent equations
-by the more efficient cnexp method.
-
 ENDCOMMENT
 
 NEURON {
@@ -30,9 +26,11 @@ NEURON {
 	GLOBAL totala, totalb
 
   RANGE std_Aa, std_Ba, std_Ab, std_Bb
+  RANGE exp_Aa, exp_Ba, amp_Aa, amp_Ba
+  RANGE exp_Ab, exp_Bb, amp_Ab,	amp_Bb
 
-  THREADSAFE : true only if every instance has its own distinct Random
-  POINTER donotuse
+  : THREADSAFE : only true if every instance has its own distinct Random
+  POINTER donotuse1
 }
 
 UNITS {
@@ -45,17 +43,17 @@ PARAMETER {
   dt (ms)
 	tau1a=.1 (ms) <1e-9,1e9>
 	tau2a = 10 (ms) <1e-9,1e9>
-	ea=0	(mV)
-	tau1b=.1 (ms) <1e-9,1e9>
+	ea=0 (mV)
+	tau1b =.1 (ms) <1e-9,1e9>
 	tau2b = 10 (ms) <1e-9,1e9>
-	eb=0	(mV)
+	eb=0 (mV)
 	sid = -1 (1) : synapse id, from cell template
-	cid = -1 (1) : id of cell to which this synapse is attached
+  cid = -1 (1) : id of cell to which this synapse is attached
 
-  std_Aa	= 0.0030 (umho)	: standard dev of Aa
-  std_Ba	= 0.0030 (umho)	: standard dev of Ba
-  std_Ab	= 0.0030 (umho)	: standard dev of Ab
-  std_Bb	= 0.0030 (umho)	: standard dev of Bb
+  std_Aa	= 0.0030 (uS)	: standard dev of Aa
+  std_Ba	= 0.0030 (uS)	: standard dev of Ba
+  std_Ab	= 0.0030 (uS)	: standard dev of Ab
+  std_Bb	= 0.0030 (uS)	: standard dev of Bb
 }
 
 ASSIGNED {
@@ -68,21 +66,21 @@ ASSIGNED {
 	factorb
 	totalb (uS)
 
-	exp_Aa
+  exp_Aa
 	exp_Ba
-	amp_Aa	(umho)
-	amp_Ba	(umho)
+	amp_Aa (uS)
+	amp_Ba (uS)
 	Aa (uS)
 	Ba (uS)
 
   exp_Ab
 	exp_Bb
-	amp_Ab	(umho)
-	amp_Bb	(umho)
+	amp_Ab (uS)
+	amp_Bb (uS)
 	Ab (uS)
 	Bb (uS)
 
-  donotuse
+  donotuse1
 }
 
 INITIAL {
@@ -105,111 +103,50 @@ INITIAL {
 	tpb = (tau1b*tau2b)/(tau2b - tau1b) * log(tau2b/tau1b)
 	factorb = -exp(-tpb/tau1b) + exp(-tpb/tau2b)
 	factorb = 1/factorb
-
-  if(tau1a!=0) {
-    exp_Aa = exp(-dt/tau1a)
-    amp_Aa = std_Aa * sqrt( 1-exp(-2*dt/tau1a) )
-  }
-  if(tau2a!=0) {
-    exp_Ba = exp(-dt/tau2a)
-    amp_Ba = std_Ba * sqrt( 1-exp(-2*dt/tau2a) )
-  }
-  if(tau1b!=0) {
-    exp_Ab = exp(-dt/tau1b)
-    amp_Ab = std_Ab * sqrt( 1-exp(-2*dt/tau1b) )
-  }
-  if(tau2b!=0) {
-    exp_Bb = exp(-dt/tau2b)
-    amp_Bb = std_Bb * sqrt( 1-exp(-2*dt/tau2b) )
-  }
 }
 
 BEFORE BREAKPOINT { : use grand()
   if(tau1a!=0) {
-    Aa =  Aa * exp_Aa + amp_Aa * grand()
+    exp_Aa = exp(-dt/tau1a)
+    amp_Aa = std_Aa * sqrt( 1-exp(-2*dt/tau1a) )
+    Aa =  Aa * exp_Aa + amp_Aa * normrand(0,1) : grand()
+  }else{
+    Aa =  std_Aa * normrand(0,1) : grand()
   }
+
   if(tau2a!=0) {
-    Ba =  Ba * exp_Ba + amp_Ba * grand()
+    exp_Ba = exp(-dt/tau2a)
+    amp_Ba = std_Ba * sqrt( 1-exp(-2*dt/tau2a) )
+    Ba =  Ba * exp_Ba + amp_Ba * normrand(0,1) : grand()
+  }else{
+    Ba =  std_Ba * normrand(0,1) : grand()
   }
+
   if(tau1b!=0) {
-    Ab =  Ab * exp_Ab + amp_Ab * grand()
+    exp_Ab = exp(-dt/tau1b)
+    amp_Ab = std_Ab * sqrt( 1-exp(-2*dt/tau1b) )
+    Ab =  Ab * exp_Ab + amp_Ab : * normrand(0,1) : grand()
+  }else{
+    Ab =  std_Ab * normrand(0,1) : grand()
   }
+
   if(tau2b!=0) {
-    Bb =  Bb * exp_Bb + amp_Bb * grand()
+    exp_Bb = exp(-dt/tau2b)
+    amp_Bb = std_Bb * sqrt( 1-exp(-2*dt/tau2b) )
+    Bb =  Bb * exp_Bb + amp_Bb * normrand(0,1) : grand()
+  }else{
+    Bb =  std_Bb * normrand(0,1) : grand()
   }
 }
 
 AFTER SOLVE {
-  if(tau1a==0) {
-    Aa =  std_Aa * grand()
-  }
-  if(tau2a==0) {
-    Ba =  std_Ba * grand()
-  }
   ga = Ba - Aa
   if (ga < 0) { ga = 0 }
 
-  if(tau1b==0) {
-    Ab =  std_Ab * grand()
-  }
-  if(tau2b==0) {
-    Bb =  std_Bb * grand()
-  }
 	gb = Bb - Ab
   if (gb < 0) { gb = 0 }
 
 	i = ga*(v - ea) + gb*(v - eb)
-}
-
-
-VERBATIM
-double nrn_random_pick(void* r);
-void* nrn_random_arg(int argpos);
-ENDVERBATIM
-
-FUNCTION grand() {
-VERBATIM
-    if (_p_donotuse) {
-        /*
-         : Supports separate independent but reproducible streams for
-         : each instance. However, the corresponding hoc Random
-         : distribution MUST be set to Random.normal(0,1)
-         */
-        _lgrand = nrn_random_pick(_p_donotuse);
-    }else{
-        /* only can be used in main thread */
-        if (_nt != nrn_threads) {
-          hoc_execerror("multithread random in InUnif"," only via hoc Random");
-        }
-ENDVERBATIM
-        : the old standby. Cannot use if reproducible parallel sim
-        : independent of nhost or which host this instance is on
-        : is desired, since each instance on this cpu draws from
-        : the same stream
-        grand = normrand(0,1)
-VERBATIM
-    }
-ENDVERBATIM
-}
-
-PROCEDURE new_seed(seed) {		: procedure to set the seed
-	set_seed(seed)
-	VERBATIM
-	  printf("Setting random generator with seed = %g\n", _lseed);
-	ENDVERBATIM
-}
-
-PROCEDURE noiseFromRandom() {
-VERBATIM
- {
-    void** pv = (void**)(&_p_donotuse);
-    if (ifarg(1)) {
-        *pv = nrn_random_arg(1);
-    }else{
-        *pv = (void*)0;
-    }
- }
-ENDVERBATIM
 }
 
 NET_RECEIVE(weight (uS)) {
@@ -227,3 +164,51 @@ NET_RECEIVE(weight (uS)) {
 	Bb = Bb + w*factorb/3.37
 	totalb = totalb+w/3.37
 }
+
+PROCEDURE print_vars() {
+  VERBATIM
+      printf("ExpGABAabFluct %f, %f, %f , %f, %1.20f, %1.20f", Aa, Ba, Ab, Bb, ga, gb);
+  ENDVERBATIM
+}
+
+FUNCTION name() {
+  VERBATIM
+    return 1;
+  ENDVERBATIM
+}
+
+COMMENT
+VERBATIM
+double nrn_random_pick(void* r);
+void* nrn_random_arg(int argpos);
+ENDVERBATIM
+
+FUNCTION grand() {
+VERBATIM
+    if (_p_donotuse1) {
+        /*
+         : Supports separate independent but reproducible streams for
+         : each instance. However, the corresponding hoc Random
+         : distribution MUST be set to Random.normal(0,1)
+         */
+        _lgrand = nrn_random_pick(_p_donotuse1);
+    }else{
+        /* only can be used in main thread */
+        if (_nt != nrn_threads) {
+          hoc_execerror("Random object ref not set correctly for donotuse1"," only via hoc Random");
+        }
+    }
+ENDVERBATIM
+}
+
+PROCEDURE noiseFromRandom() {
+  VERBATIM
+  void** pv = (void**)(&_p_donotuse1);
+  if (ifarg(1)) {
+      *pv = nrn_random_arg(1);
+  }else{
+      *pv = (void*)0;
+  }
+  ENDVERBATIM
+}
+ENDCOMMENT
