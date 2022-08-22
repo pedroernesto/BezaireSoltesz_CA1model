@@ -1,5 +1,8 @@
 
-proc stimulateSynapses() { local gid, i, rank localobj synapse, cell, rs
+proc set_rnd_synapses() { local gid, i, rank localobj synapse, cell, rs
+
+	rs = new Random()
+	rs.discunif(0, nclist.count)
 
 	pc.barrier() // Wait for all processors to get to this point
 	for rank = 0, pc.nhost-1 {				// For each processor, allow processor to stimulate its hosted synapses
@@ -9,16 +12,13 @@ proc stimulateSynapses() { local gid, i, rank localobj synapse, cell, rs
 				synapse = nclist.o(i).syn()		   // Get a reference to the synapse object on the target cell
 
 				// cell = pc.gid2cell(synapse.cid)    // Postsynaptic cell the current synapse is attached to
-
-
-				// rs = new RandomStream(1+RandomSeedsConn, synapse.sid + 1*nclist.count)
-				// rs.r.normal(0,1)
-				print pc.id, "synapse.tau2 = ", synapse.tau2
-				//synapse.noiseFromRandom(rs.r)
-
-				// rs = new Random()
-				// rs.normal(0,1)
-				// synapse.noiseFromRandom(rs)
+				/*
+				rs = new RandomStream(1+RandomSeedsConn, synapse.sid+1*nclist.count)
+				rs.r.normal(0,1)
+				synapse.noiseFromRandom(rs.r)
+				*/
+				synapse.set_std(StdevSyn)
+				synapse.seed(rs.repick())
 			}
 		}
 		pc.barrier()	// All the other processors wait for
@@ -26,4 +26,4 @@ proc stimulateSynapses() { local gid, i, rank localobj synapse, cell, rs
 	}
 }
 
-stimulateSynapses()
+set_rnd_synapses()

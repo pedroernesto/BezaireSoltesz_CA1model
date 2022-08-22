@@ -81,7 +81,7 @@ proc init() {
         // initialize all cells to random voltage centered on their Vrest with stdev of 1.0
         randomVinit(1.0)
     } else {
-        presimulation (500)
+        // presimulation (500)
     }
 
 	if (cvode.active()){

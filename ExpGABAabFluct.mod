@@ -25,12 +25,7 @@ NEURON {
 	RANGE ga, gb
 	GLOBAL totala, totalb
 
-  RANGE std_Aa, std_Ba, std_Ab, std_Bb
-  RANGE exp_Aa, exp_Ba, amp_Aa, amp_Ba
-  RANGE exp_Ab, exp_Bb, amp_Ab,	amp_Bb
-
-  : THREADSAFE : only true if every instance has its own distinct Random
-  POINTER donotuse1
+  RANGE seed, set_std
 }
 
 UNITS {
@@ -40,20 +35,18 @@ UNITS {
 }
 
 PARAMETER {
-  dt (ms)
 	tau1a=.1 (ms) <1e-9,1e9>
 	tau2a = 10 (ms) <1e-9,1e9>
-	ea=0 (mV)
-	tau1b =.1 (ms) <1e-9,1e9>
+	ea=0	(mV)
+	tau1b=.1 (ms) <1e-9,1e9>
 	tau2b = 10 (ms) <1e-9,1e9>
-	eb=0 (mV)
+	eb=0	(mV)
 	sid = -1 (1) : synapse id, from cell template
-  cid = -1 (1) : id of cell to which this synapse is attached
+	cid = -1 (1) : id of cell to which this synapse is attached
 
-  std_Aa	= 0.0030 (uS)	: standard dev of Aa
   std_Ba	= 0.0030 (uS)	: standard dev of Ba
-  std_Ab	= 0.0030 (uS)	: standard dev of Ab
   std_Bb	= 0.0030 (uS)	: standard dev of Bb
+  dt (ms)
 }
 
 ASSIGNED {
@@ -66,21 +59,15 @@ ASSIGNED {
 	factorb
 	totalb (uS)
 
-  exp_Aa
-	exp_Ba
-	amp_Aa (uS)
-	amp_Ba (uS)
+  gBa_n (uS)
+  gBb_n (uS)
+}
+
+STATE {
 	Aa (uS)
-	Ba (uS)
-
-  exp_Ab
-	exp_Bb
-	amp_Ab (uS)
-	amp_Bb (uS)
 	Ab (uS)
-	Bb (uS)
-
-  donotuse1
+  Ba (uS)
+  Bb (uS)
 }
 
 INITIAL {
@@ -103,50 +90,49 @@ INITIAL {
 	tpb = (tau1b*tau2b)/(tau2b - tau1b) * log(tau2b/tau1b)
 	factorb = -exp(-tpb/tau1b) + exp(-tpb/tau2b)
 	factorb = 1/factorb
+
+  gBa_n = 0
+  gBb_n = 0
 }
 
-BEFORE BREAKPOINT { : use grand()
-  if(tau1a!=0) {
-    exp_Aa = exp(-dt/tau1a)
-    amp_Aa = std_Aa * sqrt( 1-exp(-2*dt/tau1a) )
-    Aa =  Aa * exp_Aa + amp_Aa * normrand(0,1) : grand()
-  }else{
-    Aa =  std_Aa * normrand(0,1) : grand()
-  }
+PROCEDURE seed(a) {
+	set_seed(a)
+}
 
-  if(tau2a!=0) {
-    exp_Ba = exp(-dt/tau2a)
-    amp_Ba = std_Ba * sqrt( 1-exp(-2*dt/tau2a) )
-    Ba =  Ba * exp_Ba + amp_Ba * normrand(0,1) : grand()
-  }else{
-    Ba =  std_Ba * normrand(0,1) : grand()
-  }
+FUNCTION set_std(std (uS)) {
+	std_Ba = std
+  std_Bb = std
+}
 
-  if(tau1b!=0) {
-    exp_Ab = exp(-dt/tau1b)
-    amp_Ab = std_Ab * sqrt( 1-exp(-2*dt/tau1b) )
-    Ab =  Ab * exp_Ab + amp_Ab : * normrand(0,1) : grand()
-  }else{
-    Ab =  std_Ab * normrand(0,1) : grand()
-  }
+BREAKPOINT {
+	SOLVE state METHOD cnexp
+	ga = Ba - Aa + gBa_n
+  if (ga <= 0) {ga = Ba - Aa}
 
-  if(tau2b!=0) {
-    exp_Bb = exp(-dt/tau2b)
-    amp_Bb = std_Bb * sqrt( 1-exp(-2*dt/tau2b) )
-    Bb =  Bb * exp_Bb + amp_Bb * normrand(0,1) : grand()
-  }else{
-    Bb =  std_Bb * normrand(0,1) : grand()
-  }
+	gb = Bb - Ab + gBb_n
+  if (gb <= 0) {gb = Bb - Ab}
+	i = ga*(v - ea) + gb*(v - eb)
+}
+
+DERIVATIVE state {
+	Aa' = -Aa/tau1a
+	Ab' = -Ab/tau1b
+  Ba' = -Ba/tau2a
+  Bb' = -Bb/tau2b
 }
 
 AFTER SOLVE {
-  ga = Ba - Aa
-  if (ga < 0) { ga = 0 }
+  if(tau2a!=0) {
+    gBa_n = std_Ba * sqrt(2/tau2a) * normrand(0,sqrt(dt))
+  }else{
+    gBa_n = std_Ba * normrand(0,sqrt(dt))
+  }
 
-	gb = Bb - Ab
-  if (gb < 0) { gb = 0 }
-
-	i = ga*(v - ea) + gb*(v - eb)
+  if(tau2b!=0) {
+    gBa_n = std_Bb * sqrt(2/tau2b) * normrand(0,sqrt(dt))
+  }else{
+    gBb_n = std_Bb * normrand(0,sqrt(dt))
+  }
 }
 
 NET_RECEIVE(weight (uS)) {
@@ -164,51 +150,3 @@ NET_RECEIVE(weight (uS)) {
 	Bb = Bb + w*factorb/3.37
 	totalb = totalb+w/3.37
 }
-
-PROCEDURE print_vars() {
-  VERBATIM
-      printf("ExpGABAabFluct %f, %f, %f , %f, %1.20f, %1.20f", Aa, Ba, Ab, Bb, ga, gb);
-  ENDVERBATIM
-}
-
-FUNCTION name() {
-  VERBATIM
-    return 1;
-  ENDVERBATIM
-}
-
-COMMENT
-VERBATIM
-double nrn_random_pick(void* r);
-void* nrn_random_arg(int argpos);
-ENDVERBATIM
-
-FUNCTION grand() {
-VERBATIM
-    if (_p_donotuse1) {
-        /*
-         : Supports separate independent but reproducible streams for
-         : each instance. However, the corresponding hoc Random
-         : distribution MUST be set to Random.normal(0,1)
-         */
-        _lgrand = nrn_random_pick(_p_donotuse1);
-    }else{
-        /* only can be used in main thread */
-        if (_nt != nrn_threads) {
-          hoc_execerror("Random object ref not set correctly for donotuse1"," only via hoc Random");
-        }
-    }
-ENDVERBATIM
-}
-
-PROCEDURE noiseFromRandom() {
-  VERBATIM
-  void** pv = (void**)(&_p_donotuse1);
-  if (ifarg(1)) {
-      *pv = nrn_random_arg(1);
-  }else{
-      *pv = (void*)0;
-  }
-  ENDVERBATIM
-}
-ENDCOMMENT

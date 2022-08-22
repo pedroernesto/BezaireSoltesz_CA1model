@@ -373,7 +373,7 @@ MakeArtConns=1
 zzz = mallinfo(zzz, "After connecting cells")	// Record the memory usage after creating the connections
 
 {sprint(cmd,"./stimulation/%s_stimulation.hoc", "synapsespont_noise")}
-//{load_file(cmd)}
+{load_file(cmd)}
 
 {sprint(cmd,"./stimulation/%s_stimulation.hoc", Stimulation)}
 {load_file(cmd)}			// Loads in a particular algorithm to stimulate the network. The algorithm
@@ -381,6 +381,7 @@ zzz = mallinfo(zzz, "After connecting cells")	// Record the memory usage after c
 							//  artificial cells in the model, and for some cases will also specify the
 							//  connectivity from the artificial (stimulating) cells to the real cells of
 							//  the model.
+
 
 
 zzz = mallinfo(zzz, "After defining stimulation")	// Record the memory usage after defining stimulation
