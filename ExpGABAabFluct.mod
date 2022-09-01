@@ -25,7 +25,7 @@ NEURON {
 	RANGE ga, gb
 	GLOBAL totala, totalb
 
-  RANGE seed, set_std
+  RANGE seed, set_std, set_GABAa, is_GABA
 }
 
 UNITS {
@@ -44,8 +44,11 @@ PARAMETER {
 	sid = -1 (1) : synapse id, from cell template
 	cid = -1 (1) : id of cell to which this synapse is attached
 
-  std_Ba	= 0.0030 (uS)	: standard dev of Ba
-  std_Bb	= 0.0030 (uS)	: standard dev of Bb
+  std_Ba	= 0.00001 (uS)	: standard dev of Ba
+  std_Bb	= 0.00001 (uS)	: standard dev of Bb
+
+  is_GABA = 1 (1)
+  FrGABAa = 0.5 (1)    : fraction of GABAa maximal conductance
   dt (ms)
 }
 
@@ -104,10 +107,17 @@ FUNCTION set_std(std (uS)) {
   std_Bb = std
 }
 
+FUNCTION set_GABAa(frac) {
+  VERBATIM
+  FrGABAa = (float)_lfrac;
+  ENDVERBATIM
+}
+
 BREAKPOINT {
 	SOLVE state METHOD cnexp
 	ga = Ba - Aa + gBa_n
   if (ga <= 0) {ga = Ba - Aa}
+  ga = FrGABAa*ga
 
 	gb = Bb - Ab + gBb_n
   if (gb <= 0) {gb = Bb - Ab}

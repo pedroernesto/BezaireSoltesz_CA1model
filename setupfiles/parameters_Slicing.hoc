@@ -61,8 +61,9 @@ default_var("LFPCellTypes","pyramidalcell")		// semicolon separated list of cell
 default_var("SliceThickness",450)       // Thickness of a single horizontal (x-direction) slice in microns
 default_var("Slices",10)                // Desired number of contiguous (but disconnected) slices
 default_var("PrintNeuronSliceIds", 1)   // Flag to print the gid of the neuron and the slice it belongs to
-default_var("PercentArtActive", 5)    // Percent of artificial cells to be kept active
+default_var("PercentArtActive", 5)      // Percent of artificial cells to be kept active
 default_var("RandomSeedsCell", 0)		// Seed used by stimulation streams to vary the stimulating artifical cells in each run
 default_var("OnSetStim", 2.0)           // Onset time in ms, for stimulation from artificial cells
 default_var("DegreeStim", 10)		    // Degree of stimulation; meaning depends on Stimulation type
-default_var("StdevSyn", 0.0030)		  // Standard deviation in stochastic synapses
+default_var("StdevSyn", 0.00005)        // Standard deviation in stochastic synapses
+default_var("FractionGABAa", 0.5)        // Fraction of GABAa maximal conductance

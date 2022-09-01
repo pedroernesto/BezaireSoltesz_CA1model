@@ -1,0 +1,86 @@
+/************************************************************
+'ca1' model code repository
+Written by Marianne Bezaire, marianne.bezaire@gmail.com, www.mariannebezaire.com
+In the lab of Ivan Soltesz, www.ivansolteszlab.org
+Published and latest versions of this code are available online at:
+ModelDB:
+Open Source Brain: http://www.opensourcebrain.org/projects/nc_ca1
+
+Main code file: ../main.hoc
+
+This file defines a procedure related to brief pulses (shots) of
+electrical current.
+setCurrentShotAmplitude: this procedure sets the properties of the random number
+   generators that are then associated to the noise functionality of
+   the artificial cells. Each artificial cell has its own, unique
+   random stream that is associated to its noise algorithm. The noise
+   algorithm then draws from that random number stream to determine
+   the interspike intervals that define the spike train pattern of the cell.
+   However, only a subset of artificial cells are kept active;
+   the other cells will be silenced throughout the simulation.
+************************************************************/
+
+proc setCurrentShotAmplitude() {local idx, reli, typei, jgid, slice_idx, p_exp, dist localobj cell, r
+    // This procedure takes four arguments:
+	//  $1 = x position of the stimulation point in microns
+	//  $2 = y position of the stimulation point in microns
+    //  $3 = The maximum distance in microns away from an electrode point, that cells may be located to get stimulated
+    //  $4 = Slice where to place the intracellular electrode
+
+	for idx=0, numCellTypes-1 {
+    	if (strcmp(cellType[idx].cellType_string, "ca3cell")==0) {	// Find the gid range of the ca3cell cells
+            break
+        }
+    }
+	// If the cell type chosen above is artificial, set the random stream
+	//  associated with the noise in its spike times
+    r = new Random(RandomSeedsCell)
+    r.uniform(0,1)
+    // For all the cells of this type, owned by this processor
+    for pcitr(&reli, &typei, &jgid, cellType[idx].cellStartGid, cellType[idx].cellEndGid) {
+        slice_idx = cellType[idx].SliceIndList.x[jgid-cellType[idx].cellStartGid]
+        cell = pc.gid2cell(jgid)	// Create a reference to the artificial cell
+
+		dist = sqrt((cell.xpos-$1)*(cell.xpos-$1) + (cell.ypos-$2)*(cell.ypos-$2))
+		p_exp = exp(-dist/$3)/$3 // Probablity according to an exponential PDF
+        if ( slice_idx==$4 && r.repick()<p_exp && cell.start==-1) {  // Ensure that the cell is not already activated)
+			// print sqrt((cell.xpos-$1)*(cell.xpos-$1) + (cell.ypos-$2)*(cell.ypos-$2))/$3, " ---> ", cell.interval
+            cell.start = OnSetStim      // Onset time in ms, for stimulation from artificial cells
+            // Use class_ppvec.hoc as NEURON template for ca3cells, at cellnumbers_xxx.dat file
+            ranstimlist.object(reli).r.negexp(1) 	// Using a negative exponential distribution to determine
+                                                    //  the interspike interval (ISI) gives Poisson-distributed
+                                                    //  spike times. Always use 1 as the argument; the interval
+                                                    //  for the netstim will set the 'rate' (or average ISI).
+                                                    //
+                                                    // For another example (which defines the randomstream class
+                                                    //  differently, and therefore calls different commands at
+                                                    //  different times) see the following file:
+                                                    // <http://senselab.med.yale.edu/modeldb/showmodel.asp?model=83319&file=\destexhe_benchmarks\NEURON\common\netstim.hoc>
+            cell.noiseFromRandom(ranstimlist.object(reli).r)	// Set this random stream as the random number
+                                                                //  generator for the noise functionality of
+                                                                //  the spike generator
+        }
+    }
+}
+
+proc setCurrentShotSlices() { local targetCircuit_length, NumSlices, slice_idx
+    // This procedure takes three arguments:
+    //  $1: SliceThickness: Thickness of the horizontal slice in microns (x-direction)
+    //  $2: Slices: desired number of slices along the x-direction
+
+    if (int(LongitudinalLength/$1) >= $2) { // Desired circuit length is similar or smaller than the available x-length
+    	targetCircuit_length = $1*$2
+    } else {                                // Desired circuit length is larger than the available x-length
+     	targetCircuit_length = $1*int(LongitudinalLength/$1)
+    }
+    NumSlices = int(targetCircuit_length/$1)
+
+    for slice_idx=0, NumSlices-1 {
+        setCurrentShotAmplitude( (slice_idx+0.5)*$1, TransverseLength/2, SliceThickness/6, slice_idx )
+    }
+}
+
+if (MakeArtConns==1) {  // It is assumed that connections from artificial cells
+                        // have been made at another time (ie, in the connectivity algorithm)
+    setCurrentShotSlices(SliceThickness, Slices)
+}

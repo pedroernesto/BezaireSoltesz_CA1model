@@ -25,7 +25,7 @@ NEURON {
 	RANGE g
 	GLOBAL total
 
-  RANGE seed, set_std
+  RANGE seed, set_std, is_GABA
 }
 
 UNITS {
@@ -42,6 +42,7 @@ PARAMETER {
 	cid = -1 (1) : id of cell to which this synapse is attached
 
   std_B = 0.0030 (uS)	: standard dev of B
+  is_GABA = 0 (1)
   dt (ms)
 }
 

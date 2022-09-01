@@ -19,6 +19,9 @@ proc set_rnd_synapses() { local gid, i, rank localobj synapse, cell, rs
 				*/
 				synapse.set_std(StdevSyn)
 				synapse.seed(rs.repick())
+				if (synapse.is_GABA==1) {
+					synapse.set_GABAa(FractionGABAa)
+				}
 			}
 		}
 		pc.barrier()	// All the other processors wait for

@@ -22,9 +22,10 @@
 # killall -TERM mpiexec
 
 Duration=20  # Biological time to be simulated, in ms
-Scale=300
+Scale=110
 # StimType="IClampPosition"
 StimType="SpikesTrainSingleSpike"
+# StimType="SpikesTrainSingleSpikePosition"
 # StimType="SpikesTrainVaryingFreq"
 # StimType="SpikesTrainVaryingFreqPosition"
 # StimType="Spikes4TrainVaryingFreqPosition"
@@ -39,50 +40,59 @@ else
     cat datasets/cellnumbers_115.dat
 fi
 
-for Stdev in $(seq 1 1 9)
+for FrGABAa in $(seq 9 -1 9)
   do
-    StdevSyn_dir="./results/NoiseSynapses_${Stdev}/${StimType}"
-    mkdir -p ${StdevSyn_dir}
-    StdevSyn=`echo 0.00001*${Stdev} | bc`
-
-    Stimulation="CurrentShot_ca3cells_${StimType}"
-    for j in $(seq 40 -1 1)
+    for k in $(seq 5 -5 5)
       do
-        for i in $(seq 8 -2 0)
+        FractionGABAa=0.${FrGABAa}${k}
+        for Stdev in $(seq 5 1 5)
           do
-          	if [[ j -lt 10 ]]
-          	then
-              result_dir="Scale_${Scale}_${StimType}_000${j}_${i}_SimDuration_${Duration}"
-            elif [[ j -ge 10 && j -lt 100 ]]
-          	then
-              result_dir="Scale_${Scale}_${StimType}_00${j}_${i}_SimDuration_${Duration}"
-            else
-              result_dir="Scale_${Scale}_${StimType}_0${j}_${i}_SimDuration_${Duration}"
-          	fi
+            StdevSyn_dir="./results/NoiseSynapses_${Stdev}_GABAa_${FrGABAa}${k}/${StimType}"
+            mkdir -p ${StdevSyn_dir}
+            StdevSyn=`echo 0.0001*${Stdev} | bc`
 
-            RANDOM=$(date +%s)
-          	if [[ "$StimType" == *"$SUB"* ]]
-            then
-      	       DegreeStim=${j}.${i}
-      	       cmd_str="-c DegreeStim=${DegreeStim} -c TemporalResolution=0.1 "
-            else
-      	       PercentArtCells=${j}.${i}
-      	       cmd_str="-c PercentArtActive=${PercentArtCells} "
-            fi
-            # mpiexec --use-hwthread-cpus --map-by ppr:32:node:pe=1 ./x86_64/special ......
-            mpiexec  -n 8 ./x86_64/special -nobanner -nogui -mpi -c "strdef RunName" -c RunName="\"${result_dir}\"" \
-    								-c "strdef Stimulation" -c Stimulation="\"${Stimulation}\"" \
-    								-c "Scale=${Scale}" -c "SimDuration=${Duration}" -c "ComputeNpoleLFP=0" \
-    								${cmd_str} -c "RandomSeedsCell=${RANDOM}" -c "JobHours=25" -c "StdevSyn=${StdevSyn}" main.hoc
+            Stimulation="CurrentShot_ca3cells_${StimType}"
+            for j in $(seq 15 -1 15)
+              do
+                for i in $(seq 0 -2 0)
+                  do
+                  	if [[ j -lt 10 ]]
+                  	then
+                      result_dir="Scale_${Scale}_${StimType}_000${j}_${i}_SimDuration_${Duration}"
+                    elif [[ j -ge 10 && j -lt 100 ]]
+                  	then
+                      result_dir="Scale_${Scale}_${StimType}_00${j}_${i}_SimDuration_${Duration}"
+                    else
+                      result_dir="Scale_${Scale}_${StimType}_0${j}_${i}_SimDuration_${Duration}"
+                  	fi
 
-            # Concatenate all spikeraster data
-            cd ./results/${result_dir}
-            # echo ${PWD}
-            cat spikeraster_*.dat | sort > spikeraster.dat
-            rm spikeraster_*.dat subconns_*.dat trace_*.dat
-            cd ../..
+                    RANDOM=$(date +%s)
+                  	if [[ "$StimType" == *"$SUB"* ]]
+                    then
+              	       DegreeStim=${j}.${i}
+              	       cmd_str="-c DegreeStim=${DegreeStim} -c TemporalResolution=0.1 "
+                    else
+              	       PercentArtCells=${j}.${i}
+              	       cmd_str="-c PercentArtActive=${PercentArtCells} "
+                    fi
+                    # mpiexec --use-hwthread-cpus --map-by ppr:32:node:pe=1 ./x86_64/special ......
+                    mpiexec  -n 8 ./x86_64/special -nobanner -nogui -mpi -c "strdef RunName" -c RunName="\"${result_dir}\"" \
+            								-c "strdef Stimulation" -c Stimulation="\"${Stimulation}\"" \
+            								-c "Scale=${Scale}" -c "SimDuration=${Duration}" -c "ComputeNpoleLFP=0" \
+            								${cmd_str} -c "RandomSeedsCell=${RANDOM}" \
+                            -c "StdevSyn=${StdevSyn}" -c "FractionGABAa=${FractionGABAa}" \
+                            -c "JobHours=25" main.hoc
 
-            mv ./results/${result_dir} ${StdevSyn_dir}
-          done
+                    # Concatenate all spikeraster data
+                    cd ./results/${result_dir}
+                    # echo ${PWD}
+                    cat spikeraster_*.dat | sort > spikeraster.dat
+                    rm spikeraster_*.dat subconns_*.dat trace_*.dat
+                    cd ../..
+
+                    mv ./results/${result_dir} ${StdevSyn_dir}
+                done
+            done
+        done
       done
   done
