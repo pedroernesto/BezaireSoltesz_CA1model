@@ -344,8 +344,14 @@ func connectCells () {local r, syn, distance, counter, precellType, postcellType
 							if (thiswgt<0.0) {thiswgt=0.0}
 
 							nc_append(conns2make.x[r], postgid, precellType, randSynNumber, thiswgt + (conns2make.x[r]+1)*1000, conDelay)
+
+
 						} else {
 							nc_append(conns2make.x[r], postgid, precellType, randSynNumber, synWeight + (conns2make.x[r]+1)*1000, conDelay)
+
+							/*if (precellType==3 && postcellType==6) {
+							//	print "Option 2: ", cellType[precellType].cellType_string, cellType[postcellType].cellType_string, synWeight + (conns2make.x[r]+1)*1000
+							}*/
 						}
 
 					}

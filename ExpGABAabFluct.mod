@@ -102,15 +102,13 @@ PROCEDURE seed(a) {
 	set_seed(a)
 }
 
-FUNCTION set_std(std (uS)) {
-	std_Ba = std
+PROCEDURE set_std(std (uS)) {
+  std_Ba = std
   std_Bb = std
 }
 
-FUNCTION set_GABAa(frac) {
-  VERBATIM
-  FrGABAa = (float)_lfrac;
-  ENDVERBATIM
+PROCEDURE set_GABAa(frac (1)) {
+  FrGABAa = frac
 }
 
 BREAKPOINT {
