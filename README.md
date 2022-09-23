@@ -8,7 +8,7 @@ Dr. Ivan Raikov provided useful comments on the Bezaire et al. (2016) model duri
 This work has been supported in part or in whole in the Human Brain Project, funded from European Union Horizon 2020 Framework Programme for Research and Innovation, Grant Agreements No. 785907 and No. 945539 (Human Brain Project SGA2 and SGA3)
 
 # Description
-This repository contains slicing functionalities and (qualitative) validation tests for a detailed NEURON simulator-based microcircuit model for the rat Hippocampus CA1 region [1]. The model is based on reported experimental data [2]. Currently, this repository contains qualitative tests of Bezaire et al. (2016) model against Sasaki et al. (2006) experimental data [3]. Preliminary results have been presented at Bernstein Conference for Computationl Neuroscience (2022) [4].
+This repository contains slicing functionalities and (qualitative) validation tests for a detailed NEURON simulator-based microcircuit model for the rat Hippocampus CA1 region [1]. The model is based on reported experimental data [2]. Currently, this repository contains qualitative tests of Bezaire et al. (2016) model against Sasaki et al. (2006) experimental data [3]. Preliminary results have been presented at Bernstein Conference for Computational Neuroscience (2022) [4].
 
 [1] Bezaire MJ, Raikov I, Burk K, Vyas D and Soltesz I (2016). Interneuronal mechanisms of hippocampal theta oscillations in a full-scale model of the rodent CA1 circuit, eLife 5: e18566, 10.7554/eLife.18566. Source code available at ModelDB: http://modeldb.science/showmodel?model=187604
 
