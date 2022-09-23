@@ -22,11 +22,12 @@
 # killall -TERM mpiexec
 
 Duration=20  # Biological time to be simulated, in ms
-Scale=110
+Scale=300
 # StimType="IClampPosition"
-StimType="SpikesTrainSingleSpike"
+# StimType="SpikesTrainSingleSpike"
 # StimType="SpikesTrainSingleSpikePosition"
-# StimType="SpikesTrainVaryingFreq"
+
+StimType="SpikesTrainVaryingFreq"
 # StimType="SpikesTrainVaryingFreqPosition"
 # StimType="Spikes4TrainVaryingFreqPosition"
 
@@ -40,19 +41,22 @@ else
     cat datasets/cellnumbers_115.dat
 fi
 
-for FrGABAa in $(seq 9 -1 9)
+for FrGABAa in $(seq 0 1 9)
   do
-    for k in $(seq 5 -5 5)
+    for k in $(seq 0 5 0)
       do
         FractionGABAa=0.${FrGABAa}${k}
-        for Stdev in $(seq 5 1 5)
+        for Stdev in $(seq 2 1 2)
           do
-            StdevSyn_dir="./results/NoiseSynapses_${Stdev}_GABAa_${FrGABAa}${k}/${StimType}"
+            StdevSyn_dir="./results/NoiseSynapsesFreq_${Stdev}_GABAa_${FrGABAa}${k}_Scale_${Scale}/${StimType}"
             mkdir -p ${StdevSyn_dir}
-            StdevSyn=`echo 0.0001*${Stdev} | bc`
+            StdevSyn=`echo 0.00001*${Stdev} | bc`
 
             Stimulation="CurrentShot_ca3cells_${StimType}"
-            for j in $(seq 15 -1 15)
+            for j in $(seq 400 -1 100)  # Scale=300, StimType="SpikesTrainVaryingFreq"
+            # for j in $(seq 230 -1 10) # Scale=110, StimType="SpikesTrainVaryingFreq"
+            # for j in $(seq 25 -1 10)  # Scale=110, StimType="SpikesTrainSingleSpike"
+            # for j in $(seq 55 -1 30)  # Scale=300, StimType="SpikesTrainSingleSpike"
               do
                 for i in $(seq 0 -2 0)
                   do
