@@ -16,7 +16,7 @@ This repository contains slicing functionalities and (qualitative) validation te
 
 [3] Sasaki T, Kimura R, Tsukamoto M, Matsuki N and Ikegaya Y (2006). Integrative spike dynamics of rat CA1 neurons: a multineuronal imaging study. The Journal of Physiology 574 (1): 195-208, 10.1113/jphysiol.2006.108480
 
-[4] García-Rodríguez P., Pananceau M., Davison A. P. (2022) Quasi-linear I-O activation transfer of CA3-CA1 projections, in a detailed biophysical model for Hippocampus CA1. Bernstein Conference 2022. https://abstracts.g-node.org/conference/BC22/abstracts#/uuid/d5f01881-d692-4a9c-8ebc-6001434c6860
+[4] García-Rodríguez P., Pananceau M., Davison A. P. (2022) Quasi-linear I-O activation transfer of CA3-CA1 projections, in a detailed biophysical model for Hippocampus CA1. Bernstein Conference 2022, 10.12751/nncn.bc2022.148
 
 # Dependencies
 - NEURON simulator
